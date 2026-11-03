@@ -929,6 +929,120 @@ kbd{font-family:var(--font);font-size:12px;font-weight:650;padding:1px 6px;borde
 .goalsel{flex-wrap:wrap;max-width:100%}.goalsel select{max-width:100%;min-width:0}
 .goalsel span{white-space:nowrap}
 
+/* ---------- Simulationen 11–15 ---------- */
+.ekgchips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.echip{min-width:58px;min-height:40px;padding:6px 12px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;color:var(--fg);text-transform:capitalize}
+.echip.on{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.echip.used{opacity:.45}
+.echip.e-rot{border-left:10px solid #e11d48}.echip.e-gelb{border-left:10px solid #eab308}.echip.e-grün{border-left:10px solid #16a34a}.echip.e-schwarz{border-left:10px solid #111827}
+.torso{display:block;width:100%;max-width:330px;margin:4px auto 10px;touch-action:manipulation}
+
+.tline{fill:none;stroke:var(--fig-line);stroke-width:1.6}.tline.faint{stroke-dasharray:3 4;opacity:.8}
+.tlab{font-size:12px;fill:var(--muted);font-weight:600}
+.espot{cursor:pointer}
+.espot circle{fill:var(--surface);stroke:var(--accent);stroke-width:2;stroke-dasharray:4 3;transition:all .2s}
+.espot:hover circle,.espot:focus circle{fill:var(--accent-soft)}
+.espot:focus{outline:none}
+.espot.set circle{stroke-dasharray:none;fill:var(--accent);}
+.espot circle.e-rot{fill:#e11d48}.espot circle.e-gelb{fill:#eab308}.espot circle.e-grün{fill:#16a34a}.espot circle.e-schwarz{fill:#111827}
+.espot.ok circle{stroke:var(--ok);stroke-width:4}.espot.bad circle{stroke:var(--bad);stroke-width:4}.espot.miss circle{stroke:var(--warn);stroke-width:3;stroke-dasharray:none}
+.elab{font-size:11px;fill:var(--muted);font-weight:600;pointer-events:none}
+.vlab{font-size:9.5px;fill:var(--on-accent);font-weight:800;pointer-events:none}
+.espot:not(.set) .vlab{fill:var(--fg)}
+.bags{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,210px),1fr));gap:10px;margin:10px 0 14px}
+.bag{width:100%;display:flex;flex-direction:column;gap:3px;text-align:left;padding:12px 14px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--fg);font-size:13.5px;line-height:1.35;position:relative}
+.bag::before{content:"";position:absolute;right:12px;top:12px;width:18px;height:24px;border-radius:5px 5px 8px 8px;background:#b91c1c;opacity:.85}
+.bag b{font-size:15px}.bag .bgr{font-weight:700;color:var(--bad-ink)}
+.bag.on{border-color:var(--accent);background:var(--accent-soft)}
+.bag.ok{border-color:var(--ok);background:var(--ok-soft)}.bag.bad{border-color:var(--bad);background:var(--bad-soft)}
+.bscard{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:360px;padding:14px;border-radius:18px;background:var(--surface2);border:1px solid var(--line)}
+.bscard>div{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}
+.bscard small{color:var(--muted);font-size:12px}
+.agg{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle,#dc2626 0 55%,#f87171 56% 100%);border:3px solid #fff;box-shadow:inset 0 0 0 2px rgba(0,0,0,.08)}
+.agg.on{background:radial-gradient(circle at 30% 35%,#7f1d1d 0 9%,transparent 10%),radial-gradient(circle at 62% 30%,#7f1d1d 0 11%,transparent 12%),radial-gradient(circle at 45% 65%,#7f1d1d 0 13%,transparent 14%),radial-gradient(circle at 72% 66%,#7f1d1d 0 8%,transparent 9%),#fecaca}
+.breath{display:grid;gap:12px;justify-items:center;margin:8px 0}
+.baby{width:100%;max-width:280px}
+.baby svg{width:100%;display:block}
+.bbed{fill:var(--surface2)}.bhead{fill:#f6d2b3;stroke:var(--fig-line);stroke-width:1.5}.bbody{fill:#bfdbfe;stroke:var(--fig-line);stroke-width:1.5}.bribs{fill:none;stroke:#64748b;stroke-width:1.6;opacity:0}
+.bchest{transform-origin:92px 80px;transform-box:view-box}
+.baby.go .bchest{animation:bbreath var(--bp,1s) ease-in-out infinite}
+.baby.go .bribs{animation:bribs var(--bp,1s) ease-in-out infinite}
+@keyframes bbreath{0%,100%{transform:scale(1,1)}50%{transform:scale(1.04,1.12)}}
+@keyframes bribs{0%,40%,100%{opacity:0}50%,60%{opacity:.9}}
+.btn.big{min-height:64px;min-width:200px;font-size:18px;border-radius:20px}
+.findings{display:grid;gap:6px;padding:12px 14px;border-radius:14px;background:var(--tint);border:1px solid var(--line);font-size:14.5px;margin:10px 0}
+@media (prefers-reduced-motion:reduce){.baby.go .bchest,.baby.go .bribs{animation-duration:calc(var(--bp,1s) * 1)}}
+
+/* ---------- Praxisauftrag ---------- */
+.pchecks{display:grid;gap:8px;margin-top:12px}
+.pcheck{display:flex;gap:12px;align-items:flex-start;padding:11px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:15px;line-height:1.45}
+.pcheck input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--accent)}
+.pcheck.on{background:var(--ok-soft);border-color:transparent}
+.pcheck.on span{color:var(--muted)}
+
+/* ---------- Praxis-Seite ---------- */
+.fgrid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:4px 14px;margin-top:10px}
+.fgrid2 .input{max-width:none;width:100%}
+.einfo{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:var(--accent-soft);font-size:14.5px}
+.minichips{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:10px}
+.mchip{display:flex;flex-direction:column;gap:4px;text-align:left;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--fg);box-shadow:var(--shadow);transition:transform .2s var(--ease),border-color .2s}
+.mchip:hover{border-color:var(--accent);transform:translateY(-1px)}
+.mchip b{font-size:15px;line-height:1.3}
+.ptlist{display:grid;gap:8px}
+.ptitem{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.ptitem:not(.static):hover{border-color:var(--accent)}
+.ptitem b{display:block;font-size:15px;line-height:1.3}.ptitem small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+.ptitem>svg{width:18px;height:18px;margin-left:auto;flex:none;color:var(--muted)}
+.ptitem.static{flex-wrap:wrap}
+.ptck{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-size:12px;font-weight:700;color:var(--muted)}
+.ptck svg{width:16px;height:16px}
+.ptitem.done .ptck,.ptitem.static .ptck:has(svg){background:var(--ok);color:#fff}
+.skbar{display:flex;height:12px;border-radius:99px;overflow:hidden;background:var(--surface2);margin:4px 0 10px}
+.skbar i{display:block;height:100%;transition:width .4s var(--ease)}
+.l3{--c:var(--ok)}.l2{--c:var(--accent)}.l1{--c:var(--warn)}.l0{--c:var(--fig-line)}
+.skbar i,.sklegend i{background:var(--c)}
+.sklegend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);margin-bottom:8px}
+.sklegend span{display:inline-flex;align-items:center;gap:6px}.sklegend i{width:10px;height:10px;border-radius:3px}
+.sklist{display:grid;gap:0;margin-top:12px}
+.skrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.skrow b{display:block;font-size:14.5px;font-weight:600;line-height:1.3}.skrow small{color:var(--muted);font-size:12.5px}
+.seg4{display:flex;flex:none;background:var(--surface2);border-radius:12px;padding:3px;gap:2px}
+.seg4 button{hyphens:manual;-webkit-hyphens:manual;border:0;background:none;border-radius:9px;padding:7px 9px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.seg4 button[aria-checked="true"]{background:var(--c);color:#fff}
+.seg4 button.l0[aria-checked="true"]{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+@media (max-width:640px){.skrow{flex-direction:column;align-items:stretch;gap:8px}.seg4 button{flex:1;padding:8px 2px;font-size:11.5px;white-space:normal;line-height:1.15}}
+.gsteps{list-style:none;display:flex;gap:6px;padding:0;margin:14px 0;overflow-x:auto}
+.gsteps button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:5px 12px 5px 5px;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap}
+.gsteps i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);font-size:12px}
+.gsteps .done i{background:var(--ok);color:#fff}
+.gsteps .cur{border-color:var(--accent);color:var(--fg)}.gsteps .cur i{background:var(--accent);color:#fff}
+.diaryed textarea{max-width:none;width:100%;margin-top:8px;resize:vertical}
+.skip.back{display:inline-flex;align-items:center;gap:4px;margin-bottom:8px}.skip.back svg{width:16px;height:16px}
+.btn.danger{color:var(--bad-ink)}
+.diaryprint{display:none}
+@media print{body.print-diary #root{display:none!important}body.print-diary .diaryprint{display:block!important}body.print-diary .diaryprint section{display:none}body.print-diary .diaryprint section.pr{display:block;font:12pt/1.5 Georgia,serif;color:#000}
+  body.print-diary .diaryprint h1{font-size:18pt;margin:0 0 4pt}body.print-diary .diaryprint h2{font-size:12pt;margin:14pt 0 2pt}}
+.pocket{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px;margin-top:12px}
+.pcard{margin:0}
+.star{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:var(--surface2);color:var(--muted);display:grid;place-items:center}
+.star svg{width:20px;height:20px}.star.on{color:#eab308;background:var(--warn-soft)}.star.on svg{fill:currentColor}
+.pdl{margin:10px 0 0;display:grid;gap:0}
+.pdl>div{display:grid;grid-template-columns:minmax(0,40%) minmax(0,1fr);gap:10px;padding:8px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.4}
+.pdl dt{font-weight:600}.pdl dd{margin:0;color:var(--fg)}
+.pnote{font-size:12.5px;margin:8px 0 0}
+/* ---------- Blitzrunde ---------- */
+.bhead2{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.btimer{flex:1;height:10px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.btimer i{display:block;height:100%;background:var(--accent);transition:width .25s linear}.btimer i.low{background:var(--bad)}
+.bsec{font-variant-numeric:tabular-nums;font-size:20px;min-width:30px;text-align:right}
+.blitz .opts{margin-top:12px}
+.bwrong{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:8px}
+.bwrong li{display:grid;gap:3px;padding:10px 14px;border-radius:14px;background:var(--surface2);font-size:14.5px}
+.bwrong span{color:var(--ok-ink);font-weight:600}.bwrong small{color:var(--muted);font-size:13px}
+@media (max-width:420px){.tabbar{width:calc(100vw - 24px)}.tabbar .tab{min-width:0;flex:1 1 0;padding:8px 2px 6px;font-size:10px}}
+.tbody path,.tbody circle{fill:var(--surface2);stroke:var(--fig-line);stroke-width:2}
+.bface{fill:#334155}.bmouth,.barm{fill:none;stroke:#94a3b8;stroke-width:2;stroke-linecap:round}
+
 /* Ergänzungen für das Lehrer-Portal. Grundlage ist das Design-System der Schüler-App (style.css). */
 .wrap.wide{max-width:1180px}
 .lwrap{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
@@ -3163,7 +3277,7 @@ input.num{max-width:180px}
   var import_react2 = __toESM(require_shim_react());
 
   // lehrer_src/catalog.js
-  var SIMS = [["med6r", "Medikamente sicher geben: der 6-R-Check"], ["sbar", "SBAR-Arztruf im Notfall"], ["triage", "Priorisieren im Fr\xFChdienst"], ["asepsis", "Aseptischer Verbandwechsel"], ["insulin", "Subkutane Injektion und Insulin"], ["btm", "Schmerzassessment und BTM-Dokumentation"], ["wunde", "Wund-Assessment und Wundauflage"], ["infusion", "Infusionsmanagement"], ["cam", "Delir erkennen mit der CAM"], ["news2", "Fr\xFChwarnscore NEWS2"]];
+  var SIMS = [["med6r", "Medikamente sicher geben: der 6-R-Check"], ["sbar", "SBAR-Arztruf im Notfall"], ["triage", "Priorisieren im Fr\xFChdienst"], ["asepsis", "Aseptischer Verbandwechsel"], ["insulin", "Subkutane Injektion und Insulin"], ["btm", "Schmerzassessment und BTM-Dokumentation"], ["wunde", "Wund-Assessment und Wundauflage"], ["infusion", "Infusionsmanagement"], ["cam", "Delir erkennen mit der CAM"], ["news2", "Fr\xFChwarnscore NEWS2"], ["ekg", "12-Kanal-EKG anlegen"], ["bedside", "Bluttransfusion und Bedside-Test"], ["sturz", "Sturz und Aufstehen nach einem Sturz"], ["saeugling", "S\xE4ugling mit Atemnot"], ["anaphylaxie", "Anaphylaxie erkennen und handeln"]];
   var HOTS = [["wunde", "Wundbefund nach Knie-TEP"], ["haut", "Hautbefund Sakralregion"], ["deku", "Dekubitus-Pr\xE4dilektionsstellen"], ["sturz", "Suchbild Sturzgefahren"], ["infusion", "Aufbau eines Infusionssystems"], ["ekg", "Das EKG lesen"], ["haende", "Benetzungsl\xFCcken bei der H\xE4ndedesinfektion"], ["sc", "Zonen f\xFCr die subkutane Injektion"], ["pvk", "Peripherven\xF6ser Zugang"]];
   var AREAS = ["Grundlagen und Berufsrolle", "Kommunikation und Beratung", "Akutpflege", "Chronische Erkrankungen", "P\xE4diatrie", "Geriatrie", "Psychiatrie", "Ambulante Pflege", "Palliative Care", "Notfall und Intensiv", "Hygiene", "Arzneimittel", "Recht und Ethik"];
   var LEVELS = ["Einsteiger", "Fortgeschritten", "Pr\xFCfungsniveau"];
@@ -3344,7 +3458,7 @@ input.num{max-width:180px}
       fields: [{ k: "q", l: "Aufgabe", t: "area" }, { k: "cats", l: "Gruppen", t: "list" }, { k: "items", l: "Begriffe", t: "objs", add: () => ({ t: "", c: 0 }), title: "t", f: [{ k: "t", l: "Begriff", t: "text" }, { k: "c", l: "Gruppe", t: "rootidx", of: "cats" }] }, { k: "fb", l: "R\xFCckmeldung", t: "area" }, { k: "points", l: "Punkte", t: "num" }]
     },
     // ---------- Simulation und Bild ----------
-    { key: "sim2", group: "Simulation und Bild", label: "Prozess-Simulation", desc: "Eine der zehn interaktiven Simulationen der App.", tpl: () => ({ type: "sim2", sim: "med6r", points: 10 }), fields: [{ k: "sim", l: "Simulation", t: "select", opts: SIMS }, { k: "points", l: "Punkte", t: "num" }] },
+    { key: "sim2", group: "Simulation und Bild", label: "Prozess-Simulation", desc: "Eine der f\xFCnfzehn interaktiven Simulationen der App.", tpl: () => ({ type: "sim2", sim: "med6r", points: 10 }), fields: [{ k: "sim", l: "Simulation", t: "select", opts: SIMS }, { k: "points", l: "Punkte", t: "num" }] },
     { key: "hotspot", group: "Simulation und Bild", label: "Bildbefund", desc: "Klickbares Bild mit Fundstellen.", tpl: () => ({ type: "hotspot", hot: "wunde", points: 5 }), fields: [{ k: "hot", l: "Bildmodell", t: "select", opts: HOTS }, { k: "points", l: "Punkte", t: "num" }] },
     {
       key: "labsim",
@@ -3371,6 +3485,14 @@ input.num{max-width:180px}
     },
     // ---------- Dokumentation ----------
     {
+      key: "praxis",
+      group: "Dokumentation",
+      label: "Praxisauftrag",
+      desc: "Ein Auftrag f\xFCr den Praxiseinsatz mit abhakbaren Schritten und einer Reflexionsfrage. Ohne Punkte, die Notizen erscheinen im Dashboard.",
+      tpl: () => ({ type: "praxis", title: "", auftrag: "", steps: ["", ""], q: "" }),
+      fields: [{ k: "title", l: "Titel", t: "text" }, { k: "auftrag", l: "Auftrag", t: "area" }, { k: "steps", l: "Schritte", t: "list" }, { k: "q", l: "Reflexionsfrage", t: "text" }]
+    },
+    {
       key: "doku",
       group: "Dokumentation",
       label: "Pflegebericht",
@@ -3385,7 +3507,7 @@ input.num{max-width:180px}
   var INTERACTIVE = /* @__PURE__ */ new Set(["task", "quiz", "cards", "reflect", "simulation", "labsim", "sim2", "hotspot", "fehler", "verlauf", "schaetz", "mythos", "bucket", "doku"]);
   var blockMax = (b) => b.type === "quiz" ? (b.questions || []).length : ["cards", "reflect", "simulation", "doku"].includes(b.type) ? 0 : INTERACTIVE.has(b.type) ? Number(b.points) || 0 : 0;
   var plain = (h) => String(h || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-  var blockTitle = (b) => plain(b.question || b.q || b.title || b.who && b.type === "fehler" && b.who || b.sit || b.prompt || b.html || b.sim && (SIMS.find((s) => s[0] === b.sim) || [])[1] || b.hot && (HOTS.find((s) => s[0] === b.hot) || [])[1] || "");
+  var blockTitle = (b) => plain(b.type === "praxis" && b.title || b.question || b.q || b.title || b.who && b.type === "fehler" && b.who || b.sit || b.prompt || b.html || b.sim && (SIMS.find((s) => s[0] === b.sim) || [])[1] || b.hot && (HOTS.find((s) => s[0] === b.hot) || [])[1] || "");
   var toHtml = (s) => /<\w+[^>]*>/.test(s) ? s : String(s || "").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean).map((p) => "<p>" + p.replace(/\n/g, "<br>") + "</p>").join("");
 
   // lehrer_src/editor.jsx
@@ -3729,8 +3851,16 @@ input.num{max-width:180px}
       return { idx, per };
     }, [mods]);
   }
+  var cleanRes = (d) => {
+    const out = {}, raw = d && typeof d.res === "object" && d.res ? d.res : {};
+    Object.keys(raw).forEach((k) => {
+      const r = raw[k];
+      if (r && typeof r === "object" && !Array.isArray(r)) out[k] = r;
+    });
+    return out;
+  };
   function statsOf(p, mods, I) {
-    const d = p && p.data || {}, res = d.res || {}, done = d.done || {};
+    const d = p && p.data && typeof p.data === "object" ? p.data : {}, res = cleanRes(d), done = d.done && typeof d.done === "object" ? d.done : {};
     const by = {};
     Object.entries(res).forEach(([uid, r]) => {
       const x = I.idx[uid];
@@ -3744,8 +3874,16 @@ input.num{max-width:180px}
     const e = Object.values(by).reduce((a, o) => a + o.e, 0), mx = Object.values(by).reduce((a, o) => a + o.m, 0);
     return { by, fin, started, e, mx, answers: Object.keys(res).length, texts: Object.entries(res).filter(([, r]) => typeof r.s === "string" && r.s.length > 20).length };
   }
-  function Answer({ b, r }) {
-    const s = r.s;
+  function Answer(props) {
+    try {
+      return AnswerInner(props);
+    } catch (e) {
+      return null;
+    }
+  }
+  function AnswerInner({ b, r }) {
+    const s = r && r.s;
+    if (!b) return null;
     if (typeof s === "string") return /* @__PURE__ */ import_react3.default.createElement("blockquote", { className: "atext" }, s);
     if (b.type === "task" && b.kind === "choice" && typeof s === "number" && b.options[s]) return /* @__PURE__ */ import_react3.default.createElement("p", { className: "aline" }, "Gew\xE4hlt: ", /* @__PURE__ */ import_react3.default.createElement("b", null, b.options[s].text), " ", b.options[s].correct ? "\u2713" : "\u2717");
     if (b.type === "task" && b.kind === "multi" && Array.isArray(s)) return /* @__PURE__ */ import_react3.default.createElement("ul", { className: "alist" }, s.map((i) => b.options[i] && /* @__PURE__ */ import_react3.default.createElement("li", { key: i }, b.options[i].text, " ", b.options[i].correct ? "\u2713" : "\u2717")));
@@ -3756,11 +3894,12 @@ input.num{max-width:180px}
       return o && /* @__PURE__ */ import_react3.default.createElement("li", { key: k }, o.t, " ", o.ok >= 1 ? "\u2713" : o.ok > 0 ? "\xBD" : "\u2717");
     }));
     if (b.type === "fehler" && Array.isArray(s)) return /* @__PURE__ */ import_react3.default.createElement("ul", { className: "alist" }, s.map((i) => b.lines[i] && /* @__PURE__ */ import_react3.default.createElement("li", { key: i }, "Markiert: \u201E", b.lines[i].t, "\u201C ", b.lines[i].e ? "\u2713" : "\u2717")));
+    if (b.type === "praxis" && s && typeof s === "object") return /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("p", { className: "aline" }, (s.c || []).filter(Boolean).length, " von ", (b.steps || []).length, " Schritten abgehakt", s.done ? " \xB7 erledigt" : ""), s.n ? /* @__PURE__ */ import_react3.default.createElement("blockquote", { className: "atext" }, s.n) : null);
     if (b.type === "schaetz" && typeof s === "number") return /* @__PURE__ */ import_react3.default.createElement("p", { className: "aline" }, "Gesch\xE4tzt: ", /* @__PURE__ */ import_react3.default.createElement("b", null, s, " ", b.unit), " (richtig: ", b.ans, " ", b.unit, ")");
     return null;
   }
   function StudentDetail({ st, p, mods, I, courses, close, onCourse }) {
-    const S = statsOf(p, mods, I), [open, setOpen] = (0, import_react3.useState)(null), res = p && p.data && p.data.res || {};
+    const S = statsOf(p, mods, I), [open, setOpen] = (0, import_react3.useState)(null), res = cleanRes(p && p.data);
     const list = mods.filter((m) => S.by[m.id]);
     return /* @__PURE__ */ import_react3.default.createElement(import_react3.default.Fragment, null, /* @__PURE__ */ import_react3.default.createElement("div", { className: "scrim", onClick: close }), /* @__PURE__ */ import_react3.default.createElement("aside", { className: "drawer wide", "aria-label": "Lernstand" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "dh" }, /* @__PURE__ */ import_react3.default.createElement("div", { style: { flex: 1, minWidth: 0 } }, /* @__PURE__ */ import_react3.default.createElement("h2", null, st.display_name || st.email), /* @__PURE__ */ import_react3.default.createElement("p", null, st.email)), /* @__PURE__ */ import_react3.default.createElement("button", { type: "button", className: "iconbtn", "aria-label": "Schlie\xDFen", onClick: stop(close) }, /* @__PURE__ */ import_react3.default.createElement(Icon, { n: "x" }))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "dcard" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "kpis small" }, /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("b", null, S.fin), /* @__PURE__ */ import_react3.default.createElement("span", null, "Module abgeschlossen")), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("b", null, S.started), /* @__PURE__ */ import_react3.default.createElement("span", null, "Module begonnen")), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("b", null, pct(S.e, S.mx), " %"), /* @__PURE__ */ import_react3.default.createElement("span", null, "Punktequote")), /* @__PURE__ */ import_react3.default.createElement("div", null, /* @__PURE__ */ import_react3.default.createElement("b", null, S.answers), /* @__PURE__ */ import_react3.default.createElement("span", null, "Antworten"))), /* @__PURE__ */ import_react3.default.createElement("div", { className: "field", style: { marginTop: 12 } }, /* @__PURE__ */ import_react3.default.createElement("label", { htmlFor: "sc" }, "Kurs"), /* @__PURE__ */ import_react3.default.createElement("select", { id: "sc", className: "input", value: st.course_id || "", onChange: (e) => onCourse(st.id, e.target.value || null) }, /* @__PURE__ */ import_react3.default.createElement("option", { value: "" }, "Kein Kurs"), courses.map((c) => /* @__PURE__ */ import_react3.default.createElement("option", { key: c.id, value: c.id }, c.name)))), /* @__PURE__ */ import_react3.default.createElement("p", { className: "muted", style: { fontSize: 13.5, marginTop: 8 } }, st.year ? st.year + ". Ausbildungsjahr \xB7 " : "", "zuletzt aktiv ", fmtDate(p && p.updated_at))), list.length === 0 && /* @__PURE__ */ import_react3.default.createElement("p", { className: "muted", style: { padding: "0 4px" } }, "Noch keine Antworten gespeichert."), list.map((m) => {
       const o = S.by[m.id], tot = I.per[m.id] || { n: 0 }, isO = open === m.id;
@@ -3932,7 +4071,7 @@ input.num{max-width:180px}
     const base = content ? content.mods : [];
     const eff = (0, import_react3.useMemo)(() => {
       const R = Object.fromEntries(rows.filter((r) => r.status === "published").map((r) => [r.id, r.data]));
-      return [...base.map((m) => R[m.id] || m), ...rows.filter((r) => r.status === "published" && !base.some((m) => m.id === r.id)).map((r) => r.data)];
+      return [...base.map((m) => R[m.id] || m), ...rows.filter((r) => r.status === "published" && !base.some((m) => m.id === r.id)).map((r) => r.data)].filter((m) => m && Array.isArray(m.chapters) && m.chapters.every((c) => c && Array.isArray(c.blocks)));
     }, [base, rows]);
     const I = useIndex(eff);
     const signOut = async () => {
@@ -3982,7 +4121,23 @@ input.num{max-width:180px}
       }
     ) : tab === "module" ? /* @__PURE__ */ import_react3.default.createElement(Modules, { base, rows, chars: content.chars, open: openMod, create }) : tab === "lernende" ? /* @__PURE__ */ import_react3.default.createElement(Students, { data, mods: eff, I, reload }) : tab === "kurse" ? /* @__PURE__ */ import_react3.default.createElement(Courses, { data, reload }) : tab === "einstellungen" ? /* @__PURE__ */ import_react3.default.createElement(Settings, { me, user, theme, setTheme, signOut }) : /* @__PURE__ */ import_react3.default.createElement(Home, { me, data, mods: eff, I, rows, go, create: () => create() })), !edit && /* @__PURE__ */ import_react3.default.createElement("nav", { className: "tabbar", "aria-label": "Hauptnavigation" }, nav));
   }
-  (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ import_react3.default.createElement(App, null));
+  var Guard = class extends import_react3.default.Component {
+    constructor(p) {
+      super(p);
+      this.state = { err: null };
+    }
+    static getDerivedStateFromError(err) {
+      return { err };
+    }
+    render() {
+      if (!this.state.err) return this.props.children;
+      return /* @__PURE__ */ import_react3.default.createElement("div", { className: "lwrap" }, /* @__PURE__ */ import_react3.default.createElement("div", { className: "card lcard" }, /* @__PURE__ */ import_react3.default.createElement("h2", null, "Da ist etwas schiefgelaufen"), /* @__PURE__ */ import_react3.default.createElement("p", { className: "muted" }, "Das Portal konnte diese Ansicht nicht anzeigen. Lade die Seite neu. Wenn der Fehler bleibt, schicke diese Meldung an die Person, die das Portal betreut:"), /* @__PURE__ */ import_react3.default.createElement("pre", { className: "jsonview" }, String(this.state.err && (this.state.err.stack || this.state.err.message) || this.state.err).slice(0, 600)), /* @__PURE__ */ import_react3.default.createElement("div", { className: "row" }, /* @__PURE__ */ import_react3.default.createElement("button", { type: "button", className: "btn", onClick: () => location.reload() }, "Neu laden"), /* @__PURE__ */ import_react3.default.createElement("button", { type: "button", className: "btn ghost", onClick: () => {
+        this.setState({ err: null });
+        location.hash = "start";
+      } }, "Zur \xDCbersicht"))));
+    }
+  };
+  (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ import_react3.default.createElement(Guard, null, /* @__PURE__ */ import_react3.default.createElement(App, null)));
 })();
 </script>
 </body>
