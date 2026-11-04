@@ -173,6 +173,86 @@ window.FP_EXTRA_CASES = [
     if (document.body) addBadge(); else document.addEventListener("DOMContentLoaded", addBadge);
   }
 })();
+
+/* Fallpfad Farbprofile: 5 eigenständige Profile, jeweils hell und dunkel. Schrift bleibt immer gleich.
+   Auswahl im Profilmenü. Wird früh im <head> geladen, damit beim Start keine falschen Farben aufblitzen. */
+(function () {
+  var KEY = "fp-palette";
+  /* hue: Drehung des blauen Logos in den Farbton des Profils */
+  var T = [
+    { id: "blau", dot: "#0062FF", n: "Blau", hue: 0,
+      L: { bg: "#f7f9fc", surface: "#ffffff", surface2: "#f0f4fa", fg: "#0f172a", muted: "#5b6b82", line: "rgba(190,204,228,.65)", accent: "#0062FF", soft: "#edf3ff", btn: "#0062FF", on: "#ffffff", side: "#ffffff" },
+      D: { bg: "#070d1a", surface: "#0d1628", surface2: "#152139", fg: "#eef3fb", muted: "#94a6c4", line: "rgba(60,82,122,.6)", accent: "#4d8dff", soft: "#10203f", btn: "#0062FF", on: "#ffffff", side: "#0a1222" } },
+    { id: "gruen", dot: "#2f8f5b", n: "Grün", hue: -72, pal: ["#1f7a4d", "#0f766e", "#4d7c0f", "#047857"], palD: ["#4ccf8d", "#2dd4bf", "#a3d955", "#34d399"],
+      L: { bg: "#edf3ee", surface: "#fbfdfb", surface2: "#e0eae2", fg: "#10241a", muted: "#536e61", line: "rgba(110,150,125,.32)", accent: "#1f7a4d", soft: "#d9ede1", btn: "#1f7a4d", on: "#ffffff", side: "#e3ece5" },
+      D: { bg: "#08140f", surface: "#0f2119", surface2: "#173024", fg: "#e6f2ea", muted: "#90b09f", line: "rgba(64,110,86,.5)", accent: "#5fd39a", soft: "#123323", btn: "#2f9e66", on: "#ffffff", side: "#0b1a13" },
+      nav: "tint" },
+    { id: "violett", dot: "#7148e0", n: "Violett", hue: 48, pal: ["#6d3fd6", "#9333ea", "#4f46e5", "#a21caf"], palD: ["#a78bfa", "#c084fc", "#818cf8", "#e879f9"],
+      L: { bg: "#f3f0fb", surface: "#fdfcff", surface2: "#e9e3f8", fg: "#1c1533", muted: "#675e88", line: "rgba(150,130,210,.32)", accent: "#6d3fd6", soft: "#ebe3fc", btn: "#6d3fd6", on: "#ffffff", side: "#fdfcff" },
+      D: { bg: "#100b20", surface: "#191330", surface2: "#241c43", fg: "#efeafd", muted: "#a59cc8", line: "rgba(100,84,160,.5)", accent: "#a78bfa", soft: "#2a1f52", btn: "#7c4ff0", on: "#ffffff", side: "#140e28" },
+      nav: "fill" },
+    { id: "sand", dot: "#d4874f", n: "Sand", hue: 165, pal: ["#c0541f", "#b45309", "#9a3412", "#a16207"], palD: ["#f0965f", "#f5b04a", "#f28b6b", "#e6c35c"],
+      L: { bg: "#f6efe5", surface: "#fffbf5", surface2: "#efe3d2", fg: "#2a1d12", muted: "#7a6552", line: "rgba(190,160,120,.4)", accent: "#c0541f", soft: "#f7e2d2", btn: "#c0541f", on: "#ffffff", side: "#f1e6d6" },
+      D: { bg: "#17100a", surface: "#22180f", surface2: "#302216", fg: "#f6eadb", muted: "#bba58b", line: "rgba(120,92,62,.5)", accent: "#ec925a", soft: "#3a2416", btn: "#d0682f", on: "#ffffff", side: "#1c140c" },
+      nav: "bar" },
+    { id: "graphit", dot: "#5a5a5e", n: "Graphit", hue: 0, gray: true, pal: ["#1d1d1f", "#48484a", "#636366", "#8e8e93"], palD: ["#f5f5f7", "#d1d1d6", "#aeaeb2", "#8e8e93"],
+      L: { bg: "#f2f2f4", surface: "#ffffff", surface2: "#e8e8ec", fg: "#1d1d1f", muted: "#6e6e73", line: "#dcdce0", accent: "#1d1d1f", soft: "#ececf0", btn: "#1d1d1f", on: "#ffffff", side: "#ffffff" },
+      D: { bg: "#000000", surface: "#111113", surface2: "#1c1c1f", fg: "#f5f5f7", muted: "#98989d", line: "#2c2c2e", accent: "#f5f5f7", soft: "#1f1f22", btn: "#f5f5f7", on: "#000000", side: "#0a0a0b" },
+      nav: "solid" }
+  ];
+  function vars(v, dark) {
+    var a = [
+      "--bg:" + v.bg, "--surface:" + v.surface, "--surface2:" + v.surface2, "--fg:" + v.fg, "--muted:" + v.muted, "--line:" + v.line,
+      "--accent:" + v.accent, "--accent-soft:" + v.soft, "--btn:" + v.btn, "--on-accent:" + v.on, "--fx-side:" + v.side,
+      "--tint:color-mix(in srgb," + v.accent + " " + (dark ? 9 : 5) + "%," + v.surface + ")",
+      "--glass:color-mix(in srgb," + v.bg + " 80%,transparent)", "--sage-soft:" + v.surface2,
+      "--fig-line:color-mix(in srgb," + v.muted + " 45%," + v.surface + ")"
+    ];
+    if (dark) a.push("color-scheme:dark");
+    return a.join(";");
+  }
+  function scope(sel, rules) { return rules.replace(/(^|\})\s*([^{}@]+)\{/g, function (m, close, sels) { return close + sels.split(",").map(function (s) { return sel + " " + s.trim(); }).join(",") + "{"; }); }
+  var css = "";
+  T.forEach(function (t) {
+    var sel = 'html:root[data-fp="' + t.id + '"]', D = sel + '[data-theme="dark"]', M = sel + ':not([data-theme="light"])';
+    if (t.id !== "blau") css += sel + "{" + vars(t.L, false) + "}";
+    else css += sel + "{--fx-side:#ffffff}";
+    css += "@media (prefers-color-scheme:dark){" + M + "{" + vars(t.D, true) + "}}" + D + "{" + vars(t.D, true) + "}";
+    var r = ".side{background:var(--fx-side)!important}" +
+      "main.main{background-image:radial-gradient(1100px 320px at 15% -90px,color-mix(in srgb,var(--accent) " + (t.gray ? 0 : 11) + "%,transparent),transparent 72%)!important}" +
+      ".topbar{background:var(--glass)!important}" + (t.id !== "blau" ? "main.main .hello .eyebrow,.eyebrow{color:var(--accent)!important}.fx-t .eyebrow{color:color-mix(in srgb,var(--c) 72%,var(--fg))!important}" : "");
+    if (t.hue) r += ".brand .logo,.fxl-bic{filter:hue-rotate(" + t.hue + "deg) saturate(.95)}";
+    if (t.gray) r += ".brand .logo,.fx-ic,.tab.fx-nav svg,.fx-t::after,.fx-n,.fxl-bic,.fxl-chips span{filter:grayscale(1)}";
+    css += scope(sel, r);
+    if (t.pal) {
+      var tiles = function (p) { var o = ""; p.forEach(function (c, i) { o += ".fx-t:nth-of-type(4n+" + (i + 1) + "),.fxl-card:nth-of-type(4n+" + (i + 1) + "){--c:" + c + "!important}"; }); return o; };
+      css += scope(sel, tiles(t.pal) + ".tab.fx-nav{--c:var(--accent)!important}");
+      css += scope(D, tiles(t.palD));
+      css += "@media (prefers-color-scheme:dark){" + scope(M, tiles(t.palD)) + "}";
+    }
+    /* Navigation: jedes Profil mit eigenem Stil für den aktiven Eintrag */
+    var on = ".side .tab.fx-nav[aria-current=page],.side .tab.fx-nav.on";
+    if (t.nav === "fill" || t.nav === "solid") css += scope(sel, on + "{background:var(--accent)!important;color:var(--on-accent)!important;box-shadow:0 6px 16px -10px var(--accent)!important}" + ".side .tab.fx-nav[aria-current=page] svg,.side .tab.fx-nav.on svg{color:var(--on-accent)!important;filter:none!important}.side .tab.fx-nav[aria-current=page]::before,.side .tab.fx-nav.on::before{display:none!important}");
+    if (t.nav === "tint") css += scope(sel, on + "{background:color-mix(in srgb,var(--accent) 16%,transparent)!important;color:var(--fg)!important;box-shadow:none!important}.side .tab.fx-nav[aria-current=page]::before,.side .tab.fx-nav.on::before{display:none!important}");
+    if (t.nav === "bar") css += scope(sel, on + "{background:transparent!important;box-shadow:none!important;color:var(--accent)!important;font-weight:700}.side .tab.fx-nav[aria-current=page]::before,.side .tab.fx-nav.on::before{left:-16px;width:5px;top:6px;bottom:6px;background:var(--accent)!important}");
+  });
+  function inject() {
+    if (document.getElementById("fx-themes-css")) return;
+    var st = document.createElement("style"); st.id = "fx-themes-css"; st.textContent = css;
+    (document.head || document.documentElement).appendChild(st);
+  }
+  function cur() { try { var v = localStorage.getItem(KEY); return T.some(function (t) { return t.id === v; }) ? v : "blau"; } catch (e) { return "blau"; } }
+  function apply(id) {
+    if (!T.some(function (t) { return t.id === id; })) id = "blau";
+    document.documentElement.setAttribute("data-fp", id);
+    try { localStorage.setItem(KEY, id); } catch (e) {}
+    var st = document.getElementById("fx-themes-css"); if (st && st.parentNode) st.parentNode.appendChild(st);
+  }
+  inject(); apply(cur());
+  function keepLast() { var st = document.getElementById("fx-themes-css"); if (st && st.nextElementSibling) st.parentNode.appendChild(st); }
+  document.addEventListener("DOMContentLoaded", function () { keepLast(); new MutationObserver(keepLast).observe(document.head, { childList: true }); });
+  window.FP_THEMES = { list: T, apply: apply, current: cur };
+})();
 </script>
 <style>body{margin:0}/* Layout: Seitenleiste ab 960px, darunter schwebende Tab-Bar; Inhalt in einer Lesespalte. Neutral, ein Akzent, keine Leuchteffekte. */
 :root{
@@ -12529,7 +12609,8 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     if (!teacher) return /* @__PURE__ */ import_react21.default.createElement(NotTeacher, { me: me || { email: user.email }, onRedeem: () => loadMe(user), signOut });
     const tabs = [["start", "\xDCbersicht", "home"], ["kurse", "Kurse & Sch\xFCler", "users"], ["module", "Module", "layers"], ["aufgaben", "Aufgaben", "clip"], ["nachweis", "Ausbildungsnachweis", "seal"], ["feedback", "Feedback", "chat"], ["pruefen", "Pr\xFCfen", "exam"], ["nachrichten", "Nachrichten", "mail"], ["stundenplan", "Stundenplan", "cal"], ["live", "Live", "play"], ["team", "Team-Krankenhaus", "hosp"], ["einstellungen", "Einstellungen", "gear"], ...me && me.role === "admin" ? [["schulen", "Schulen", "school"]] : []];
     const nav = tabs.map(([k, l, ic]) => /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", key: k, className: "tab", "aria-current": tab === k && !edit ? "page" : void 0, onClick: stop(() => go(k)) }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: ic, w: tab === k ? 2.2 : 1.8 }), /* @__PURE__ */ import_react21.default.createElement("span", null, l)));
-    return /* @__PURE__ */ import_react21.default.createElement("div", { className: "shell" }, /* @__PURE__ */ import_react21.default.createElement("nav", { className: "side", "aria-label": "Hauptnavigation" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "brand" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("div", null, /* @__PURE__ */ import_react21.default.createElement("b", null, "Fallpfad"), /* @__PURE__ */ import_react21.default.createElement("span", null, "Lehrer-Portal"))), nav, /* @__PURE__ */ import_react21.default.createElement("div", { className: "foot" }, isDemo ? "Demo-Modus \xB7 erfundene Daten" : "Online", /* @__PURE__ */ import_react21.default.createElement("br", null), me.email || user.email)), /* @__PURE__ */ import_react21.default.createElement("main", { className: "main" }, /* @__PURE__ */ import_react21.default.createElement("header", { className: "topbar" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "t" }, "Fallpfad Lehrer-Portal", /* @__PURE__ */ import_react21.default.createElement("small", null, isDemo ? "Demo-Modus" : me.display_name || me.email)), /* @__PURE__ */ import_react21.default.createElement("a", { className: "iconbtn", href: SETTINGS.appUrl, target: "_blank", rel: "noopener", "aria-label": "Sch\xFCler-App \xF6ffnen", title: "Sch\xFCler-App \xF6ffnen" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "eye" })), /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "switch", role: "switch", "aria-checked": theme === "dark", "aria-label": "Dunkelmodus", onClick: stop(() => setTheme(theme === "dark" ? "light" : "dark")) }, /* @__PURE__ */ import_react21.default.createElement("i", null, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: theme === "dark" ? "moon" : "sun" })))), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", style: { marginTop: 14 } }, err, " ", /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setErr(null)) }, "Ausblenden")), edit ? /* @__PURE__ */ import_react21.default.createElement(
+    window.FP_PROF = { signOut, setTheme: (x) => setTheme(x), name: me && (me.display_name || ""), email: (me && me.email) || (user && user.email), go: (t) => setTab(t) };
+    return /* @__PURE__ */ import_react21.default.createElement("div", { className: "shell" }, /* @__PURE__ */ import_react21.default.createElement("nav", { className: "side", "aria-label": "Hauptnavigation" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "brand" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("div", null, /* @__PURE__ */ import_react21.default.createElement("b", null, "Fallpfad"), /* @__PURE__ */ import_react21.default.createElement("span", null, "Lehrer-Portal"))), nav, /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "foot fxpm-foot", onClick: (ev) => window.FP_PROFILE && window.FP_PROFILE.open(ev.currentTarget) }, /* @__PURE__ */ import_react21.default.createElement("span", { className: "avatar ini" }, String(me.display_name || me.email || "?").trim().split(/\s+/).map((w) => w.charAt(0)).join("").slice(0, 2).toUpperCase()), /* @__PURE__ */ import_react21.default.createElement("span", null, /* @__PURE__ */ import_react21.default.createElement("b", null, me.display_name || (isDemo ? "Demo-Lehrkraft" : "Profil")), /* @__PURE__ */ import_react21.default.createElement("small", null, isDemo ? "Demo-Modus \xB7 erfundene Daten" : me.email || user.email)))), /* @__PURE__ */ import_react21.default.createElement("main", { className: "main" }, /* @__PURE__ */ import_react21.default.createElement("header", { className: "topbar" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "t" }, "Fallpfad Lehrer-Portal", /* @__PURE__ */ import_react21.default.createElement("small", null, isDemo ? "Demo-Modus" : me.display_name || me.email)), /* @__PURE__ */ import_react21.default.createElement("a", { className: "iconbtn", href: SETTINGS.appUrl, target: "_blank", rel: "noopener", "aria-label": "Sch\xFCler-App \xF6ffnen", title: "Sch\xFCler-App \xF6ffnen" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "eye" })), /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "switch", role: "switch", "aria-checked": theme === "dark", "aria-label": "Dunkelmodus", onClick: stop(() => setTheme(theme === "dark" ? "light" : "dark")) }, /* @__PURE__ */ import_react21.default.createElement("i", null, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: theme === "dark" ? "moon" : "sun" })))), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", style: { marginTop: 14 } }, err, " ", /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setErr(null)) }, "Ausblenden")), edit ? /* @__PURE__ */ import_react21.default.createElement(
       Editor,
       {
         key: edit.initial.id,
@@ -12995,6 +13076,71 @@ h2,h3{letter-spacing:-.018em}
 .fx-toast{max-width:min(440px,calc(100vw - 32px))}
 @media (max-width:959px){.fx-toast{bottom:96px}}
 
+/* ===== Profilmenü ===== */
+.fxpm-bg{position:fixed;inset:0;z-index:10040;background:transparent}
+.fxpm-bg.sheet{background:rgba(15,23,42,.38);display:flex;align-items:flex-end;animation:fxfade .2s ease both}
+.fxpm{background:var(--surface,#fff);color:var(--fg,#0f172a);border:1px solid var(--line,#e2e8f0);border-radius:20px;box-shadow:0 24px 60px -18px rgba(15,23,42,.45);padding:8px;display:flex;flex-direction:column;gap:2px;animation:fxpm-in .22s cubic-bezier(.22,1,.36,1) both;transform-origin:top right}
+.fxpm.up{transform-origin:bottom left}
+.fxpm-bg.sheet .fxpm{width:100%;border-radius:22px 22px 0 0;padding:10px 10px calc(14px + env(safe-area-inset-bottom,0px));animation:fxpm-sheet .28s cubic-bezier(.22,1,.36,1) both}
+.fxpm-bg.sheet .fxpm::before{content:"";width:40px;height:5px;border-radius:5px;background:var(--line,#cbd5e1);align-self:center;margin:2px 0 8px}
+.fxpm-bg.out .fxpm{animation:fxpm-out .16s ease both}
+@keyframes fxpm-in{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes fxpm-out{to{opacity:0;transform:scale(.97)}}
+@keyframes fxpm-sheet{from{transform:translateY(100%)}to{transform:none}}
+.fxpm-head{display:flex;align-items:center;gap:12px;padding:10px 10px 12px;border-bottom:1px solid var(--line,#e2e8f0);margin-bottom:4px}
+.fxpm-head b{display:block;font-size:15.5px;line-height:1.25}
+.fxpm-head small{display:block;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.fxpm-head .fxpm-avi,.fxpm-head .avatar{width:44px!important;height:44px!important;flex:0 0 44px;border-radius:50%;font-size:16px!important;display:grid;place-items:center;overflow:hidden}
+.fxpm-head svg.fxpm-avi{border-radius:50%}
+.fxpm-row{display:flex;align-items:center;gap:12px;width:100%;padding:11px 10px;border:0;background:none;color:inherit;font:inherit;font-size:14.5px;font-weight:550;border-radius:12px;cursor:pointer;text-align:left;transition:background .15s,transform .1s}
+.fxpm-row:hover{background:var(--surface2,#f1f5f9)}
+.fxpm-row:active{transform:scale(.98)}
+.fxpm-row svg{width:19px;height:19px;color:var(--muted);flex:0 0 19px}
+.fxpm-row.bad{color:var(--bad-ink,#c81e1e)}.fxpm-row.bad svg{color:currentColor}
+.fxpm-sec{padding:8px 10px 10px}
+.fxpm-sec>span{display:block;font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.fxpm-sws{display:flex;gap:12px}
+.fxpm-sw{position:relative;width:34px;height:34px;border-radius:50%;border:0;padding:0;cursor:pointer;background:radial-gradient(circle at 32% 28%,color-mix(in srgb,var(--a) 55%,#fff) 0,var(--a) 55%,color-mix(in srgb,var(--a) 80%,#000) 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12);transition:transform .15s}
+.fxpm-sw:hover{transform:scale(1.08)}
+.fxpm-sw.on{box-shadow:0 0 0 2px var(--surface,#fff),0 0 0 4px var(--accent)}
+.fxpm-seg{display:grid;grid-template-columns:repeat(3,1fr);padding:3px;border-radius:12px;background:var(--surface2,#f1f5f9);gap:2px}
+.fxpm-seg button{font:inherit;font-size:13px;font-weight:600;border:0;background:none;color:var(--muted);padding:8px 4px;border-radius:9px;cursor:pointer;transition:background .15s,color .15s}
+.fxpm-seg button.on{background:var(--surface,#fff);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+/* Lehrer-Portal: Profil unten links */
+.side .fxpm-foot{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;color:inherit;font:inherit;text-align:left;padding:10px;border-radius:14px;cursor:pointer;transition:background .15s}
+.side .fxpm-foot:hover{background:var(--surface2,#f1f5f9)}
+.side .fxpm-foot .avatar{width:36px;height:36px;flex:0 0 36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.side .fxpm-foot b{display:block;font-size:14px;color:var(--fg)}
+.side .fxpm-foot small{display:block;font-size:12px;color:var(--muted);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px}
+.fxpm-av .avatar{display:grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700}
+@media (max-width:640px){.topbar .avbtn{display:inline-flex!important}.topbar .switch{display:none!important}}
+/* Tutorial-Knopf (eine Stunde nach der Registrierung) */
+.fx-tourchip{display:inline-flex;align-items:center;gap:7px;font:inherit;font-size:13px;font-weight:650;padding:7px 12px 7px 9px;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));background:color-mix(in srgb,var(--accent) 9%,var(--surface));color:var(--accent);cursor:pointer;transition:transform .15s,background .15s;animation:fxpop .4s cubic-bezier(.22,1,.36,1) both}
+.fx-tourchip svg{width:14px;height:14px}
+.fx-tourchip:hover{background:color-mix(in srgb,var(--accent) 15%,var(--surface))}
+.fx-tourchip:active{transform:scale(.95)}
+.fx-tourchip.inside{align-self:flex-start;margin:8px 10px 6px}
+.fx-tourchip:not(.inside){position:fixed;left:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:900;box-shadow:0 8px 20px -10px rgba(15,23,42,.35)}
+.fx-tour b{color:var(--fg,#0f172a)}
+/* Untere Leiste auf dem Handy: feste Breite je Eintrag, kurze Beschriftungen, Hinweis auf Wischen */
+@media (max-width:959px){
+  .tabbar:has(.tab:nth-child(9)) .tab{flex:0 0 auto;min-width:64px}
+  .tabbar .tab span{display:block;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tabbar .tab span[data-short]{font-size:0!important}
+  .tabbar .tab span[data-short]::after{content:attr(data-short);font-size:10.5px;letter-spacing:-.01em}
+  .tabbar{scroll-snap-type:x proximity;-webkit-mask-image:linear-gradient(90deg,#000 88%,transparent);mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  .tabbar:has(.tab:nth-child(9)){padding-right:28px}
+  .tabbar:not(:has(.tab:nth-child(9))){-webkit-mask-image:none;mask-image:none}
+  .subtabs{-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent);padding-right:22px}
+}
+/* Sprungleiste Ausbildungsjahre */
+.fx-yjump{position:relative;display:flex;align-items:center;gap:8px;margin:6px 0 14px;padding:8px 10px;border-radius:14px;background:var(--glass,rgba(255,255,255,.8));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line)}
+.fx-yjump span{font-size:12.5px;color:var(--muted);font-weight:600;margin-right:2px}
+.fx-yjump button{font:inherit;font-size:13.5px;font-weight:650;padding:6px 12px;border-radius:99px;border:1px solid color-mix(in srgb,var(--c) 35%,var(--line));background:color-mix(in srgb,var(--c) 10%,var(--surface));color:color-mix(in srgb,var(--c) 75%,var(--fg));cursor:pointer}
+/* Seitenleiste: auf niedrigen Bildschirmen kompakter und scrollbar */
+@media (min-width:960px){.side{overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}.side::-webkit-scrollbar{display:none}}
+@media (min-width:960px) and (max-height:900px){.side{gap:2px;padding-top:18px!important;padding-bottom:14px!important}.side .tab{padding-top:8px!important;padding-bottom:8px!important;font-size:14.5px!important}.side .brand{margin-bottom:8px}}
+
 /* ===== Lehrer-Portal: Folien-Import, Schulen, Schulanzeige ===== */
 .btn.fx-aibtn{background:linear-gradient(135deg,#7C3AED 0%,#0062FF 100%);color:#fff;border:0;box-shadow:0 8px 20px -10px rgba(124,58,237,.6);display:inline-flex;align-items:center;gap:7px}
 .btn.fx-aibtn:hover{filter:brightness(1.07);transform:translateY(-1px)}
@@ -13187,6 +13333,19 @@ h2,h3{letter-spacing:-.018em}
   X.rule(".fxl-grid > .fxl-card", function (el) { return el.style.getPropertyValue("--c") || C.violet; });
   X.rule(".adm-card", function (el, i) { return X.ROT[i % X.ROT.length]; });
 })();
+/* Handy: kurze Beschriftungen in der unteren Leiste */
+(function () {
+  var S = { "Kurse & Schüler": "Kurse", "Ausbildungsnachweis": "Nachweis", "Team-Krankenhaus": "Team", "Einstellungen": "Optionen", "Stundenplan": "Plan", "Nachrichten": "Nachricht." };
+  function run() {
+    document.querySelectorAll(".tabbar .tab span").forEach(function (sp) {
+      var t = (sp.textContent || "").trim();
+      if (S[t] && sp.getAttribute("data-short") !== S[t]) sp.setAttribute("data-short", S[t]);
+    });
+  }
+  var q = 0;
+  function start() { run(); new MutationObserver(function () { if (q) return; q = 1; requestAnimationFrame(function () { q = 0; run(); }); }).observe(document.body, { childList: true, subtree: true }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
 
 /* Kurze Einführung beim ersten Anmelden: hebt die wichtigsten Bereiche hervor. */
 (function () {
@@ -13207,31 +13366,35 @@ h2,h3{letter-spacing:-.018em}
     play: '<path d="M8 5.5v13l10.5-6.5z"/>',
     mail: '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/>',
     ok: '<path d="M5 12.5 10 17l9-10"/>',
+    chat: '<path d="M4 5h16v11H9l-5 4z"/>',
     school: '<path d="M3 20.5h18M5 20.5V10l7-5 7 5v10.5M10 20.5v-5h4v5"/>'
   };
   var STEPS = {
     schueler: [
-      { ic: "hi", c: C.blue, t: "Willkommen bei Fallpfad", p: "In einer Minute zeigen wir dir die wichtigsten Bereiche. Du kannst die Einführung jederzeit überspringen und später unter Fortschritt wieder starten." },
-      { tab: "Home", ic: "home", t: "Home: dein Startpunkt", p: "Hier siehst du wichtige Nachrichten deiner Lehrkräfte, dein aktuelles Modul zum Weiterlernen, deinen Stundenplan und kleine Tagesaufträge." },
-      { tab: "Lernmodule", ic: "book", t: "Lernmodule", p: "Alle Fallmodule nach Ausbildungsjahr. Jedes Modul begleitet einen Menschen über mehrere Stationen mit Aufgaben, Quiz und Patientenakte." },
-      { tab: "Training", ic: "cap", t: "Training", p: "Üben fürs Examen: Praktisches Examen, Simulationen, Karteikarten, PharmakoLab und mehr. Ideal für zwischendurch." },
-      { tab: "Praxis", ic: "clip", t: "Praxis: dein Ausbildungsnachweis", p: "Arbeitstage und Praxisanleitung eintragen und direkt auf deinem Handy von der Praxisanleitung unterschreiben lassen. Ohne Papier." },
-      { tab: "Aufgaben", ic: "list", t: "Aufgaben", p: "Was dir deine Lehrkraft stellt, mit Abgabetermin. Ein roter Punkt zeigt, dass etwas Neues da ist." },
-      { tab: "Fortschritt", ic: "chart", t: "Fortschritt und Einstellungen", p: "Punkte, Lernkalender und Kompetenzen. Hier stellst du auch Hell oder Dunkel, Schriftgröße und deinen Kurs ein." },
-      { sel: ".topbar .iconbtn, header .iconbtn", ic: "search", c: C.slate, t: "Suche", p: "Über die Lupe findest du jedes Thema, jeden Begriff und jedes Modul. Tastenkürzel am Computer: /" },
-      { ic: "ok", c: C.green, t: "Alles klar, los geht’s!", p: "Tipp: Fang mit „Weiterlernen“ auf Home an. Viel Erfolg!", last: true }
+      { ic: "hi", c: C.blue, t: "Willkommen bei Fallpfad", p: "Fallpfad begleitet dich durch die ganze Ausbildung: lernen an echten Fällen, üben fürs Examen und dein Ausbildungsnachweis ohne Papier. In zwei Minuten zeigen wir dir, wo du was findest." },
+      { tab: "Home", ic: "home", t: "Home: dein Startpunkt", p: "Oben findest du vier Schnellstarts. <b>Weiterlernen</b> bringt dich genau dorthin, wo du aufgehört hast. Darunter stehen Nachrichten deiner Lehrkräfte. Tippe auf <b>Gelesen</b>, wenn du sie gesehen hast." },
+      { tab: "Lernmodule", ic: "book", t: "Lernmodule: lernen am Fall", p: "Jedes Modul begleitet einen Menschen durch mehrere Stationen. <b>So geht’s:</b> Modul antippen, Station für Station lesen, Aufgaben lösen und Punkte sammeln. Mit dem Pfeil oben links kommst du zurück. Module mit Schloss schaltet deine Lehrkraft frei." },
+      { tab: "Training", ic: "cap", t: "Training: üben fürs Examen", p: "Lernkarten mit Wiederholungsplan, Fachlexikon, Praktisches Examen, Simulationen, PharmakoLab und mehr. <b>Tipp:</b> Zehn Minuten Lernkarten am Tag bringen mehr als ein langer Abend vor der Prüfung." },
+      { tab: "Praxis", ic: "clip", t: "Praxis: dein Ausbildungsnachweis", p: "<b>So geht’s:</b> Im laufenden Einsatz auf <b>Arbeitstag eintragen</b> tippen, Zeiten wählen, speichern. Für die Unterschrift <b>Unterschrift holen</b> tippen und das Handy deiner Praxisanleitung geben. Unter <b>Praxisbegleiter</b> findest du die Kitteltasche mit Normwerten und Schemata." },
+      { tab: "Aufgaben", ic: "list", t: "Aufgaben deiner Lehrkraft", p: "Ein roter Punkt zeigt neue Aufgaben. Aufgabe antippen, bearbeiten und abgeben. Den Abgabetermin siehst du immer oben auf der Karte." },
+      { tab: "Fortschritt", ic: "chart", t: "Fortschritt und Kurs", p: "Punkte, Lernkalender und Kompetenzen auf einen Blick. <b>Kurs beitreten:</b> Hier gibst du den Code ein, den du von deiner Lehrkraft bekommst." },
+      { sel: ".topbar .avbtn, .sideprof", ic: "users", c: C.violet, t: "Dein Profil", p: "Tippe auf dein Profil: Dort änderst du dein Profilbild, die Farbe der App und Hell oder Dunkel. Abmelden kannst du dich dort auch." },
+      { sel: '.topbar .iconbtn[aria-label="Suche öffnen"], .topbar .iconbtn', ic: "search", c: C.slate, t: "Suche", p: "Über die Lupe findest du jedes Thema, jeden Fachbegriff und jedes Modul." },
+      { ic: "play", c: C.red, t: "Live im Unterricht", p: "Zeigt deine Lehrkraft vorne einen QR-Code, scanne ihn mit der Handykamera. Du antwortest anonym, vorne erscheint das Ergebnis der Klasse. Weiterblättern kann nur die Lehrkraft." },
+      { ic: "ok", c: C.green, t: "Alles klar, los geht’s!", p: "Fang am besten mit <b>Weiterlernen</b> auf Home an. Falls du die Einführung nochmal sehen willst: Unten links findest du in der ersten Stunde den Knopf <b>Tutorial</b>.", last: true }
     ],
     lehrer: [
-      { ic: "hi", c: C.blue, t: "Willkommen im Lehrer-Portal", p: "Eine kurze Tour durch die wichtigsten Bereiche. Du kannst sie jederzeit überspringen und unter Einstellungen wieder starten." },
-      { tab: "Übersicht", ic: "home", t: "Übersicht", p: "Dein Unterricht heute, Schnellzugriff und alle Benachrichtigungen. Wichtige Hinweise sind rot markiert." },
-      { tab: "Kurse & Schüler", ic: "users", t: "Kurse & Schüler", p: "Jeder Kurs mit Lernstand, Einsatz und Unterrichtsfeedback. Ein Klick auf eine Person öffnet die Schülerakte." },
-      { tab: "Module", ic: "layers", t: "Module bauen und anpassen", p: "Alle Fallmodule ansehen, bearbeiten oder eigene bauen. Neu: Lade eine PowerPoint oder PDF hoch und Fallpfad erstellt daraus ein interaktives Modul." },
-      { tab: "Aufgaben", ic: "list", t: "Aufgaben stellen", p: "Module, Trainings, Team- oder Live-Fälle als Aufgabe mit Termin. Du siehst sofort, wer abgegeben hat." },
-      { tab: "Ausbildungsnachweis", ic: "clip", t: "Ausbildungsnachweis", p: "Stunden, Praxisanleitung und Unterschriften aller Lernenden. Was fehlt, steht in der Schülerakte." },
-      { tab: "Live", ic: "play", t: "Live im Unterricht", p: "Ein Fall am Beamer, die Klasse stimmt per Handy ab. Auch Live-Fälle lassen sich aus Folien erstellen." },
-      { tab: "Nachrichten", ic: "mail", t: "Nachrichten", p: "An Kurse oder einzelne Lernende. Du wählst, wie lange sie sichtbar bleiben." },
-      { tab: "Einstellungen", ic: "school", c: C.slate, t: "Einstellungen", p: "Darstellung, Einladungscodes für Kolleginnen und Kollegen und diese Einführung noch einmal ansehen." },
-      { ic: "ok", c: C.green, t: "Fertig!", p: "Tipp: Unter Module > „Aus Folien erstellen“ probierst du den Folien-Import direkt aus.", last: true }
+      { ic: "hi", c: C.blue, t: "Willkommen im Lehrer-Portal", p: "Hier steuerst du Kurse, Module, Aufgaben, den Ausbildungsnachweis und den Live-Unterricht. Wir zeigen dir in zwei Minuten, wie du die wichtigsten Dinge erledigst." },
+      { tab: "Übersicht", ic: "home", t: "Übersicht", p: "Dein Unterricht heute, Schnellzugriff auf die häufigsten Aufgaben und alle Benachrichtigungen. Rot markierte Hinweise brauchen deine Aufmerksamkeit." },
+      { tab: "Kurse & Schüler", ic: "users", t: "Kurse & Schüler", p: "<b>Kurs anlegen:</b> Neuer Kurs, Name und Ausbildungsjahr eintragen, fertig. Es entsteht ein Einladungscode, den die Lernenden in der App unter Fortschritt eingeben. Ein Klick auf eine Person öffnet die Schülerakte mit Lernstand und Nachweis." },
+      { tab: "Module", ic: "layers", t: "Module und Freischalten", p: "Alle Fallmodule ansehen, als Kopie anpassen oder neu bauen. <b>Für Kurse freischalten:</b> pro Kurs festlegen, welche Module frei, gesperrt oder ausgeblendet sind. <b>Aus Folien erstellen:</b> PowerPoint oder PDF hochladen, daraus entsteht ein fertiger Entwurf." },
+      { tab: "Aufgaben", ic: "list", t: "Aufgaben stellen", p: "<b>So geht’s:</b> Neue Aufgabe, Art wählen (Modul, Training, Team-Krankenhaus, Live-Fall oder eigene Aufgabe), Kurs und Termin festlegen, stellen. Wer abgegeben hat, siehst du sofort." },
+      { tab: "Ausbildungsnachweis", ic: "clip", t: "Ausbildungsnachweis", p: "Stunden, Praxisanleitung, Fehlzeiten und Unterschriften aller Lernenden. Fehlt etwas, siehst du es hier und in der Schülerakte." },
+      { tab: "Feedback", ic: "chat", t: "Feedback", p: "Freitags gibt die Klasse kurzes Feedback zum Unterricht, dazu Rückmeldungen aus den Einsätzen. So erkennst du früh, wo es hakt." },
+      { tab: "Live", ic: "play", t: "Live im Unterricht", p: "Drei Wege: <b>Live-Stunde bauen</b> aus 17 Methoden, <b>Modul live an der Tafel</b> oder aus Folien. Auf <b>Live starten</b> klicken, QR-Code am Beamer zeigen, mit Pfeiltaste weiter. Die Klasse antwortet anonym und kann nicht vorblättern." },
+      { tab: "Nachrichten", ic: "mail", t: "Nachrichten", p: "Empfänger wählen (Kurs oder einzelne Lernende), Text schreiben, Ablaufzeit in Stunden oder Tagen festlegen. Mit <b>Wichtig</b> erscheint die Nachricht rot." },
+      { sel: ".fxpm-av, .fxpm-foot", ic: "users", c: C.violet, t: "Dein Profil", p: "Über dein Profil oben rechts oder unten links wählst du die Farbe, Hell oder Dunkel, öffnest die Einstellungen und meldest dich ab." },
+      { ic: "ok", c: C.green, t: "Fertig!", p: "Guter erster Schritt: einen Kurs anlegen und den Code an die Klasse geben. Die Einführung findest du in der ersten Stunde unten links unter <b>Tutorial</b>.", last: true }
     ]
   };
   function svg(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON[k] || ICON.ok) + "</svg>"; }
@@ -13306,33 +13469,67 @@ h2,h3{letter-spacing:-.018em}
     window.addEventListener("resize", draw);
     document.addEventListener("keydown", onKey, true);
   }
+  /* Konto erkennen: Tutorial nur nach der Registrierung, Knopf eine Stunde lang */
+  function acct() {
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (/^sb-.*-auth-token$/.test(k)) { var v = JSON.parse(localStorage.getItem(k) || "null"), u = v && (v.user || (v.currentSession && v.currentSession.user)); if (u && u.id) return { id: u.id, created: Date.parse(u.created_at || "") || 0 }; }
+      }
+    } catch (e) {}
+    if (window.FP_DEMO_ACC) {
+      var dk = "fp-tour-demo-" + KIND, t0 = 0;
+      try { t0 = Number(localStorage.getItem(dk)) || 0; if (!t0) { t0 = Date.now(); localStorage.setItem(dk, String(t0)); } } catch (e) { t0 = Date.now(); }
+      return { id: "demo", created: t0, demo: true };
+    }
+    return null;
+  }
+  var HOUR = 3600 * 1000;
+  function keyFor(a) { return KEY + "-" + a.id; }
+  function firstKey(a) { return KEY + "-first-" + a.id; }
+  function seen(a) { try { return !!localStorage.getItem(keyFor(a)); } catch (e) { return true; } }
+  function chipUntil(a) {
+    var f = 0; try { f = Number(localStorage.getItem(firstKey(a))) || 0; } catch (e) {}
+    return Math.max(a.created || 0, f) + HOUR;
+  }
+  var _end = end;
+  end = function (done) { _end(done); var a = acct(); if (a) try { localStorage.setItem(keyFor(a), done ? "1" : "skip"); } catch (e) {} };
   window.FP_TOUR = { start: start };
   function ready() {
     if (KIND === "schueler") return document.querySelector("main .hello") && visTab("Home");
     return document.querySelector(".side .tab, .tab") && document.querySelector("main .topbar, header.topbar") && !document.querySelector(".lwrap");
   }
-  function seen() { try { return !!localStorage.getItem(KEY); } catch (e) { return true; } }
   var tries = 0;
   function poll() {
-    if (seen() || root) return;
-    if (ready()) { setTimeout(function () { if (!seen() && ready()) start(); }, 900); return; }
+    var a = acct();
+    if (root) return;
+    if (!a) { if (++tries < 120) setTimeout(poll, 1000); return; }
+    /* Automatisch nur für neue Konten (bis 7 Tage nach Registrierung), nie im Demo-Konto */
+    if (a.demo || seen(a) || Date.now() - a.created > 7 * 24 * HOUR) return;
+    if (ready()) { setTimeout(function () { if (!root && ready()) { try { localStorage.setItem(firstKey(a), String(Date.now())); } catch (e) {} start(); } }, 900); return; }
     setTimeout(poll, ++tries < 120 ? 500 : 1500);
   }
-  /* "Einführung ansehen" in den Einstellungen */
-  function addLink() {
-    var host = KIND === "schueler" ? document.querySelector(".card.account") : Array.prototype.find.call(document.querySelectorAll("main .card"), function (c) { var h = c.querySelector("h3"); return h && /^Verbindung$/.test(h.textContent.trim()); });
-    if (!host || host.querySelector(".fx-tourlink")) return;
-    var b = document.createElement("button");
-    b.type = "button";
-    b.className = "btn ghost sm fx-tourlink";
-    b.style.marginTop = "12px";
-    b.textContent = "Einführung noch einmal ansehen";
+  /* Kleiner Knopf "Tutorial" unten links, eine Stunde nach der Registrierung */
+  var PLAY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
+  function chip() {
+    var a = acct(), old = document.querySelector(".fx-tourchip");
+    var show = a && Date.now() < chipUntil(a) && ready();
+    if (!show) { if (old) old.remove(); return; }
+    var side = document.querySelector(".side"), inSide = side && side.getBoundingClientRect().width > 0;
+    if (old && (inSide ? old.parentNode === side : old.parentNode === document.body)) return;
+    if (old) old.remove();
+    var b = document.createElement("button"); b.type = "button"; b.className = "fx-tourchip" + (inSide ? " inside" : "");
+    b.innerHTML = PLAY + "<span>Tutorial</span>"; b.title = "Einführung noch einmal ansehen";
     b.onclick = function () { start(); };
-    host.appendChild(b);
+    if (inSide) { var ref = side.querySelector(".sideprof, .fxpm-foot, .foot"); side.insertBefore(b, ref || null); }
+    else document.body.appendChild(b);
   }
   function boot() {
     poll();
-    new MutationObserver(function () { addLink(); }).observe(document.body, { childList: true, subtree: true });
+    var q = 0;
+    new MutationObserver(function () { if (q) return; q = 1; requestAnimationFrame(function () { q = 0; chip(); }); }).observe(document.body, { childList: true, subtree: true });
+    setInterval(chip, 60000);
+    window.addEventListener("resize", function () { setTimeout(chip, 120); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
@@ -14961,6 +15158,145 @@ h2,h3{letter-spacing:-.018em}
   }
   var q = false;
   new MutationObserver(function () { if (q) return; q = true; requestAnimationFrame(function () { q = false; addBtn(); }); }).observe(document.documentElement, { childList: true, subtree: true });
+})();
+
+</script>
+<script>
+/* Fallpfad Profilmenü: Klick auf das Profil (oben rechts oder unten links) öffnet ein Menü mit
+   Profil, Farbprofil, Hell/Dunkel, Einstellungen und Abmelden. Funktioniert in Schüler-App und Lehrer-Portal. */
+(function () {
+  var KIND = window.FP_APP_KIND || "schueler";
+  function P() { return window.FP_PROF || {}; }
+  function esc(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function mode() { var a = document.documentElement.getAttribute("data-theme"); return a === "dark" || a === "light" ? a : "system"; }
+  function setMode(m) {
+    var p = P();
+    if (p.setTheme) p.setTheme(m);
+    else if (m === "system") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", m);
+  }
+  function initials(n) { return String(n || "?").trim().split(/\s+/).map(function (w) { return w.charAt(0); }).join("").slice(0, 2).toUpperCase() || "?"; }
+  function avatarHtml() {
+    var av = document.querySelector(".topbar .avbtn .avatar, .sideprof .avatar, .topbar .avbtn svg");
+    if (av) { var c = av.cloneNode(true); c.removeAttribute("style"); c.classList && c.classList.add("fxpm-avi"); return c.outerHTML; }
+    return '<span class="avatar ini fxpm-avi">' + esc(initials(P().name)) + "</span>";
+  }
+  var SW = function (t, on) {
+    return '<button type="button" class="fxpm-sw' + (on ? " on" : "") + '" data-fp="' + t.id + '" aria-label="Farbprofil ' + esc(t.n) + '" aria-pressed="' + on + '" style="--a:' + (t.dot || t.L.accent) + '"></button>';
+  };
+  var ICO = {
+    pic: '<path d="M4 7h3l2-2.5h6L17 7h3v12H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    set: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3h0a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8v0a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>',
+    out: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
+    chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'
+  };
+  function ic(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICO[k] + "</svg>"; }
+  var openEl = null;
+  function close() { if (openEl) { var e = openEl; openEl = null; e.classList.add("out"); setTimeout(function () { e.remove(); }, 160); } }
+  function open(anchor) {
+    if (openEl) { close(); return; }
+    var p = P(), T = (window.FP_THEMES && window.FP_THEMES.list) || [], cur = window.FP_THEMES ? window.FP_THEMES.current() : "blau";
+    var name = p.name || (KIND === "lehrer" ? "Lehrkraft" : "Profil"), sub = p.email || (KIND === "lehrer" ? "Lehrer-Portal" : "Auszubildende");
+    var bg = document.createElement("div"); bg.className = "fxpm-bg";
+    var m = document.createElement("div"); m.className = "fxpm"; m.setAttribute("role", "dialog"); m.setAttribute("aria-label", "Profil und Einstellungen");
+    var md = mode();
+    m.innerHTML =
+      '<div class="fxpm-head">' + avatarHtml() + '<div><b>' + esc(name) + "</b><small>" + esc(sub) + "</small></div></div>" +
+      (KIND !== "lehrer" ? '<button type="button" class="fxpm-row" data-a="pic">' + ic("pic") + "<span>Profilbild ändern</span></button>" : "") +
+      '<div class="fxpm-sec"><span>Farbe</span><div class="fxpm-sws">' + T.map(function (t) { return SW(t, t.id === cur); }).join("") + "</div></div>" +
+      '<div class="fxpm-sec"><span>Darstellung</span><div class="fxpm-seg">' + [["light", "Hell"], ["dark", "Dunkel"], ["system", "Automatisch"]].map(function (x) { return '<button type="button" data-m="' + x[0] + '" class="' + (md === x[0] ? "on" : "") + '">' + x[1] + "</button>"; }).join("") + "</div></div>" +
+      '<button type="button" class="fxpm-row" data-a="set">' + ic(KIND === "lehrer" ? "set" : "chart") + "<span>" + (KIND === "lehrer" ? "Einstellungen" : "Konto, Kurse und Fortschritt") + "</span></button>" +
+      '<button type="button" class="fxpm-row bad" data-a="out">' + ic("out") + "<span>Abmelden</span></button>";
+    bg.appendChild(m);
+    document.body.appendChild(bg);
+    openEl = bg;
+    /* Position: am Element ausrichten, auf dem Handy als Blatt von unten */
+    if (anchor && window.innerWidth > 640) {
+      var r = anchor.getBoundingClientRect(), w = 300;
+      m.style.position = "fixed"; m.style.width = w + "px";
+      var left = Math.min(window.innerWidth - w - 12, Math.max(12, r.right - w));
+      if (r.left < window.innerWidth / 3) left = Math.max(12, r.left);
+      m.style.left = left + "px";
+      if (r.top > window.innerHeight / 2) { m.style.bottom = (window.innerHeight - r.top + 8) + "px"; m.classList.add("up"); }
+      else m.style.top = (r.bottom + 8) + "px";
+    } else bg.classList.add("sheet");
+    bg.addEventListener("click", function (e) {
+      if (e.target === bg) return close();
+      var sw = e.target.closest(".fxpm-sw");
+      if (sw) { window.FP_THEMES.apply(sw.dataset.fp); m.querySelectorAll(".fxpm-sw").forEach(function (x) { x.classList.toggle("on", x === sw); x.setAttribute("aria-pressed", x === sw); }); return; }
+      var mb = e.target.closest("[data-m]");
+      if (mb) { setMode(mb.dataset.m); m.querySelectorAll("[data-m]").forEach(function (x) { x.classList.toggle("on", x === mb); }); return; }
+      var a = e.target.closest("[data-a]");
+      if (!a) return;
+      var act = a.dataset.a, pp = P();
+      close();
+      if (act === "pic" && pp.avatar) pp.avatar();
+      if (act === "set") { if (pp.go) pp.go(KIND === "lehrer" ? "einstellungen" : "fortschritt"); window.scrollTo(0, 0); }
+      if (act === "out" && pp.signOut) pp.signOut();
+    });
+  }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+  /* Lehrer-Portal: Profil-Knopf oben rechts ergänzen */
+  function place() {
+    if (KIND !== "lehrer") return;
+    var tb = document.querySelector(".topbar"), sw = tb && tb.querySelector('.switch[role="switch"]');
+    if (sw && !tb.querySelector(".fxpm-av")) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "avbtn fxpm-av"; b.setAttribute("aria-label", "Profil und Einstellungen");
+      b.innerHTML = '<span class="avatar ini" style="width:36px;height:36px;font-size:14px">' + esc(initials(P().name)) + "</span>";
+      b.addEventListener("click", function () { open(b); });
+      sw.parentNode.insertBefore(b, sw.nextSibling);
+    }
+    var av = tb && tb.querySelector(".fxpm-av .avatar"); if (av && P().name && av.textContent !== initials(P().name)) av.textContent = initials(P().name);
+  }
+  function start() { place(); var q = 0; new MutationObserver(function () { if (q) return; q = 1; requestAnimationFrame(function () { q = 0; place(); }); }).observe(document.body, { childList: true, subtree: true }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+  window.FP_PROFILE = { open: function (el) { open(el || (document.activeElement && document.activeElement.closest ? document.activeElement.closest("button") : null)); }, close: close };
+})();
+
+/* Fallpfad Mikro-Effekte: kurzer Ring beim Antippen, sanftes Einblenden neuer Seiten, kleine Pops bei Auswahl.
+   Alles dezent und abgeschaltet, wenn das Gerät "Bewegung reduzieren" verlangt. */
+(function () {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var css =
+    "@keyframes fxm-ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--rc,var(--accent,#0062FF)) 38%,transparent)}100%{box-shadow:0 0 0 9px transparent}}" +
+    "@keyframes fxm-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}" +
+    "@keyframes fxm-pop{0%{transform:scale(1)}40%{transform:scale(1.035)}100%{transform:scale(1)}}" +
+    "@keyframes fxm-badge{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}" +
+    ".fxm-ring{animation:fxm-ring .45s ease-out}" +
+    "button,.btn,.tab,.chip,a.card,.lvopt,.iconbtn{transition:transform .12s ease,background-color .18s,border-color .18s,color .18s,box-shadow .2s}" +
+    "button:not(:disabled):active,.btn:active,.tab:active,.chip:active,.lvopt:not(:disabled):active,.iconbtn:active{transform:scale(.965)}" +
+    ".fx-t:active,button.mod:active{transform:scale(.985)!important}" +
+    ".fxm-page{animation:fxm-in .32s cubic-bezier(.22,1,.36,1) both}" +
+    ".lvopt.on,.chip.on,.fxl-si button.on,.fxpm-sw.on,.fxm-pick{animation:fxm-pop .28s ease}" +
+    ".badge,.fx-n,.tab .count,.tab b.n{animation:fxm-badge .35s cubic-bezier(.22,1,.36,1)}" +
+    ".card,.fx-t{transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s,border-color .25s}" +
+    "@media (hover:hover){a.card:hover,.card.click:hover,.acard:hover{transform:translateY(-2px)}}" +
+    ".switch i{transition:transform .25s cubic-bezier(.34,1.56,.64,1)!important}" +
+    "input[type=checkbox],input[type=radio]{transition:transform .12s}input[type=checkbox]:active,input[type=radio]:active{transform:scale(.88)}";
+  var st = document.createElement("style"); st.id = "fx-motion-css"; st.textContent = css;
+  (document.head || document.documentElement).appendChild(st);
+  var SEL = "button, .btn, .tab, .chip, a.card, .lvopt, .iconbtn, .fx-t, [role=button]";
+  document.addEventListener("pointerdown", function (e) {
+    var el = e.target && e.target.closest && e.target.closest(SEL);
+    if (!el || el.disabled) return;
+    var c = getComputedStyle(el).getPropertyValue("--c").trim();
+    if (c) el.style.setProperty("--rc", c);
+    el.classList.remove("fxm-ring"); void el.offsetWidth; el.classList.add("fxm-ring");
+    setTimeout(function () { el.classList.remove("fxm-ring"); }, 480);
+  }, { passive: true });
+  /* Seitenwechsel: neuen Inhalt im Hauptbereich sanft einblenden */
+  var last = null;
+  function page() {
+    var m = document.querySelector("main.main, main");
+    if (!m) return;
+    var key = (document.querySelector(".tab[aria-current=page], .tab.on") || {}).textContent || "";
+    key += "|" + ((m.querySelector("h1") || {}).textContent || "").slice(0, 40);
+    if (key === last) return;
+    last = key;
+    var kids = Array.prototype.filter.call(m.children, function (k) { return !k.classList.contains("topbar"); });
+    kids.forEach(function (k) { k.classList.remove("fxm-page"); void k.offsetWidth; k.classList.add("fxm-page"); setTimeout(function () { k.classList.remove("fxm-page"); }, 400); });
+  }
+  function start() { var q = 0; new MutationObserver(function () { if (q) return; q = 1; requestAnimationFrame(function () { q = 0; page(); }); }).observe(document.body, { childList: true, subtree: true }); page(); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
 })();
 
 </script>
