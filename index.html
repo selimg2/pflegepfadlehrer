@@ -12798,6 +12798,95 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
 .fxl-grid>.card+.card,.fxl-tiles>.card+.card,.fxl-grid>*+*{margin-top:0}
 .fxl-kitgrid>*+*,.fxl-big>*+*{margin-top:0}
 
+/* ===== Neue Live-Methoden ===== */
+.fxl-new{font-style:normal;font-size:10.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-left:8px;padding:2px 7px;border-radius:99px;background:var(--c,#7C3AED);color:#fff;vertical-align:2px}
+.fxl-kitgrid .btn{margin-top:8px}
+.fxb-zones{display:flex;flex-wrap:wrap;gap:6px}
+.fxb-zone{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;border:1px solid var(--line,#e2e8f0);font-size:13.5px;cursor:pointer;background:var(--surface,#fff)}
+.fxb-zone.on{border-color:#059669;background:color-mix(in srgb,#10B981 12%,var(--surface,#fff));color:#047857;font-weight:600}
+.fxb-zone input{accent-color:#059669}
+.fxb-graph{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.5}
+.fxp-btn.clue{background:#B45309;color:#fff}
+/* Sicher oder geraten */
+.fxp-matrix{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.fxp-matrix .q{padding:14px 18px;border-radius:16px;display:flex;flex-direction:column;gap:2px;background:rgba(148,163,184,.12)}
+.fxp-matrix .q b{font-size:clamp(26px,3vw,40px);line-height:1}
+.fxp-matrix .q span{font-weight:700;font-size:clamp(15px,1.5vw,19px)}
+.fxp-matrix .q small{opacity:.75;font-size:14px}
+.fxp-matrix .gs{background:rgba(16,185,129,.14)}.fxp-matrix .gs b{color:#059669}
+.fxp-matrix .gu{background:rgba(245,158,11,.14)}.fxp-matrix .gu b{color:#B45309}
+.fxp-matrix .fu{background:rgba(100,116,139,.14)}
+.fxp-matrix .fs{background:rgba(239,68,68,.14);box-shadow:inset 0 0 0 2px rgba(239,68,68,.45)}.fxp-matrix .fs b{color:#DC2626}
+/* Körperkarte */
+.fxp-body{display:grid;grid-template-columns:minmax(220px,340px) 1fr;gap:28px;align-items:center}
+.fxp-bodyfig svg,.fxl-body svg{width:100%;height:auto;display:block}
+.fxp-bodyfig{max-height:62vh;aspect-ratio:1/2;margin:0 auto}
+.fxp-zl{margin:8px 0 0;padding-left:20px;font-size:clamp(15px,1.5vw,19px);line-height:1.6}
+.fxl-body{max-width:260px;margin:4px auto 0;border-radius:18px;background:var(--surface2,#f0f4fa);padding:10px;touch-action:manipulation}
+.fxl-body.live{cursor:crosshair;box-shadow:inset 0 0 0 2px color-mix(in srgb,#BE185D 30%,transparent)}
+.fxl-reset{display:block;margin:8px auto 0}
+:root[data-theme=dark] .fxp,:root[data-theme=dark] .fxl-body{--bfill:#1e293b;--bline:#64748b}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .fxp,:root:not([data-theme=light]) .fxl-body{--bfill:#1e293b;--bline:#64748b}}
+/* Live-Zuordnung */
+.fxp-legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-weight:600}
+.fxp-legend span{display:inline-flex;align-items:center;gap:6px}
+.fxp-legend i{width:14px;height:14px;border-radius:4px;background:var(--bc)}
+.fxp-sort{display:flex;flex-direction:column;gap:8px}
+.fxp-srow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:14px;align-items:center;padding:8px 12px;border-radius:12px;background:rgba(148,163,184,.1)}
+.fxp-srow.weak{box-shadow:inset 4px 0 0 #EF4444}
+.fxp-srow.good{box-shadow:inset 4px 0 0 #10B981}
+.fxp-sl{font-size:clamp(15px,1.5vw,19px);font-weight:600;display:flex;flex-direction:column}
+.fxp-sl em{font-style:normal;font-size:.8em}
+.fxp-stack{display:flex;height:30px;border-radius:9px;overflow:hidden;background:rgba(148,163,184,.18)}
+.fxp-stack b{display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;transition:width .4s}
+.fxl-sort{display:flex;flex-direction:column;gap:10px}
+.fxl-si{padding:10px 12px;border-radius:14px;background:var(--surface2,#f0f4fa)}
+.fxl-si>b{display:block;margin-bottom:8px}
+.fxl-si>div{display:flex;flex-wrap:wrap;gap:6px}
+.fxl-si button{font:inherit;font-size:14px;padding:7px 12px;border-radius:99px;border:1.5px solid var(--sc,#94a3b8);background:var(--surface,#fff);color:var(--fg,#0f172a);cursor:pointer}
+.fxl-si button.on{background:var(--sc);color:#fff}
+.fxl-si.ok{box-shadow:inset 4px 0 0 #10B981}.fxl-si.bad{box-shadow:inset 4px 0 0 #EF4444}
+.fxl-si small{display:block;margin-top:6px;color:#B91C1C;font-weight:600}
+/* Hinweis für Hinweis */
+.fxp-clues,.fxl-clues{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:8px}
+.fxp-clues li,.fxl-clues li{display:flex;gap:12px;align-items:baseline;padding:10px 14px;border-radius:12px;background:rgba(180,83,9,.08);border-left:4px solid #B45309}
+.fxp-clues li{font-size:clamp(16px,1.7vw,22px)}
+.fxp-clues li b,.fxl-clues li b{color:#B45309;white-space:nowrap;font-size:.8em;text-transform:uppercase;letter-spacing:.04em}
+.fxp-clues li.new,.fxl-clues li.new{animation:fxpop .45s cubic-bezier(.22,1,.36,1) both;background:rgba(180,83,9,.16)}
+.fxp-clues li.more{background:none;border-left-style:dashed;opacity:.6;font-size:15px}
+.fxp-when{margin-top:12px}
+.fxp-whenrow{display:flex;gap:10px;align-items:flex-end;height:120px;margin-top:8px}
+.fxp-whenrow>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.fxp-whenrow i{width:100%;max-width:70px;border-radius:8px 8px 0 0;background:#B45309}
+.fxp-whenrow small{font-size:13px;opacity:.7}.fxp-whenrow em{font-style:normal;font-size:13px;font-weight:700}
+/* Perspektivwechsel */
+.fxp-roles{display:grid;gap:12px;margin-top:6px}
+.fxp-role{border-radius:16px;background:color-mix(in srgb,var(--rc) 8%,transparent);border-top:5px solid var(--rc);padding:12px 14px;min-height:180px;display:flex;flex-direction:column;gap:8px}
+.fxp-role header{display:flex;justify-content:space-between;font-size:clamp(16px,1.6vw,20px)}
+.fxp-role header span{font-weight:800;color:var(--rc)}
+.fxp-role p{margin:0;padding:8px 10px;border-radius:10px;background:var(--surface,#fff);font-size:clamp(14px,1.3vw,17px);line-height:1.4;box-shadow:0 2px 6px -4px rgba(15,23,42,.3);animation:fxpop .35s ease both}
+:root[data-theme=dark] .fxp-role p{background:#111a2e}
+.fxl-rolecard{padding:14px 16px;border-radius:16px;background:color-mix(in srgb,var(--rc) 12%,var(--surface,#fff));border-left:5px solid var(--rc);display:flex;flex-direction:column}
+.fxl-rolecard small{text-transform:uppercase;letter-spacing:.06em;font-weight:700;font-size:11.5px;color:var(--rc)}
+.fxl-rolecard b{font-size:20px}
+/* Klassenentscheid */
+.fxp-path{padding:16px 20px;border-radius:16px;background:rgba(220,38,38,.07);border-left:5px solid #DC2626;display:flex;flex-direction:column;gap:6px;font-size:clamp(16px,1.6vw,20px)}
+.fxp-path p{margin:0}
+.fxp-alt{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-top:8px;border-top:1px dashed rgba(148,163,184,.6)}
+.fxp-alt small{font-size:15px;opacity:.85}
+/* Sicherheit (Schüler) */
+.fxl-conf{margin-top:12px}
+.fxl-conf p{margin:0 0 6px;font-weight:600}
+.fxl-conf>div{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fxl-conf button{font:inherit;font-weight:600;padding:12px;border-radius:14px;border:1.5px solid var(--line,#e2e8f0);background:var(--surface,#fff);color:var(--fg,#0f172a);cursor:pointer}
+.fxl-conf button.on{background:#0F766E;border-color:#0F766E;color:#fff}
+.fxl-conf button.on.u{background:#B45309;border-color:#B45309}
+.fxl-me{margin-top:10px;padding:12px 14px;border-radius:14px;font-weight:600}
+.fxl-me.ok{background:color-mix(in srgb,#10B981 12%,var(--surface,#fff));color:#047857}
+.fxl-me.bad{background:color-mix(in srgb,#EF4444 10%,var(--surface,#fff));color:#B91C1C}
+@media (max-width:900px){.fxp-body{grid-template-columns:1fr}.fxp-roles{grid-template-columns:1fr 1fr!important}}
+@media (min-width:1100px){.fxp-matrix{grid-template-columns:repeat(4,1fr)}.fxp-matrix .q{padding:12px 14px}}
+
 /* ===== Fallpfad Design-Ebene: Kacheln, farbige Bereiche, Tutorial, Demo ===== */
 :root{--pc:#0062FF}
 /* Navigation: jede Rubrik hat ihre Farbe */
@@ -13888,6 +13977,74 @@ h2,h3{letter-spacing:-.018em}
 
 </script>
 <script>
+/* Fallpfad Live: Körperkarte (Silhouette vorne/hinten) und benannte Zonen, gemeinsam für Lehrer-Portal und Schüler-App.
+   Koordinaten im viewBox 0 0 100 200. Antippungen werden als x 0..99, y 0..99 (halbe Höhe) übertragen. */
+(function () {
+  var Z = {
+    hinten: {
+      hinterkopf: ["Hinterkopf", [[50, 11, 7]]],
+      ohren: ["Ohrmuscheln", [[38, 16, 4], [62, 16, 4]]],
+      schulter: ["Schulterblätter", [[40, 45, 7], [60, 45, 7]]],
+      dorn: ["Dornfortsätze der Wirbelsäule", [[50, 62, 5]]],
+      ellenbogen: ["Ellenbogen", [[18, 66, 6], [82, 66, 6]]],
+      kreuzbein: ["Kreuzbein", [[50, 88, 7]]],
+      sitzbein: ["Sitzbeinhöcker", [[43, 100, 5], [57, 100, 5]]],
+      trochanter: ["Großer Rollhügel (Trochanter)", [[28, 95, 6], [72, 95, 6]]],
+      kniekehle: ["Kniekehlen", [[41, 140, 5], [59, 140, 5]]],
+      waden: ["Waden", [[41, 160, 6], [59, 160, 6]]],
+      fersen: ["Fersen", [[41, 186, 6], [59, 186, 6]]]
+    },
+    vorne: {
+      stirn: ["Stirn", [[50, 9, 6]]],
+      deltoid: ["Oberarm, Deltamuskel", [[26, 44, 6], [74, 44, 6]]],
+      brust: ["Brustkorb", [[50, 48, 9]]],
+      bauch: ["Bauchhaut seitlich des Nabels", [[41, 78, 6], [59, 78, 6]]],
+      nabel: ["Nabel", [[50, 78, 3]]],
+      leiste: ["Leiste", [[38, 96, 5], [62, 96, 5]]],
+      oberschenkel: ["Oberschenkel vorne außen", [[36, 120, 7], [64, 120, 7]]],
+      knie: ["Knie", [[41, 148, 6], [59, 148, 6]]],
+      schienbein: ["Schienbein", [[41, 162, 5], [59, 162, 5]]],
+      knoechel: ["Knöchel", [[40, 177, 5], [60, 177, 5]]],
+      handruecken: ["Handrücken", [[17, 101, 5], [83, 101, 5]]],
+      unterarm: ["Unterarm innen", [[19, 80, 5], [81, 80, 5]]]
+    }
+  };
+  function svg(fig, extra) {
+    var back = fig === "hinten";
+    var s = '<svg viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" class="fxbody-svg" role="img" aria-label="Körperkarte ' + (back ? "Rückseite" : "Vorderseite") + '">' +
+      '<g fill="var(--bfill,#e8eef7)" stroke="var(--bline,#94a3b8)" stroke-width="1.2" stroke-linejoin="round">' +
+      '<circle cx="50" cy="16" r="11"/>' + (back ? "" : '') +
+      '<path d="M45 26h10v7H45z"/>' +
+      '<path d="M30 32Q50 28 70 32L72 92Q50 99 28 92Z"/>' +
+      '<path d="M30 34L22 36L14 96L21 97L30 52Z"/><path d="M70 34L78 36L86 96L79 97L70 52Z"/>' +
+      '<circle cx="17" cy="101" r="5"/><circle cx="83" cy="101" r="5"/>' +
+      '<path d="M30 90L49 93L47 179L36 179Z"/><path d="M51 93L70 90L64 179L53 179Z"/>' +
+      '<ellipse cx="41" cy="185" rx="8" ry="4"/><ellipse cx="59" cy="185" rx="8" ry="4"/></g>' +
+      '<g fill="none" stroke="var(--bline,#94a3b8)" stroke-width=".8" opacity=".7">' +
+      (back ? '<path d="M50 34V90"/><path d="M38 40q2 8 8 10M62 40q-2 8-8 10"/><path d="M42 96q8 4 16 0"/>' : '<path d="M44 21q6 4 12 0"/><circle cx="50" cy="78" r="1.4"/><path d="M38 46q6 5 11 2M62 46q-6 5-11 2"/>') +
+      "</g>" + (extra || "") + '<text x="50" y="198" text-anchor="middle" font-size="7" fill="var(--bline,#94a3b8)">' + (back ? "Rückseite" : "Vorderseite") + "</text></svg>";
+    return s;
+  }
+  function zonesSvg(fig, keys, labels) {
+    var Zf = Z[fig] || {}, out = "";
+    (keys || []).forEach(function (k) {
+      var z = Zf[k]; if (!z) return;
+      z[1].forEach(function (c, i) {
+        out += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (c[2] + 1.5) + '" fill="rgba(16,185,129,.18)" stroke="#059669" stroke-width="1.1" stroke-dasharray="2 1.5"/>';
+        if (labels && i === 0) out += '<text x="' + Math.min(96, Math.max(4, c[0])) + '" y="' + (c[1] - c[2] - 3 < 7 ? c[1] + c[2] + 6 : c[1] - c[2] - 3) + '" text-anchor="middle" font-size="5.2" font-weight="700" fill="#047857" paint-order="stroke" stroke="#fff" stroke-width="1.6">' + z[0].replace(/&/g, "&amp;") + "</text>";
+      });
+    });
+    return out;
+  }
+  function hit(fig, keys, x, y) {
+    var Zf = Z[fig] || {}, X = x + 0.5, Y = y * 2 + 1;
+    return (keys || []).some(function (k) { var z = Zf[k]; return z && z[1].some(function (c) { var dx = X - c[0], dy = Y - c[1]; return dx * dx + dy * dy <= (c[2] + 3) * (c[2] + 3); }); });
+  }
+  function enc(taps) { var a = []; taps.forEach(function (t) { a.push(Math.floor(t[0] / 10), t[0] % 10, Math.floor(t[1] / 10), t[1] % 10); }); return a; }
+  function dec(ch) { var t = []; for (var i = 0; i + 3 < (ch || []).length; i += 4) t.push([ch[i] * 10 + ch[i + 1], ch[i + 2] * 10 + ch[i + 3]]); return t; }
+  window.FP_BODY = { Z: Z, svg: svg, zonesSvg: zonesSvg, hit: hit, enc: enc, dec: dec };
+})();
+
 /* Fallpfad: fertige Live-Stunden und Fallbeispiele (ohne Vitalzeichen-Monitor) */
 (function () {
   var o = function (t, ok) { return { t: t, ok: !!ok }; };
@@ -14028,7 +14185,41 @@ h2,h3{letter-spacing:-.018em}
       { type: "reihe", q: "Ordnet die BE-FAST-Prüfung.", items: ["Balance: Gleichgewicht prüfen", "Eyes: Sehstörungen erfragen", "Face: lächeln lassen", "Arms: beide Arme heben lassen", "Speech: einen Satz nachsprechen lassen", "Time: Uhrzeit notieren und 112 rufen"] }
     ] }
   ];
-  window.FP_LIVE_LIB = { stunden: stunden, faelle: faelle };
+  var beispiele = [
+    { m: "sicher", t: "Medikamente sicher geben: Sicher oder geraten?", kurz: "Drei Fragen zur Arzneimittelsicherheit. Die Matrix zeigt, wo die Klasse sicher, aber falsch liegt.", lvl: "Jahr 1", ber: "Arzneimittel", blocks: [
+      { type: "folie", titel: "So funktioniert „Sicher oder geraten?“", text: "Ihr wählt eine Antwort und sagt ehrlich, ob ihr euch sicher seid oder ratet.\nVorne sehen wir danach vier Felder.\n• sicher und richtig: gefestigt\n• geraten und richtig: noch wackelig\n• geraten und falsch: Lücke erkannt\n• sicher, aber falsch: Fehlvorstellung, die im Alltag gefährlich werden kann\nNiemand sieht, wer was gewählt hat." },
+      { type: "sicher", q: "Eine Retardtablette lässt sich schlecht schlucken. Was tust du?", opts: [o("Mörsern und in Joghurt geben"), o("Halbieren, dann geht es leichter"), o("Nicht teilen, Rücksprache mit Ärztin oder Apotheke wegen einer anderen Darreichungsform", 1), o("Weglassen und in der Übergabe erwähnen")], exp: "Retardtabletten setzen den Wirkstoff verzögert frei. Mörsern oder Teilen kann zu einer gefährlichen Überdosis führen. Gemeinsam mit Ärztin oder Apotheke eine andere Darreichungsform suchen, nie eigenmächtig weglassen." },
+      { type: "sicher", q: "Frau Kaiser bekommt Insulin. Ihr Blutzucker ist 64 mg/dl, sie ist wach. Was ist richtig?", opts: [o("Insulin wie geplant spritzen, gleich gibt es Frühstück"), o("Insulin nicht spritzen, 15 bis 20 g schnelle Kohlenhydrate geben, nach 15 Minuten nachmessen, Ärztin informieren", 1), o("Nur das Frühstück vorziehen"), o("Die Insulindosis halbieren")], exp: "Unter 70 mg/dl liegt eine Hypoglykämie vor. Erst den Zucker anheben, dann nachmessen und das weitere Vorgehen ärztlich klären." },
+      { type: "sicher", q: "Was gehört NICHT zu den 6-R-Regeln?", opts: [o("Richtiger Zeitpunkt"), o("Richtige Applikationsart"), o("Richtiger Hersteller", 1), o("Richtige Dokumentation")], exp: "Die 6 R: richtige Person, richtiges Arzneimittel, richtige Dosis, richtige Applikationsart, richtiger Zeitpunkt, richtige Dokumentation. Der Hersteller kann bei Rabattverträgen wechseln, der Wirkstoff zählt." },
+      { type: "ampel", q: "Wie sicher fühlst du dich jetzt beim Richten und Verabreichen von Medikamenten?" }
+    ] },
+    { m: "koerper", t: "Dekubitus und Injektionen: Wo genau?", kurz: "Die Klasse tippt Prädilektionsstellen und Injektionsorte auf der Körperkarte an. Vorne entsteht eine Heatmap.", lvl: "Jahr 1", ber: "Prophylaxe", blocks: [
+      { type: "koerper", sit: "Herr Ruhland, 84 Jahre, liegt nach einem Schlaganfall seit drei Tagen überwiegend auf dem Rücken. Braden-Skala 12 Punkte.", q: "Tippe die zwei Stellen an, an denen du in Rückenlage zuerst nach Rötungen schaust.", fig: "hinten", taps: "2", zones: ["kreuzbein", "fersen", "hinterkopf", "schulter", "ellenbogen", "dorn"], exp: "In Rückenlage sind Kreuzbein und Fersen am häufigsten betroffen, außerdem Hinterkopf, Schulterblätter, Ellenbogen und Dornfortsätze. Bei Seitenlage kommen Trochanter, Ohren und Knöchel dazu. Fingertest: Bleibt die Rötung beim Drücken bestehen, liegt ein Dekubitus Kategorie 1 vor." },
+      { type: "koerper", q: "Wo kannst du Herrn Ruhland die angeordnete Heparin-Spritze subkutan geben? Tippe eine geeignete Stelle an.", fig: "vorne", taps: "1", zones: ["bauch", "oberschenkel"], exp: "Geeignet sind die Bauchhaut mit etwa 2 bis 5 cm Abstand zum Nabel und die Vorder- und Außenseite der Oberschenkel. Einstichstellen wechseln, nicht in Narben, Hämatome oder entzündete Haut spritzen." },
+      { type: "tf", items: [tf("Eine gerötete Stelle sollte man massieren, damit sie besser durchblutet wird.", false, "Massage schädigt das vorgeschädigte Gewebe zusätzlich. Entlasten statt massieren."), tf("Die 30-Grad-Seitenlage entlastet Kreuzbein und Trochanter.", true, "Deshalb ist sie Standard bei Menschen mit Dekubitusrisiko.")] }
+    ] },
+    { m: "sortier", t: "Isolierung: Welcher Erreger, welche Maßnahme?", kurz: "Erreger live den Übertragungswegen zuordnen. Vorne siehst du sofort, bei welchem Erreger die Klasse unsicher ist.", lvl: "Jahr 1", ber: "Hygiene", blocks: [
+      { type: "sortier", q: "Ordnet jeden Erreger seinem Hauptübertragungsweg zu.", cats: ["Kontakt", "Tröpfchen", "Aerogen"], items: [{ t: "MRSA", k: "Kontakt" }, { t: "Noroviren", k: "Kontakt" }, { t: "Clostridioides difficile", k: "Kontakt" }, { t: "Influenza", k: "Tröpfchen" }, { t: "RSV", k: "Tröpfchen" }, { t: "Offene Lungentuberkulose", k: "Aerogen" }, { t: "Masern", k: "Aerogen" }, { t: "4MRGN", k: "Kontakt" }], exp: "Kontakt: Schutzkittel und Handschuhe, bei Noroviren und C. difficile spezielle Desinfektionsmittel. Tröpfchen: Mund-Nasen-Schutz bei engem Kontakt. Aerogen: Einzelzimmer und FFP2-Maske. Noroviren werden zusätzlich über Tröpfchen beim Erbrechen übertragen." },
+      { type: "sortier", q: "Was gehört zu welcher Phase der Händehygiene am Bett von Herrn Kraus (MRSA)?", cats: ["Vor dem Zimmer", "Im Zimmer", "Beim Verlassen"], items: [{ t: "Hände desinfizieren, Kittel anlegen", k: "Vor dem Zimmer" }, { t: "Blutdruck mit der zimmereigenen Manschette messen", k: "Im Zimmer" }, { t: "Handschuhe und Kittel im Zimmer ablegen", k: "Beim Verlassen" }, { t: "Hände desinfizieren nach dem Ablegen", k: "Beim Verlassen" }, { t: "Handschuhe über die Kittelbündchen ziehen", k: "Vor dem Zimmer" }, { t: "Flächen am Bett wischdesinfizieren", k: "Im Zimmer" }], exp: "Schutzausrüstung wird vor dem Zimmer angelegt und im Zimmer abgelegt, damit Erreger das Zimmer nicht verlassen. Die letzte Händedesinfektion ist die wichtigste." }
+    ] },
+    { m: "hinweis", t: "Was ist mit Herrn Albers los?", kurz: "Ein Fall wird Hinweis für Hinweis aufgedeckt. Die Klasse vermutet früh und darf umdenken. Klinisches Urteilen in Echtzeit.", lvl: "Jahr 2", ber: "Klinisches Urteilen", blocks: [
+      { type: "folie", titel: "So funktioniert „Hinweis für Hinweis“", text: "Ihr seht zuerst nur einen Hinweis. Legt euch trotzdem fest.\nMit jedem neuen Hinweis dürft ihr eure Vermutung ändern.\nAm Ende sehen wir, wann die Klasse richtig lag und welcher Hinweis den Unterschied gemacht hat." },
+      { type: "hinweis", person: "Herr Albers, 74 Jahre", info: "Unfallchirurgie, 2. Tag nach Hüft-TEP", clues: ["In der Nacht ist er unruhig und zupft an der Bettdecke.", "Er fragt, warum seine verstorbene Frau nicht zu Besuch kommt, und weiß nicht, wo er ist.", "Gestern Nachmittag war er klar und hat mit dir Witze gemacht.", "Er bekommt seit der OP ein Opioid. Seit gestern hat er kaum getrunken, die Urinmenge ist gering.", "Blutzucker 128 mg/dl, keine Lähmungen, Sprache verständlich, Temperatur 37,4 °C."], q: "Was vermutest du am ehesten?", opts: [o("Demenz"), o("Delir", 1), o("Schlaganfall"), o("Hypoglykämie"), o("Altersentsprechende Vergesslichkeit")], exp: "Akuter Beginn, schwankende Aufmerksamkeit und Desorientierung nach einem klaren Vortag sprechen für ein Delir. Auslöser hier: Operation, Opioid, Flüssigkeitsmangel. Hypoglykämie und Schlaganfall sind durch Blutzucker und Neurologie unwahrscheinlich. Eine Demenz beginnt schleichend. Jetzt: Ärztin informieren, Ursachen behandeln, Orientierung geben, Angehörige einbeziehen." },
+      { type: "frage", q: "Welche Maßnahme hilft Herrn Albers am meisten?", opts: [o("Fixieren, damit er nicht stürzt"), o("Orientierung geben, Brille und Hörgerät, Trinken fördern, Tag-Nacht-Rhythmus, Angehörige einbeziehen", 1), o("Licht nachts anlassen und das Radio laut stellen")], exp: "Nichtmedikamentöse Delirprävention und -behandlung wirkt. Fixierung erhöht das Delir- und Verletzungsrisiko." }
+    ] },
+    { m: "rolle", t: "Herr Petersen soll ins Heim: vier Perspektiven", kurz: "Jedes Handy bekommt eine Rolle. Vorne stehen die Sichtweisen von Patient, Tochter, Pflegekraft und Ärztin nebeneinander.", lvl: "Jahr 2", ber: "Kommunikation und Ethik", blocks: [
+      { type: "folie", titel: "So funktioniert der Perspektivwechsel", text: "Euer Handy lost euch gleich eine Rolle zu.\nVersetzt euch in diese Person und schreibt einen Satz aus ihrer Sicht, in der Ich-Form.\nVorne sehen wir alle Perspektiven nebeneinander, anonym." },
+      { type: "rolle", sit: "Herr Petersen, 86 Jahre, ist zum dritten Mal in diesem Jahr zu Hause gestürzt. Er lebt allein, seine Frau ist vor zwei Jahren gestorben. Die Tochter wohnt 200 km entfernt und arbeitet Vollzeit. Im Entlassgespräch wird vorgeschlagen, dass er in ein Pflegeheim zieht. Herr Petersen sagt: „Ich will in meinem Haus sterben.“", roles: ["Herr Petersen", "Tochter", "Pflegefachkraft", "Hausärztin"], q: "Was denkst und fühlst du in diesem Gespräch? Ein Satz in der Ich-Form.", exp: "Was verbindet die Perspektiven, wo liegen die Konflikte? Selbstbestimmung, Sicherheit, Schuldgefühle und Verantwortung stehen sich gegenüber. Welche Lösungen gibt es zwischen „alles bleibt“ und „Heim“, zum Beispiel Hausnotruf, ambulanter Dienst, Tagespflege, Wohnraumanpassung?" },
+      { type: "skala", q: "Herr Petersen sollte zu Hause bleiben dürfen, auch wenn er wieder stürzen könnte.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "wort", q: "Welche Hilfen könnten Herrn Petersen zu Hause unterstützen?", demo: ["Hausnotruf", "Pflegedienst", "Tagespflege", "Rollator", "Haltegriffe", "Essen auf Rädern", "Nachbarn", "Sturzmatte"] }
+    ] },
+    { m: "pfad", t: "Nachtdienst: Frau Lorenz will allein zur Toilette", kurz: "Ein verzweigter Fall. Die Mehrheit entscheidet, wie es weitergeht, und die Klasse erlebt die Folgen.", lvl: "Jahr 1", ber: "Sturzprophylaxe", blocks: [
+      { type: "folie", titel: "So funktioniert der Klassenentscheid", text: "Ihr stimmt ab, was ihr tun würdet. Was die Mehrheit wählt, passiert.\nJe nach Entscheidung entwickelt sich der Fall anders.\nAm Ende vergleichen wir, was die fachlich empfohlene Entscheidung bewirkt hätte." },
+      { type: "pfad", titel: "Nachtdienst, Zimmer 7", graph: "# 1 2:10 Uhr. Frau Lorenz, 82 Jahre, nach Oberschenkelhalsfraktur, klingelt. Sie möchte allein zur Toilette gehen. Sie ist etwas schläfrig, der Rollator steht am Fenster.\n? Was tust du?\n* Licht an, Rollator holen, rutschfeste Schuhe, sie begleiten -> 2 | Sie steht langsam auf, du gehst neben ihr.\n- Ihr die Steckbeckenschüssel anbieten, das geht schneller -> 3 | Sie ist gekränkt: „Ich bin doch kein Baby.“\n- Sagen, dass sie warten soll, bis du mit der Runde fertig bist -> 4 | Du gehst weiter zum nächsten Zimmer.\n# 2 Auf dem Rückweg sagt Frau Lorenz, ihr sei schwindelig. Sie wird blass.\n? Was tust du?\n* Sofort hinsetzen lassen, Blutdruck und Puls messen, Hilfe rufen -> 5 | RR 94/58 mmHg, Puls 96. Nach ein paar Minuten geht es besser.\n- Schnell weiter zum Bett, sind ja nur noch drei Meter -> 6 | Nach zwei Schritten sackt sie in die Knie.\n# 3 Frau Lorenz lehnt die Schüssel ab und will trotzdem aufstehen.\n? Was tust du?\n* Entschuldigen, Licht an und sie doch begleiten -> 2 | Sie lächelt wieder und nimmt deinen Arm.\n- Bettgitter hochziehen, damit sie liegen bleibt -> 7 | Sie rüttelt am Gitter und versucht, darüber zu steigen.\n# 4 Fünf Minuten später hörst du einen dumpfen Schlag aus Zimmer 7.\n? Was tust du zuerst?\n* Ansprechen, nicht sofort hochheben, auf Verletzungen und Kopfanprall prüfen, Hilfe holen -> 6 | Sie liegt neben dem Bett, das Bein ist verkürzt und außenrotiert.\n- Sie schnell zu zweit ins Bett heben -> 6 | Sie schreit vor Schmerzen auf.\n# 5 Geschafft. Du dokumentierst Schwindel und Blutdruck, informierst die Ärztin und vereinbarst mit Frau Lorenz: Sie klingelt, du kommst, nachts brennt ein Nachtlicht und der Rollator steht am Bett. Kein Sturz in dieser Nacht.\n# 6 Frau Lorenz ist gestürzt. Die Ärztin ordnet ein Röntgen an, ein Sturzprotokoll wird geschrieben. Was hätte den Sturz verhindert? Begleitung, Licht, Hilfsmittel in Reichweite und bei Schwindel sofort hinsetzen.\n# 7 Bettgitter ohne Einwilligung oder richterliche Genehmigung sind eine freiheitsentziehende Maßnahme und erhöhen das Sturzrisiko, weil Menschen darüber steigen. Besser: Niedrigbett, Sensormatte, Toilettenplan und Gespräch." },
+      { type: "ampel", q: "Wie sicher fühlst du dich jetzt, wenn eine sturzgefährdete Person nachts aufstehen möchte?" }
+    ] }
+  ];
+  window.FP_LIVE_LIB = { stunden: stunden, faelle: faelle, beispiele: beispiele };
 })();
 
 /* Lehrer-Portal: Live-Unterricht. Live-Stunden aus Bausteinen bauen, Module live an der Tafel zeigen,
@@ -14047,7 +14238,9 @@ h2,h3{letter-spacing:-.018em}
     schaetz: "M4 18h16M7 18V9M12 18V5M17 18v-6", wort: "M4 7h9M4 12h16M4 17h11", ampel: "M9 3h6v18H9zM12 7h.01M12 12h.01M12 17h.01", skala: "M3 12h18M6 9v6M12 9v6M18 9v6",
     reihe: "M9 6h11M9 12h11M9 18h11M4 5.5l1-.5v3M4 11h2l-2 2h2M4 17h2v2H4", fehler: "M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zM16 16l5 5", play: "M8 5.5v13l10.5-6.5z", plus: "M12 5v14M5 12h14",
     up: "M12 19V5M6 11l6-6 6 6", down: "M12 5v14M6 13l6 6 6-6", x: "M6 6l12 12M18 6 6 18", trash: "M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13", edit: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
-    left: "M15 6l-6 6 6 6", right: "M9 6l6 6-6 6", eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z", book: "M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3zM5 16.5a3 3 0 0 1 3-3h11", stop: "M7 7h10v10H7z", spark: "M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z", copy: "M8 8h11v11H8zM5 16V5h11"
+    left: "M15 6l-6 6 6 6", right: "M9 6l6 6-6 6", eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z", book: "M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3zM5 16.5a3 3 0 0 1 3-3h11", stop: "M7 7h10v10H7z", spark: "M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z", copy: "M8 8h11v11H8zM5 16V5h11",
+    sicher: "M12 3l7 3v5c0 4.5-3 8.2-7 9.5C8 19.2 5 15.5 5 11V6zM9 12l2 2 4-4", koerper: "M12 2.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM7 9.5h10l-1.5 6H14l-.8 6h-2.4l-.8-6H8.5z", sortier: "M4 4h6v7H4zM14 4h6v7h-6zM4 15h6v5H4zM14 15h6v5h-6z",
+    hinweis: "M9 18h6M10 21h4M12 3a6 6 0 0 1 3.5 10.9c-.6.5-1 1.1-1 1.9V16h-5v-.2c0-.8-.4-1.4-1-1.9A6 6 0 0 1 12 3z", rolle: "M3 5h11v8H7l-4 3zM10 16h7l4 3v-9h-4", pfad: "M6 20V4M6 14c0-4 4-6 10-6M13 5l3 3-3 3"
   };
   function Ic(p) { return h("svg", { viewBox: "0 0 24 24", width: p.s || 20, height: p.s || 20, fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true }, h("path", { d: I[p.n] || I.spark })); }
   var TYPES = {
@@ -14061,9 +14254,41 @@ h2,h3{letter-spacing:-.018em}
     ampel: { t: "Ampel-Check", d: "Wie sicher fühlt ihr euch? Grün, gelb, rot. Zeigt, ob du wiederholen solltest.", c: "#059669" },
     skala: { t: "Meinungslinie", d: "Zustimmung von „voll“ bis „gar nicht“. Startet Diskussionen zu ethischen Fragen.", c: "#4F46E5" },
     reihe: { t: "Reihenfolge", d: "Schritte in die richtige Reihenfolge bringen, z. B. Handlungsabläufe.", c: "#0891B2" },
-    fehler: { t: "Fehlerjagd", d: "Eine Übergabe oder Dokumentation mit versteckten Fehlern. Die Klasse markiert sie.", c: "#EA580C" }
+    fehler: { t: "Fehlerjagd", d: "Eine Übergabe oder Dokumentation mit versteckten Fehlern. Die Klasse markiert sie.", c: "#EA580C" },
+    sicher: { t: "Sicher oder geraten?", d: "Antwort plus Sicherheit. Vorne erscheint eine Matrix, die gefährliche Fehlvorstellungen („sicher, aber falsch“) sichtbar macht.", c: "#0F766E", neu: 1 },
+    koerper: { t: "Körperkarte", d: "Die Klasse tippt Stellen auf einer Körpersilhouette an, vorne entsteht eine Heatmap. Für Dekubitus, Injektionen, Schmerzorte, Ödeme.", c: "#BE185D", neu: 1 },
+    sortier: { t: "Live-Zuordnung", d: "Begriffe in 2 bis 4 Kategorien sortieren. Vorne siehst du pro Begriff, wo die Klasse unsicher ist.", c: "#9333EA", neu: 1 },
+    hinweis: { t: "Hinweis für Hinweis", d: "Ein Fall wird Stück für Stück aufgedeckt. Die Klasse legt sich früh fest und darf umdenken. Trainiert klinisches Urteilen.", c: "#B45309", neu: 1 },
+    rolle: { t: "Perspektivwechsel", d: "Jedes Handy bekommt zufällig eine Rolle (z. B. Patient, Tochter, Pflegekraft) und antwortet aus dieser Sicht. Vorne erscheinen die Perspektiven nebeneinander.", c: "#2563EB", neu: 1 },
+    pfad: { t: "Klassenentscheid", d: "Ein verzweigter Fall: Die Mehrheit entscheidet, wie es weitergeht. Die Klasse erlebt die Folgen ihrer Entscheidung.", c: "#DC2626", neu: 1 }
   };
-  var ORDER = ["folie", "fall", "frage", "peer", "tf", "schaetz", "wort", "ampel", "skala", "reihe", "fehler"];
+  var ORDER = ["folie", "fall", "frage", "peer", "tf", "schaetz", "wort", "ampel", "skala", "reihe", "fehler", "sicher", "koerper", "sortier", "hinweis", "rolle", "pfad"];
+  var NCOL = ["#0062FF", "#EA580C", "#0D9488", "#9333EA"];
+  /* Klassenentscheid: Text -> Knoten. "# Situation", "? Frage", "* empfohlene Option -> 2 | Folge", "- Option -> Ende | Folge" */
+  function parseGraph(txt) {
+    var nodes = [], cur = null;
+    String(txt || "").split("\n").forEach(function (raw) {
+      var l = raw.trim(); if (!l) return;
+      if (/^#/.test(l)) { cur = { sit: l.replace(/^#+\s*(\d+[.:)]?\s*)?/, ""), q: "", opts: [] }; nodes.push(cur); return; }
+      if (!cur) { cur = { sit: "", q: "", opts: [] }; nodes.push(cur); }
+      if (/^\?/.test(l)) { cur.q = l.replace(/^\?\s*/, ""); return; }
+      var m = /^([*\-])\s*(.+)$/.exec(l);
+      if (m) {
+        var rest = m[2], c = "", to = null, bar = rest.indexOf("|");
+        if (bar >= 0) { c = rest.slice(bar + 1).trim(); rest = rest.slice(0, bar); }
+        var ar = /->\s*(\S+)\s*$/.exec(rest);
+        if (ar) { to = /^\d+$/.test(ar[1]) ? Number(ar[1]) : 0; rest = rest.slice(0, ar.index); }
+        if (cur.opts.length < 5) cur.opts.push({ t: rest.trim(), ok: m[1] === "*", to: to, c: c });
+        return;
+      }
+      cur.sit += (cur.sit ? " " : "") + l;
+    });
+    return nodes.filter(function (n) { return n.sit || n.opts.length; }).slice(0, 12);
+  }
+  function sortAns(b) {
+    var cats = (b.cats || []).slice(0, 4);
+    return { cats: cats, items: (b.items || []).slice(0, 8).map(function (it) { return typeof it === "string" ? { t: it, k: "" } : it; }) };
+  }
 
   /* ---------- Lektion -> Schritte ---------- */
   function seeded(n, seed) {
@@ -14100,6 +14325,19 @@ h2,h3{letter-spacing:-.018em}
           var ls = (b.lines || []).slice(0, 10);
           out.push({ kind: "lines", type: b.type, titel: b.titel || "Fehlerjagd", q: b.q || "Wo stecken die Fehler?", opts: ls.map(function (l) { return l.t; }), ok: ls.map(function (l, i) { return l.err ? i : -1; }).filter(function (i) { return i >= 0; }), lineExp: ls.map(function (l) { return l.err ? l.e || "" : null; }), multi: true, exp: b.exp });
           break;
+        case "sicher": var o6 = o.slice(0, 6); out.push({ kind: "conf", type: b.type, titel: b.titel || "Sicher oder geraten?", sit: b.sit, q: b.q, opts: o6.map(function (x) { return x.t; }), ok: o6.map(function (x, i) { return x.ok ? i : -1; }).filter(function (i) { return i >= 0; }).slice(0, 1), exp: b.exp }); break;
+        case "koerper": out.push({ kind: "body", type: b.type, titel: b.titel || "Körperkarte", sit: b.sit, q: b.q, fig: b.fig === "vorne" ? "vorne" : "hinten", zones: (b.zones || []).slice(), taps: Number(b.taps) === 1 ? 1 : 2, exp: b.exp }); break;
+        case "sortier": var sa = sortAns(b); out.push({ kind: "sort", type: b.type, titel: b.titel || "Live-Zuordnung", q: b.q, cats: sa.cats, items: sa.items.map(function (x) { return x.t; }), ans: sa.items.map(function (x) { var k = sa.cats.findIndex(function (c) { return c.toLowerCase() === String(x.k || "").toLowerCase(); }); return k; }), colors: NCOL, exp: b.exp }); break;
+        case "hinweis": var o5 = o.slice(0, 5); out.push({ kind: "clue", type: b.type, titel: b.titel || "Hinweis für Hinweis", person: b.person ? { name: b.person, info: b.info } : null, q: b.q || "Was vermutest du?", opts: o5.map(function (x) { return x.t; }), ok: o5.map(function (x, i) { return x.ok ? i : -1; }).filter(function (i) { return i >= 0; }).slice(0, 1), clues: (b.clues || []).slice(0, 5), exp: b.exp }); break;
+        case "rolle": out.push({ kind: "role", type: b.type, titel: b.titel || "Perspektivwechsel", sit: b.sit, roles: (b.roles || []).slice(0, 4), q: b.q || "Was denkst und fühlst du in dieser Situation?", exp: b.exp }); break;
+        case "pfad":
+          var nodes = parseGraph(b.graph), base = out.length, after = base + nodes.length;
+          nodes.forEach(function (n, ni) {
+            var tgt = function (to) { return to && to >= 1 && to <= nodes.length && to - 1 !== ni ? base + to - 1 : after; };
+            if (!n.opts.length) out.push({ kind: "info", type: "pfad", titel: b.titel || "Klassenentscheid", html: n.sit, after: after });
+            else out.push({ kind: "choice", type: "pfad", titel: b.titel || "Klassenentscheid", sit: n.sit, q: n.q || "Wie entscheidet ihr?", opts: n.opts.map(function (x) { return x.t; }), ok: n.opts.map(function (x, i) { return x.ok ? i : -1; }).filter(function (i) { return i >= 0; }), cons: n.opts.map(function (x) { return x.c; }), jumps: n.opts.map(function (x) { return tgt(x.to); }), pfad: true });
+          });
+          break;
       }
     });
     return out;
@@ -14133,11 +14371,20 @@ h2,h3{letter-spacing:-.018em}
     });
     return out;
   }
-  function pubOf(title, steps, i, phase) {
-    var s = steps[i];
+  function majority(s, votes) {
+    var c = (s.opts || []).map(function (_, i) { return votes.filter(function (v) { return (v.choice || [])[0] === i; }).length; });
+    var best = c.indexOf(Math.max.apply(null, c));
+    if (!votes.length) best = s.ok && s.ok.length ? s.ok[0] : 0;
+    return best < 0 ? 0 : best;
+  }
+  function pubOf(title, steps, i, phase, x) {
+    var s = steps[i]; x = x || {};
     if (!s) return { mode: "unterricht", title: title, total: steps.length };
-    var p = { mode: "unterricht", title: title, total: steps.length, kind: s.kind, titel: s.titel, html: s.html, img: s.img, rows: s.rows, person: s.person, sit: s.sit, q: s.q, opts: s.opts, multi: !!s.multi, colors: s.colors, items: s.items, unit: s.unit, min: s.min, max: s.max, hint: s.hint };
-    if (phase === "reveal" && !s.survey) p.rev = { ok: s.ok, exp: s.exp, ans: s.ans, order: s.order, lines: s.lineExp };
+    var p = { mode: "unterricht", title: title, total: steps.length, kind: s.kind, titel: s.titel, html: s.html, img: s.img, rows: s.rows, person: s.person, sit: s.sit, q: s.q, opts: s.opts, multi: !!s.multi, colors: s.colors, items: s.items, unit: s.unit, min: s.min, max: s.max, hint: s.hint, cats: s.cats, roles: s.roles, fig: s.fig, taps: s.taps };
+    if (s.kind === "clue") { p.clue = x.clue || 0; p.clues = (s.clues || []).slice(0, (x.clue || 0) + 1); }
+    if (phase === "reveal" && s.kind === "clue") p.clues = s.clues;
+    if (phase === "reveal" && !s.survey) p.rev = { ok: s.ok, exp: s.exp, ans: s.ans, order: s.order, lines: s.lineExp, zones: s.zones };
+    if (phase === "reveal" && s.pfad && x.pick != null) { p.rev.pick = x.pick; p.rev.cons = s.cons[x.pick]; }
     if (phase === "reveal" && s.survey && s.peer !== 1) p.rev = { exp: s.exp };
     return JSON.parse(JSON.stringify(p));
   }
@@ -14178,6 +14425,25 @@ h2,h3{letter-spacing:-.018em}
           v.choice = r < 0.45 ? s.order.slice() : seeded(s.items.length, Math.floor(Math.random() * 999));
         } else if (s.kind === "estimate") {
           var a = Number(s.ans) || 10; v.txt = String(Math.round((a + (Math.random() + Math.random() + Math.random() - 1.5) * a * 0.45) * 10) / 10);
+        } else if (s.kind === "conf" || s.kind === "clue") {
+          var g0 = s.ok && s.ok.length ? s.ok[0] : 0, no2 = s.opts.length, right = r < (s.kind === "clue" ? 0.55 : 0.6);
+          var pick = right ? g0 : (g0 + 1 + Math.floor(Math.random() * Math.max(1, no2 - 1))) % no2;
+          if (s.kind === "conf") v.choice = [pick, Math.random() < (right ? 0.7 : 0.45) ? 8 : 9];
+          else { var maxc = Math.max(0, (s._clue || 0)); v.choice = [pick, 5 + Math.min(maxc, Math.floor(Math.random() * (maxc + 1)))]; }
+        } else if (s.kind === "body") {
+          var BZ = (window.FP_BODY && window.FP_BODY.Z[s.fig]) || {}, keys = s.zones && s.zones.length ? s.zones : Object.keys(BZ), taps = [];
+          for (var q = 0; q < s.taps; q++) {
+            var useKey = Math.random() < 0.72 ? keys[Math.floor(Math.random() * keys.length)] : Object.keys(BZ)[Math.floor(Math.random() * Object.keys(BZ).length)], z = BZ[useKey];
+            if (!z) continue; var cc = z[1][Math.floor(Math.random() * z[1].length)];
+            taps.push([Math.max(0, Math.min(99, Math.round(cc[0] + (Math.random() - 0.5) * 8))), Math.max(0, Math.min(99, Math.round((cc[1] + (Math.random() - 0.5) * 8) / 2)))]);
+          }
+          v.choice = window.FP_BODY ? window.FP_BODY.enc(taps) : [0];
+          if (!v.choice.length) v.choice = [0, 0, 0, 0];
+        } else if (s.kind === "sort") {
+          v.choice = s.ans.map(function (a) { return Math.random() < 0.7 && a >= 0 ? a : Math.floor(Math.random() * s.cats.length); });
+        } else if (s.kind === "role") {
+          var ri = Math.floor(Math.random() * Math.max(1, s.roles.length)), RP = [["Ich habe Angst, nicht mehr gefragt zu werden.", "Ich will einfach nach Hause.", "Warum redet keiner mit mir?", "Ich fühle mich wie eine Last."], ["Ich mache mir Sorgen und habe ein schlechtes Gewissen.", "Ich kann das nicht mehr allein schaffen.", "Ich will das Beste, aber was ist das?"], ["Ich will Sicherheit geben und trotzdem seine Wünsche respektieren.", "Ich habe zu wenig Zeit für das Gespräch.", "Ich sehe die Risiken jeden Tag."], ["Medizinisch ist die Lage klar, menschlich nicht.", "Ich muss alle an einen Tisch holen.", "Wir brauchen eine gemeinsame Entscheidung."]];
+          var pool2 = RP[ri % RP.length]; v.txt = "[" + ri + "] " + pool2[Math.floor(Math.random() * pool2.length)];
         } else if (s.kind === "word") {
           var pool = s.demo && s.demo.length ? s.demo : ["Zuwendung", "Sicherheit", "Beobachtung", "Kommunikation", "Hygiene", "Empathie", "Teamarbeit", "Verantwortung"];
           v.txt = [pool[Math.floor(Math.pow(Math.random(), 1.7) * pool.length)], Math.random() < 0.5 ? pool[Math.floor(Math.random() * pool.length)] : null].filter(Boolean).join(", ");
@@ -14206,6 +14472,24 @@ h2,h3{letter-spacing:-.018em}
       var bins = [0, 0, 0, 0, 0, 0, 0, 0];
       nums.forEach(function (x) { var k = Math.max(0, Math.min(7, Math.floor((x - lo) / (hi - lo) * 8))); bins[k]++; });
       res.bins = bins; res.lo = lo; res.hi = hi;
+    } else if (s.kind === "conf" || s.kind === "clue" || (s.pfad)) {
+      res.c = (s.opts || []).map(function (_, i) { return votes.filter(function (v) { return (v.choice || [])[0] === i; }).length; });
+      var g = s.ok && s.ok.length ? s.ok[0] : -1;
+      res.right = votes.filter(function (v) { return (v.choice || [])[0] === g; }).length;
+      if (s.kind === "conf") {
+        res.m = { gs: 0, gu: 0, fu: 0, fs: 0 }; res.sure = 0;
+        votes.forEach(function (v) { var ok = (v.choice || [])[0] === g, sure = (v.choice || [])[1] !== 9; if (sure) res.sure++; res.m[(ok ? "g" : "f") + (sure ? "s" : "u")]++; });
+      }
+      if (s.kind === "clue") res.by = (s.clues || []).map(function (_, ci) { var vv = votes.filter(function (v) { return (v.choice || [])[1] === 5 + ci; }); return { n: vv.length, ok: vv.filter(function (v) { return v.choice[0] === g; }).length }; });
+    } else if (s.kind === "body") {
+      res.taps = []; votes.forEach(function (v) { (window.FP_BODY ? window.FP_BODY.dec(v.choice) : []).forEach(function (t) { res.taps.push(t); }); });
+      res.hit = res.taps.filter(function (t) { return window.FP_BODY && window.FP_BODY.hit(s.fig, s.zones, t[0], t[1]); }).length;
+    } else if (s.kind === "sort") {
+      res.per = s.items.map(function (_, ii) { return s.cats.map(function (_, ci) { return votes.filter(function (v) { return (v.choice || [])[ii] === ci; }).length; }); });
+      res.full = votes.filter(function (v) { return s.ans.every(function (a, ii) { return a < 0 || (v.choice || [])[ii] === a; }); }).length;
+    } else if (s.kind === "role") {
+      res.by = (s.roles || []).map(function () { return []; });
+      votes.forEach(function (v) { var m = /^\[(\d)\]\s*([\s\S]*)$/.exec(String(v.txt || "")); if (m && res.by[Number(m[1])] && m[2].trim()) res.by[Number(m[1])].push(m[2].trim()); });
     } else if (s.kind === "word") {
       var f = {};
       votes.forEach(function (v) { String(v.txt || "").split(/[,;\n]+/).map(function (w) { return w.trim().replace(/\s+/g, " "); }).filter(function (w) { return w.length > 1 && w.length < 40; }).forEach(function (w) { var k = w.toLowerCase(); f[k] = f[k] || { w: w.charAt(0).toUpperCase() + w.slice(1), n: 0 }; f[k].n++; }); });
@@ -14219,9 +14503,65 @@ h2,h3{letter-spacing:-.018em}
       var c = t.c ? t.c[i] : 0, pct = Math.round(c / max * 100), good = showOk && s.ok.indexOf(i) >= 0;
       var cmp = p.cmp && p.cmp.c ? Math.round(p.cmp.c[i] / Math.max(1, p.cmp.n) * 100) : null;
       return h("div", { key: i, className: "fxp-bar" + (good ? " ok" : showOk ? " no" : ""), style: { "--bc": s.colors ? s.colors[i] : null } },
-        h("div", { className: "fxp-bl" }, s.kind !== "scale" && s.kind !== "lines" ? h("i", null, "ABCDEFGHIJ"[i]) : null, h("span", null, o), good ? h("em", null, "richtig") : null),
+        h("div", { className: "fxp-bl" }, s.kind !== "scale" && s.kind !== "lines" ? h("i", null, "ABCDEFGHIJ"[i]) : null, h("span", null, o), good ? h("em", null, s.pfad ? "empfohlen" : "richtig") : null),
         h("div", { className: "fxp-bt" }, cmp != null && h("u", { style: { width: cmp + "%" } }), h("b", { style: { width: pct + "%" } })),
         h("div", { className: "fxp-bn" }, pct + " %", cmp != null ? h("small", null, "vorher " + cmp + " %") : null));
+    }));
+  }
+
+  /* ---------- Ansichten der neuen Methoden ---------- */
+  var pct = function (a, b) { return Math.round(a / Math.max(1, b) * 100); };
+  function ConfView(p) {
+    var s = p.s, t = p.t;
+    if (!p.show) return h("div", { className: "fxp-opts" }, s.opts.map(function (o, i) { return h("div", { key: i, className: "fxp-opt" }, h("i", null, "ABCDEF"[i]), h("span", null, o)); }), h("p", { className: "fxp-small" }, "Auf dem Handy: Antwort wählen und angeben, ob man sich sicher ist oder rät."));
+    var M = t.m || { gs: 0, gu: 0, fu: 0, fs: 0 };
+    return h("div", null, h(Bars, { s: s, t: t, rev: p.rev }),
+      !p.rev ? h("p", { className: "fxp-big" }, h("b", null, pct(t.sure, t.n) + " %"), " sind sich sicher") :
+      h("div", { className: "fxp-matrix" },
+        h("div", { className: "q gs" }, h("b", null, pct(M.gs, t.n) + " %"), h("span", null, "sicher und richtig"), h("small", null, "Gefestigtes Wissen")),
+        h("div", { className: "q fs" }, h("b", null, pct(M.fs, t.n) + " %"), h("span", null, "sicher, aber falsch"), h("small", null, "Fehlvorstellung! Hier lohnt die Diskussion am meisten.")),
+        h("div", { className: "q gu" }, h("b", null, pct(M.gu, t.n) + " %"), h("span", null, "geraten und richtig"), h("small", null, "Noch wackelig, bitte festigen")),
+        h("div", { className: "q fu" }, h("b", null, pct(M.fu, t.n) + " %"), h("span", null, "geraten und falsch"), h("small", null, "Lücke erkannt, gut zum Wiederholen"))));
+  }
+  function BodyView(p) {
+    var s = p.s, t = p.t, B = window.FP_BODY;
+    if (!B) return null;
+    var dots = "";
+    if (p.show) (t.taps || []).forEach(function (tp) { dots += '<circle cx="' + (tp[0] + 0.5) + '" cy="' + (tp[1] * 2 + 1) + '" r="5" fill="rgba(225,29,72,.22)"/><circle cx="' + (tp[0] + 0.5) + '" cy="' + (tp[1] * 2 + 1) + '" r="1.3" fill="#BE185D"/>'; });
+    var extra = (p.rev ? B.zonesSvg(s.fig, s.zones, true) : "") + dots;
+    return h("div", { className: "fxp-body" }, h("div", { className: "fxp-bodyfig", dangerouslySetInnerHTML: { __html: B.svg(s.fig, extra) } }),
+      h("div", { className: "fxp-bodyside" },
+        h("p", { className: "fxp-big" }, h("b", null, (t.taps || []).length), " Stellen angetippt"),
+        p.rev && s.zones && s.zones.length ? h("p", { className: "fxp-big" }, h("b", { className: "ok" }, pct(t.hit, (t.taps || []).length) + " %"), " treffen eine richtige Stelle") : null,
+        p.rev && h("ul", { className: "fxp-zl" }, (s.zones || []).map(function (k) { var z = B.Z[s.fig][k]; return z ? h("li", { key: k }, z[0]) : null; })),
+        !p.show && h("p", { className: "fxp-small" }, "Die Heatmap erscheint, sobald du das Ergebnis zeigst.")));
+  }
+  function SortView(p) {
+    var s = p.s, t = p.t;
+    return h("div", { className: "fxp-sort" },
+      h("div", { className: "fxp-legend" }, s.cats.map(function (c, i) { return h("span", { key: i, style: { "--bc": NCOL[i] } }, h("i", null), c); })),
+      s.items.map(function (it, ii) {
+        var per = t.per ? t.per[ii] : [], tot = per.reduce(function (a, b) { return a + b; }, 0), a = s.ans[ii];
+        return h("div", { key: ii, className: "fxp-srow" + (p.rev ? (tot && per[a] / tot >= 0.7 ? " good" : " weak") : "") },
+          h("span", { className: "fxp-sl" }, it, p.rev && a >= 0 ? h("em", { style: { color: NCOL[a] } }, "→ " + s.cats[a]) : null),
+          h("div", { className: "fxp-stack" }, p.show ? per.map(function (c, ci) { return c ? h("b", { key: ci, style: { width: pct(c, tot) + "%", background: NCOL[ci], opacity: p.rev && ci !== a ? 0.35 : 1 } }, pct(c, tot) >= 12 ? pct(c, tot) + " %" : "") : null; }) : null));
+      }),
+      p.rev && h("p", { className: "fxp-big" }, h("b", null, pct(t.full, t.n) + " %"), " haben alles richtig zugeordnet"));
+  }
+  function ClueView(p) {
+    var s = p.s, t = p.t, shown = p.rev ? s.clues.length : p.clue + 1;
+    return h("div", { className: "fxp-clue" },
+      h("ol", { className: "fxp-clues" }, s.clues.slice(0, shown).map(function (c, i) { return h("li", { key: i, className: i === shown - 1 && !p.rev ? "new" : "" }, h("b", null, "Hinweis " + (i + 1)), h("span", null, c)); }),
+        !p.rev && shown < s.clues.length ? h("li", { className: "more" }, (s.clues.length - shown) + " weitere Hinweise folgen") : null),
+      h("h2", { className: "fxp-q" }, s.q),
+      p.show ? h(Bars, { s: s, t: t, rev: p.rev }) : h("div", { className: "fxp-opts" }, s.opts.map(function (o, i) { return h("div", { key: i, className: "fxp-opt" }, h("i", null, "ABCDE"[i]), h("span", null, o)); })),
+      p.rev && t.by && h("div", { className: "fxp-when" }, h("b", null, "Wann habt ihr euch festgelegt?"), h("div", { className: "fxp-whenrow" }, t.by.map(function (b, i) { return h("div", { key: i }, h("i", { style: { height: Math.max(4, pct(b.n, t.n)) + "%" } }), h("small", null, "nach " + (i + 1)), h("em", null, b.n ? pct(b.ok, b.n) + " % richtig" : "–")); }))));
+  }
+  function RoleView(p) {
+    var s = p.s, t = p.t, RC = ["#2563EB", "#DB2777", "#0D9488", "#EA580C"];
+    return h("div", { className: "fxp-roles", style: { gridTemplateColumns: "repeat(" + Math.max(1, s.roles.length) + ",minmax(0,1fr))" } }, s.roles.map(function (r, i) {
+      var list = t.by ? t.by[i] || [] : [];
+      return h("div", { key: i, className: "fxp-role", style: { "--rc": RC[i % 4] } }, h("header", null, h("b", null, r), h("span", null, list.length)), p.show ? list.slice(-8).map(function (x, j) { return h("p", { key: j }, "„" + x + "“"); }) : h("p", { className: "fxp-small" }, list.length ? "Antworten werden gesammelt …" : "Noch keine Antwort"));
     }));
   }
 
@@ -14236,6 +14576,9 @@ h2,h3{letter-spacing:-.018em}
     var se = useState(null), err = se[0], setErr = se[1];
     var sh = useState({}), hist = sh[0], setHist = sh[1];
     var sq = useState(true), bigQr = sq[0], setBigQr = sq[1];
+    var scl = useState(0), clue = scl[0], setClue = scl[1];
+    var str = useState([]), trail = str[0], setTrail = str[1];
+    var spk2 = useState(null), pick = spk2[0], setPick = spk2[1];
     useEffect(function () { var S = Session(title, steps.length); S.start().then(setSes).catch(function (e) { setErr(e.message); }); }, []);
     var s = idx >= 0 ? steps[idx] : null;
     useEffect(function () {
@@ -14247,30 +14590,44 @@ h2,h3{letter-spacing:-.018em}
       f(); var t = setInterval(f, 1300);
       return function () { alive = false; clearInterval(t); };
     }, [ses, idx, phase]);
-    async function go(i, ph) {
+    async function go(i, ph, isBack) {
       if (!ses) return;
       if (s && idx >= 0) setHist(function (x) { var y = Object.assign({}, x); y[idx] = tally(s, votes); return y; });
-      setIdx(i); setPhase(ph); setVotes([]);
-      try { await ses.update({ step: i, phase: ph, pub: pubOf(title, steps, i, ph) }); } catch (e) { setErr(e.message); }
+      if (!isBack && idx >= 0) setTrail(function (t) { return t.concat([idx]); });
+      setIdx(i); setPhase(ph); setVotes([]); setClue(0); setPick(null);
+      if (steps[i]) steps[i]._clue = 0;
+      try { await ses.update({ step: i, phase: ph, pub: pubOf(title, steps, i, ph, { clue: 0 }) }); } catch (e) { setErr(e.message); }
     }
     async function reveal() {
       setPhase("reveal");
       setHist(function (x) { var y = Object.assign({}, x); y[idx] = tally(s, votes); return y; });
-      try { await ses.update({ phase: "reveal", pub: pubOf(title, steps, idx, "reveal") }); } catch (e) { setErr(e.message); }
+      var pk = s && s.pfad ? majority(s, votes) : null; setPick(pk);
+      try { await ses.update({ phase: "reveal", pub: pubOf(title, steps, idx, "reveal", { clue: clue, pick: pk }) }); } catch (e) { setErr(e.message); }
+    }
+    async function nextClue() {
+      if (!s || s.kind !== "clue" || clue >= s.clues.length - 1) return;
+      var c = clue + 1; setClue(c); s._clue = c;
+      try { await ses.update({ pub: pubOf(title, steps, idx, "question", { clue: c }) }); } catch (e) { setErr(e.message); }
     }
     async function end() {
       try { if (ses) await ses.end(); } catch (e) {}
       p.close();
     }
-    function next() { if (idx < steps.length - 1) go(idx + 1, "question"); else if (phase !== "end") { setPhase("end"); ses && ses.update({ phase: "end", pub: { mode: "unterricht", title: title, total: steps.length, summary: "Danke fürs Mitmachen! Die Stunde ist beendet." } }); } }
-    function back() { if (idx > 0) go(idx - 1, "question"); }
+    function next() {
+      if (s && s.jumps) { var pk = pick != null ? pick : majority(s, votes), tg = s.jumps[pk]; if (tg < steps.length) return go(tg, "question"); return finish(); }
+      if (s && s.after != null) { if (s.after < steps.length) return go(s.after, "question"); return finish(); }
+      if (idx < steps.length - 1) go(idx + 1, "question"); else finish();
+    }
+    function finish() { if (phase !== "end") { setPhase("end"); ses && ses.update({ phase: "end", pub: { mode: "unterricht", title: title, total: steps.length, summary: "Danke fürs Mitmachen! Die Stunde ist beendet." } }); } }
+    function back() { if (trail.length) { var t = trail[trail.length - 1]; setTrail(trail.slice(0, -1)); go(t, "question", true); } else if (idx > 0) go(idx - 1, "question", true); }
     var canReveal = s && s.kind !== "info" && phase === "question";
+    var moreClue = s && s.kind === "clue" && phase === "question" && clue < s.clues.length - 1;
     useEffect(function () {
       var k = function (e) {
         if (/input|textarea|select/i.test((e.target || {}).tagName || "")) return;
-        if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); if (idx < 0) go(0, "question"); else if (canReveal) reveal(); else next(); }
+        if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); if (idx < 0) go(0, "question"); else if (moreClue) nextClue(); else if (canReveal) reveal(); else next(); }
         else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); back(); }
-        else if (e.key === " ") { e.preventDefault(); if (canReveal) reveal(); else if (idx < 0) go(0, "question"); else next(); }
+        else if (e.key === " ") { e.preventDefault(); if (moreClue) nextClue(); else if (canReveal) reveal(); else if (idx < 0) go(0, "question"); else next(); }
         else if (e.key === "Escape") { e.preventDefault(); end(); }
       };
       document.addEventListener("keydown", k);
@@ -14293,11 +14650,17 @@ h2,h3{letter-spacing:-.018em}
         s.img && h("img", { className: "fxp-img", src: s.img, alt: "" }),
         s.sit && h("div", { className: "fxp-sit" }, s.sit),
         s.rows && s.rows.length > 0 && h("table", { className: "fxp-rows" }, h("tbody", null, s.rows.map(function (r, i) { return h("tr", { key: i }, h("td", null, r[0]), h("td", null, h("b", null, r[1]))); }))),
-        s.q && h("h2", { className: "fxp-q" }, s.q),
+        s.q && s.kind !== "clue" && h("h2", { className: "fxp-q" }, s.q),
         s.kind === "choice" || s.kind === "scale" || s.kind === "lines" ? (showRes ? h(Bars, { s: s, t: t, rev: phase === "reveal", cmp: s.peer === 2 && hist[s.ref] ? hist[s.ref] : null }) : h("div", { className: "fxp-opts" + (s.kind === "lines" ? " lines" : "") }, s.opts.map(function (o, i) { return h("div", { key: i, className: "fxp-opt", style: { "--bc": s.colors ? s.colors[i] : null } }, s.kind === "choice" ? h("i", null, "ABCDEFGHIJ"[i]) : null, h("span", null, o)); }))) : null,
         s.kind === "order" && (showRes ? h("div", { className: "fxp-order" }, h("p", { className: "fxp-big" }, h("b", null, Math.round(t.full / Math.max(1, t.n) * 100) + " %"), " haben alles richtig"), h("ol", null, s.order.map(function (k, pIdx) { return h("li", { key: k }, h("span", null, phase === "reveal" ? s.items[k] : "Position " + (pIdx + 1)), h("em", null, Math.round(t.pos[pIdx] / Math.max(1, t.n) * 100) + " % richtig")); }))) : h("div", { className: "fxp-opts" }, s.items.map(function (o, i) { return h("div", { key: i, className: "fxp-opt" }, h("span", null, o)); }))),
         s.kind === "estimate" && showRes && h("div", { className: "fxp-est" }, h("div", { className: "fxp-hist" }, t.bins.map(function (b, i) { return h("div", { key: i, style: { height: Math.round(b / Math.max(1, Math.max.apply(null, t.bins)) * 100) + "%" } }, b ? h("span", null, b) : null); })), h("div", { className: "fxp-axis" }, h("span", null, Math.round(t.lo * 10) / 10), h("span", null, Math.round(t.hi * 10) / 10)), h("p", { className: "fxp-big" }, "Median der Klasse: ", h("b", null, t.median == null ? "–" : String(t.median).replace(".", ",")), phase === "reveal" ? h(R.Fragment, null, " · richtig: ", h("b", { className: "ok" }, String(s.ans).replace(".", ",") + (s.unit ? " " + s.unit : ""))) : null)),
         s.kind === "word" && showRes && h("div", { className: "fxp-cloud" }, t.words.length ? t.words.map(function (w, i) { var mx = t.words[0].n; return h("span", { key: w.w, style: { fontSize: (16 + Math.round(w.n / mx * 46)) + "px", color: ["#0062FF", "#7C3AED", "#0D9488", "#DB2777", "#EA580C", "#4F46E5", "#059669"][i % 7] } }, w.w); }) : h("p", { className: "fxp-small" }, "Noch keine Stichworte.")),
+        s.kind === "conf" && h(ConfView, { s: s, t: t, show: showRes, rev: phase === "reveal" }),
+        s.kind === "body" && h(BodyView, { s: s, t: t, show: showRes, rev: phase === "reveal" }),
+        s.kind === "sort" && h(SortView, { s: s, t: t, show: showRes, rev: phase === "reveal" }),
+        s.kind === "clue" && h(ClueView, { s: s, t: t, show: showRes, rev: phase === "reveal", clue: clue }),
+        s.kind === "role" && h(RoleView, { s: s, t: t, show: showRes, rev: phase === "reveal" }),
+        s.pfad && phase === "reveal" && pick != null && h("div", { className: "fxp-path" }, h("span", { className: "fxp-eyebrow" }, "Die Klasse hat entschieden"), h("b", null, "ABCDE"[pick] + ": " + s.opts[pick]), s.cons[pick] && h("p", null, s.cons[pick]), s.ok.length && s.ok.indexOf(pick) < 0 ? h("div", { className: "fxp-alt" }, h("small", null, "Fachlich empfohlen wäre gewesen: " + "ABCDE"[s.ok[0]] + ". " + s.opts[s.ok[0]]), s.cons[s.ok[0]] && h("small", null, "Was dann passiert wäre: " + s.cons[s.ok[0]])) : null),
         phase === "reveal" && s.exp && h("div", { className: "fxp-exp" }, h("b", null, "Erklärung"), h("p", null, s.exp)),
         phase === "reveal" && s.kind === "lines" && s.lineExp && h("div", { className: "fxp-exp" }, s.lineExp.map(function (e, i) { return e ? h("p", { key: i }, h("b", null, "„" + s.opts[i].slice(0, 70) + "“ "), e) : null; })),
         s.peer === 1 && phase === "reveal" && h("div", { className: "fxp-exp peer" }, h("b", null, "Jetzt diskutieren"), h("p", null, "Sucht euch jemanden mit einer anderen Antwort und überzeugt euch gegenseitig. Zwei Minuten. Danach stimmen alle noch einmal ab.")));
@@ -14314,10 +14677,11 @@ h2,h3{letter-spacing:-.018em}
       err && h("div", { className: "fxp-err" }, err),
       h("main", { className: "fxp-main" }, main),
       ses && idx >= 0 && phase !== "end" && h("footer", { className: "fxp-bot" },
-        h("button", { type: "button", className: "fxp-btn", onClick: back, disabled: idx <= 0 }, h(Ic, { n: "left" }), "Zurück"),
+        h("button", { type: "button", className: "fxp-btn", onClick: back, disabled: idx <= 0 && !trail.length }, h(Ic, { n: "left" }), "Zurück"),
         s && s.kind !== "info" && phase === "question" && h("label", { className: "fxp-tog" }, h("input", { type: "checkbox", checked: peek, onChange: function (e) { setPeek(e.target.checked); } }), "Ergebnis live mitzeigen"),
         h("div", { className: "fxp-sp" }),
         ses && ses.demo && s && s.kind !== "info" && h("span", { className: "fxp-small" }, "Demo: Stimmen werden simuliert"),
+        moreClue && h("button", { type: "button", className: "fxp-btn clue", onClick: nextClue }, h(Ic, { n: "hinweis", s: 18 }), "Nächster Hinweis (" + (clue + 2) + "/" + s.clues.length + ")"),
         canReveal && h("button", { type: "button", className: "fxp-btn accent", onClick: reveal }, s.survey ? "Ergebnis zeigen" : "Auflösen"),
         h("button", { type: "button", className: "fxp-btn primary", onClick: next }, idx < steps.length - 1 ? "Weiter" : "Beenden", h(Ic, { n: "right" })))
     ), document.body);
@@ -14332,6 +14696,8 @@ h2,h3{letter-spacing:-.018em}
     if (b.items && b.type === "tf") f.items = b.items.map(function (i) { return (i.ok ? "R: " : "F: ") + i.t + (i.e ? " | " + i.e : ""); }).join("\n");
     if (b.items && b.type === "reihe") f.items = b.items.join("\n");
     if (b.lines) f.lines = b.lines.map(function (l) { return (l.err ? "! " : "") + l.t + (l.e ? " | " + l.e : ""); }).join("\n");
+    ["cats", "roles", "clues"].forEach(function (k) { if (Array.isArray(b[k])) f[k] = b[k].join("\n"); });
+    if (b.items && b.type === "sortier") f.items = b.items.map(function (i) { return typeof i === "string" ? i : i.t + " = " + (i.k || ""); }).join("\n");
     return f;
   }
   function fromForm(f) {
@@ -14340,6 +14706,8 @@ h2,h3{letter-spacing:-.018em}
     if (typeof f.befunde === "string") b.befunde = linesOf(f.befunde).map(function (l) { var i = l.indexOf(":"); return i > 0 ? [l.slice(0, i).trim(), l.slice(i + 1).trim()] : [l, ""]; });
     if (f.type === "tf" && typeof f.items === "string") b.items = linesOf(f.items).map(function (l) { var ok = !/^F\s*:/i.test(l), t = l.replace(/^[RF]\s*:\s*/i, ""), parts = t.split("|"); return { t: parts[0].trim(), ok: ok, e: (parts[1] || "").trim() }; });
     if (f.type === "reihe" && typeof f.items === "string") b.items = linesOf(f.items).slice(0, 8);
+    ["cats", "roles", "clues"].forEach(function (k) { if (typeof f[k] === "string") b[k] = linesOf(f[k]); });
+    if (f.type === "sortier" && typeof f.items === "string") b.items = linesOf(f.items).slice(0, 8).map(function (l) { var i = l.lastIndexOf("="); return i > 0 ? { t: l.slice(0, i).trim(), k: l.slice(i + 1).trim() } : { t: l, k: "" }; });
     if (typeof f.lines === "string") b.lines = linesOf(f.lines).slice(0, 10).map(function (l) { var err = /^!/.test(l), t = l.replace(/^!\s*/, ""), parts = t.split("|"); return { t: parts[0].trim(), err: err, e: (parts[1] || "").trim() }; });
     return b;
   }
@@ -14354,8 +14722,15 @@ h2,h3{letter-spacing:-.018em}
     ampel: [["q", "Frage (optional), z. B. Wie sicher fühlst du dich beim Blutdruckmessen?"]],
     skala: [["q", "These, z. B. Eine Lüge aus Fürsorge ist in Ordnung."], ["links", "Linkes Ende (optional)"], ["rechts", "Rechtes Ende (optional)"]],
     reihe: [["q", "Aufgabe, z. B. Bringt die Schritte der Händedesinfektion in die richtige Reihenfolge."], ["items", "Schritte in der RICHTIGEN Reihenfolge, je Zeile einer (höchstens 8)", "area"], ["exp", "Erklärung", "area"]],
-    fehler: [["titel", "Überschrift, z. B. Übergabe der Frühschicht"], ["lines", "Sätze, je Zeile einer. Fehlerhafte mit ! davor, Erklärung nach |", "area"], ["exp", "Gesamterklärung (optional)", "area"]]
+    fehler: [["titel", "Überschrift, z. B. Übergabe der Frühschicht"], ["lines", "Sätze, je Zeile einer. Fehlerhafte mit ! davor, Erklärung nach |", "area"], ["exp", "Gesamterklärung (optional)", "area"]],
+    sicher: [["sit", "Kurze Situation (optional)", "area"], ["q", "Frage"], ["opts", "Antworten, je Zeile eine (höchstens 6). Die richtige mit * davor", "area"], ["exp", "Erklärung nach dem Auflösen", "area"]],
+    koerper: [["sit", "Situation (optional)", "area"], ["q", "Aufgabe, z. B. Tippe die zwei Stellen an, die in Rückenlage am stärksten gefährdet sind."], ["fig", "Ansicht", "select", [["hinten", "Rückseite"], ["vorne", "Vorderseite"]]], ["taps", "Antippen pro Person", "select", [["2", "bis zu 2 Stellen"], ["1", "1 Stelle"]]], ["zones", "Richtige Stellen (werden beim Auflösen eingeblendet)", "zones"], ["exp", "Erklärung", "area"]],
+    sortier: [["q", "Aufgabe, z. B. Ordnet die Erreger der richtigen Isolierung zu."], ["cats", "Kategorien, je Zeile eine (2 bis 4)", "area"], ["items", "Begriffe, je Zeile „Begriff = Kategorie“ (höchstens 8)", "area"], ["exp", "Erklärung", "area"]],
+    hinweis: [["person", "Person (erfunden), z. B. Herr Albers, 74 Jahre"], ["info", "Kurzinfo, z. B. Chirurgie, 2. Tag nach OP"], ["clues", "Hinweise, je Zeile einer, vom unklaren zum eindeutigen (höchstens 5)", "area"], ["q", "Frage, z. B. Was vermutest du?"], ["opts", "Vermutungen, je Zeile eine (höchstens 5). Die richtige mit * davor", "area"], ["exp", "Auflösung", "area"]],
+    rolle: [["sit", "Situation, die alle sehen", "area"], ["roles", "Rollen, je Zeile eine (2 bis 4), z. B. Patient, Tochter, Pflegekraft, Ärztin", "area"], ["q", "Frage an alle Rollen, z. B. Was denkst und fühlst du gerade?"], ["exp", "Impuls für die Auswertung", "area"]],
+    pfad: [["titel", "Überschrift, z. B. Nachtdienst auf Station 3"], ["graph", "Ablauf. Jede Situation beginnt mit #, Optionen mit - (empfohlen mit *). Nach -> die Nummer der nächsten Situation oder Ende, nach | die Folge.", "graph"]]
   };
+  var GRAPH_HINT = "# 1 Frau Lorenz klingelt um 2 Uhr, sie will allein zur Toilette.\n? Was tust du?\n* Begleiten und Licht anmachen -> 2 | Sie kommt sicher an.\n- Ihr die Urinflasche geben -> 3 | Sie ist gekränkt.\n# 2 Auf dem Rückweg wird ihr schwindelig.\n* Hinsetzen lassen, Blutdruck messen -> Ende | RR 92/58, du informierst die Ärztin.\n- Schnell zurück ins Bett -> Ende | Sie stürzt fast.\n# 3 Zehn Minuten später steht sie allein auf.\n- Bettgitter hochziehen -> Ende | Das ist eine freiheitsentziehende Maßnahme.\n* Gespräch und Toilettenplan -> Ende | Sie fühlt sich ernst genommen.";
   function shrinkImg(file, cb) {
     var u = URL.createObjectURL(file), im = new Image();
     im.onload = function () { var f = Math.min(1, 1200 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * f); c.height = Math.round(im.height * f); var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); cb(c.toDataURL("image/jpeg", 0.82)); };
@@ -14368,6 +14743,9 @@ h2,h3{letter-spacing:-.018em}
         h("span", { className: "fxb-tools" }, h("button", { type: "button", className: "iconbtn", "aria-label": "Nach oben", disabled: p.i === 0, onClick: function () { p.move(-1); } }, h(Ic, { n: "up", s: 16 })), h("button", { type: "button", className: "iconbtn", "aria-label": "Nach unten", disabled: p.last, onClick: function () { p.move(1); } }, h(Ic, { n: "down", s: 16 })), h("button", { type: "button", className: "iconbtn", "aria-label": "Löschen", onClick: p.del }, h(Ic, { n: "trash", s: 16 })))),
       h("div", { className: "fxb-fields" }, FIELDS[b.type].map(function (f) {
         var k = f[0], v = b[k] == null ? "" : b[k], id = "fxb-" + b._id + "-" + k;
+        if (f[2] === "select") return h("div", { key: k, className: "field" }, h("label", { htmlFor: id }, f[1]), h("select", { id: id, className: "input", value: v || f[3][0][0], onChange: function (e) { p.set(k, e.target.value); if (k === "fig") p.set("zones", []); } }, f[3].map(function (o) { return h("option", { key: o[0], value: o[0] }, o[1]); })));
+        if (f[2] === "zones") { var BZ = window.FP_BODY ? window.FP_BODY.Z[b.fig === "vorne" ? "vorne" : "hinten"] : {}, cur = Array.isArray(v) ? v : []; return h("div", { key: k, className: "field wide" }, h("label", null, f[1]), h("div", { className: "fxb-zones" }, Object.keys(BZ).map(function (zk) { var on = cur.indexOf(zk) >= 0; return h("label", { key: zk, className: "fxb-zone" + (on ? " on" : "") }, h("input", { type: "checkbox", checked: on, onChange: function () { p.set(k, on ? cur.filter(function (x) { return x !== zk; }) : cur.concat([zk])); } }), BZ[zk][0]); }))); }
+        if (f[2] === "graph") { var nodes = parseGraph(v); return h("div", { key: k, className: "field wide" }, h("label", { htmlFor: id }, f[1]), h("textarea", { id: id, className: "input fxb-graph", rows: 11, value: v, placeholder: GRAPH_HINT, onChange: function (e) { p.set(k, e.target.value); } }), h("small", { className: "muted" }, nodes.length ? nodes.length + " Situationen erkannt: " + nodes.map(function (n, i) { return (i + 1) + (n.opts.length ? " (" + n.opts.map(function (o) { return o.to ? "→" + o.to : "→Ende"; }).join(", ") + ")" : " (Abschluss)"); }).join(" · ") : "Beispiel im Feld, einfach überschreiben."), !v && h("button", { type: "button", className: "btn ghost sm", style: { marginTop: 6 }, onClick: function () { p.set(k, GRAPH_HINT); } }, "Beispiel einsetzen")); }
         if (f[2] === "check") return h("label", { key: k, className: "fxb-chk" }, h("input", { type: "checkbox", checked: !!v, onChange: function (e) { p.set(k, e.target.checked); } }), f[1]);
         if (f[2] === "img") return h("div", { key: k, className: "field" }, h("label", null, f[1]), v ? h("div", { className: "fxb-img" }, h("img", { src: v, alt: "" }), h("button", { type: "button", className: "btn ghost sm", onClick: function () { p.set(k, ""); } }, "Entfernen")) : h("input", { type: "file", accept: "image/*", onChange: function (e) { var fl = e.target.files[0]; if (fl) shrinkImg(fl, function (d) { p.set(k, d); }); } }));
         return h("div", { key: k, className: "field" + (f[2] === "area" ? " wide" : "") }, h("label", { htmlFor: id }, f[1]), f[2] === "area" ? h("textarea", { id: id, className: "input", rows: k === "sit" || k === "text" ? 4 : 3, value: v, onChange: function (e) { p.set(k, e.target.value); } }) : h("input", { id: id, className: "input", type: f[2] === "num" ? "number" : "text", step: "any", value: v, onChange: function (e) { p.set(k, e.target.value); } }));
@@ -14395,6 +14773,12 @@ h2,h3{letter-spacing:-.018em}
         if (b.type === "tf" && !(b.items || []).length) return n + "Mindestens eine Aussage.";
         if (b.type === "fehler" && !(b.lines || []).some(function (l) { return l.err; })) return n + "Markiere fehlerhafte Sätze mit ! am Zeilenanfang.";
         if ((b.type === "wort" || b.type === "skala") && !b.q) return n + "Die Frage fehlt.";
+        if ((b.type === "sicher" || b.type === "hinweis") && (!b.q || (b.opts || []).length < 2 || !(b.opts || []).some(function (o) { return o.ok; }))) return n + "Frage, mindestens zwei Antworten und die richtige (mit *) fehlen.";
+        if (b.type === "hinweis" && (b.clues || []).length < 2) return n + "Mindestens zwei Hinweise.";
+        if (b.type === "koerper" && !b.q) return n + "Die Aufgabe fehlt.";
+        if (b.type === "sortier") { var sa = sortAns(b); if (sa.cats.length < 2 || sa.items.length < 2) return n + "Mindestens zwei Kategorien und zwei Begriffe."; var bad = sa.items.filter(function (it) { return !sa.cats.some(function (c) { return c.toLowerCase() === String(it.k).toLowerCase(); }); }); if (bad.length) return n + "„" + bad[0].t + "“ gehört zu keiner Kategorie. Schreibe „Begriff = Kategorie“."; }
+        if (b.type === "rolle" && ((b.roles || []).length < 2 || !b.sit)) return n + "Situation und mindestens zwei Rollen fehlen.";
+        if (b.type === "pfad") { var nd = parseGraph(b.graph); if (!nd.length || !nd[0].opts.length) return n + "Die erste Situation braucht mindestens zwei Optionen (Zeilen mit - oder *)."; }
       }
       return null;
     }
@@ -14478,7 +14862,7 @@ h2,h3{letter-spacing:-.018em}
     return h("div", { className: "fxl-hub" },
       err && h("div", { className: "notice bad" }, err),
       h("div", { className: "fxl-start" },
-        h("button", { type: "button", className: "fxl-big", style: { "--c": "#7C3AED" }, onClick: function () { setBuild({}); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "plus", s: 24 })), h("b", null, "Live-Stunde bauen"), h("small", null, "Aus 11 Bausteinen: Fallsituation, Peer Instruction, Wortwolke, Schätzfrage, Fehlerjagd und mehr")),
+        h("button", { type: "button", className: "fxl-big", style: { "--c": "#7C3AED" }, onClick: function () { setBuild({}); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "plus", s: 24 })), h("b", null, "Live-Stunde bauen"), h("small", null, "Aus " + ORDER.length + " Bausteinen: Klassenentscheid, Körperkarte, Hinweis für Hinweis, Peer Instruction, Wortwolke und mehr")),
         h("button", { type: "button", className: "fxl-big", style: { "--c": "#0062FF" }, onClick: function () { setPick(true); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "book", s: 24 })), h("b", null, "Modul live an der Tafel"), h("small", null, "Ein Fallmodul Schritt für Schritt zeigen. Die Klasse antwortet mit, weiter schaltest nur du.")),
         h("button", { type: "button", className: "fxl-big", style: { "--c": "#E11D48" }, onClick: function () { if (window.FP_IMPORT) window.FP_IMPORT.open("live"); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "spark", s: 24 })), h("b", null, "Aus Folien erstellen"), h("small", null, "PowerPoint oder PDF hochladen, daraus wird ein Live-Fall."))),
       h("div", { className: "sec" }, h("h2", null, "Live-Stunden"), h("div", { className: "fxl-flt" }, ["alle", "Jahr 1", "Jahr 2", "Jahr 3"].map(function (x) { return h("button", { key: x, type: "button", className: "chip" + (flt === x ? " on blue" : ""), onClick: function () { setFlt(x); } }, x === "alle" ? "Alle" : x); }))),
@@ -14489,14 +14873,17 @@ h2,h3{letter-spacing:-.018em}
       h("div", { className: "sec" }, h("h2", null, "Fallbeispiele für die Klasse")),
       h("p", { className: "muted", style: { marginTop: -6 } }, "Ein Fall entwickelt sich Schritt für Schritt, die Klasse entscheidet gemeinsam. Ohne Vitalzeichen-Monitor, ideal zum Besprechen an der Tafel."),
       h("div", { className: "agrid fxl-grid" }, (lib.faelle || []).filter(Y).map(function (L, i) { return h(LessonCard, { key: "f" + i, L: L, tag: "Fallbeispiel", col: "#E11D48", start: function () { start(L); }, edit: function () { setBuild({ lesson: Object.assign({}, L, { t: L.t + " (eigene Fassung)" }) }); } }); })),
-      h("details", { className: "card fxl-kit" }, h("summary", null, h("b", null, "Der Bausteinkasten: 11 Live-Methoden"), h("span", { className: "muted" }, " und wofür sie sich eignen")), h("div", { className: "fxl-kitgrid" }, ORDER.map(function (t) { return h("div", { key: t, style: { "--c": TYPES[t].c } }, h("span", { className: "fxb-ic" }, h(Ic, { n: t, s: 18 })), h("b", null, TYPES[t].t), h("p", null, TYPES[t].d)); }))),
+      (lib.beispiele || []).length > 0 && h("div", { className: "sec" }, h("h2", null, "Neue Methoden ausprobieren")),
+      (lib.beispiele || []).length > 0 && h("p", { className: "muted", style: { marginTop: -6 } }, "Sechs neue Live-Methoden mit je einem fertigen Beispiel. Kurz, sofort startklar und gut, um die Methode einmal mit der Klasse zu erleben."),
+      (lib.beispiele || []).length > 0 && h("div", { className: "agrid fxl-grid" }, lib.beispiele.filter(Y).map(function (L, i) { var T = TYPES[L.m] || {}; return h(LessonCard, { key: "b" + i, L: L, tag: "Methode: " + (T.t || ""), col: T.c || "#7C3AED", badge: "Neu", start: function () { start(L); }, edit: function () { setBuild({ lesson: Object.assign({}, L, { t: L.t + " (eigene Fassung)" }) }); } }); })),
+      h("details", { className: "card fxl-kit" }, h("summary", null, h("b", null, "Der Bausteinkasten: " + ORDER.length + " Live-Methoden"), h("span", { className: "muted" }, " und wofür sie sich eignen")), h("div", { className: "fxl-kitgrid" }, ORDER.map(function (t) { var ex = (lib.beispiele || []).find(function (L) { return L.m === t; }); return h("div", { key: t, style: { "--c": TYPES[t].c } }, h("span", { className: "fxb-ic" }, h(Ic, { n: t, s: 18 })), h("b", null, TYPES[t].t, TYPES[t].neu ? h("em", { className: "fxl-new" }, "Neu") : null), h("p", null, TYPES[t].d), ex && h("button", { type: "button", className: "btn ghost sm", onClick: function () { start(ex); } }, h(Ic, { n: "play", s: 14 }), "Beispiel zeigen")); }))),
       h("div", { className: "sec" }, h("h2", null, "Live-Klassenfälle mit Vitalzeichen")),
       build && h(Builder, { row: build.row, lesson: build.lesson, close: function () { setBuild(null); }, saved: function () { load(); setBuild(null); }, start: function (L, preview) { if (!preview) setBuild(null); setRun({ title: L.t, steps: stepsOf(L) }); } }),
       pick && h(ModulePicker, { close: function () { setPick(false); }, start: function (t, steps) { setPick(false); setRun({ title: t, steps: steps }); } }),
       run && h(Presenter, { title: run.title, steps: run.steps, close: function () { setRun(null); } }));
   }
   window.FP_LiveHub = Hub;
-  window.FP_LIVE = { stepsOf: stepsOf, stepsOfModule: stepsOfModule, tally: tally, pubOf: pubOf };
+  window.FP_LIVE = { stepsOf: stepsOf, stepsOfModule: stepsOfModule, tally: tally, pubOf: pubOf, parseGraph: parseGraph, TYPES: TYPES };
 })();
 
 /* Lehrer-Portal: Module je Kurs freischalten, sperren oder ausblenden. */
