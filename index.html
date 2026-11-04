@@ -9,6 +9,85 @@
 <meta name="theme-color" content="#0062FF">
 <script>window.addEventListener("error",function(e){if(/config\.js/.test(e.filename||""))window.FALLPFAD_CONFIG_ERROR=String(e.message||"Syntaxfehler");});</script>
 <script src="config.js"></script>
+<script>window.FP_APP_KIND="lehrer";
+/* Fallpfad Demo-Konten: läuft direkt nach config.js, vor der App.
+   Zugangsdaten werden nur im Browser erkannt, es gibt kein echtes Konto in der Datenbank. */
+(function () {
+  var APPK = window.FP_APP_KIND || "schueler";
+  var K = "fp-demo-acc", PW = "Demo2026";
+  var ACC = { "lehrer@demo.fallpfad.de": "lehrer", "schueler@demo.fallpfad.de": "schueler" };
+  var a = null;
+  try { a = localStorage.getItem(K); } catch (e) {}
+  if (a && a !== APPK) a = null;
+  if (a) {
+    window.FP_DEMO_ACC = a;
+    window.FALLPFAD_CONFIG = Object.assign({}, window.FALLPFAD_CONFIG || {}, { supabaseUrl: "", supabaseAnonKey: "" });
+    window.FALLPFAD_CONFIG_ERROR = undefined;
+  }
+  window.FP_DEMO_END = function () {
+    try {
+      localStorage.removeItem(K);
+      localStorage.removeItem("fp-demo-auto");
+      var del = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (/^fallpfad-(state:lokal-demo|session|profiles|nw-demo2|bg-demo|demo-t0|course|msg-read|lehrer-demo)/.test(k) || /^fp-(tour|demo)/.test(k)) del.push(k);
+      }
+      if (window.FP_DEMO_ACC) del.forEach(function (k) { localStorage.removeItem(k); });
+    } catch (e) {}
+    location.reload();
+  };
+  document.addEventListener("submit", function (e) {
+    var f = e.target;
+    if (!f || !f.querySelector) return;
+    var em = f.querySelector("input[type=email]"), pw = f.querySelector("input[type=password]");
+    if (!em || !pw) return;
+    var acc = ACC[String(em.value || "").trim().toLowerCase()];
+    if (!acc || pw.value !== PW) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    if (acc !== APPK) {
+      alertBox(acc === "lehrer" ? "Das ist das Demo-Konto für das Lehrer-Portal." : "Das ist das Demo-Konto für die Schüler-App.");
+      return;
+    }
+    try {
+      localStorage.setItem(K, acc);
+      localStorage.setItem("fp-demo-auto", "1");
+    } catch (x) {}
+    location.reload();
+  }, true);
+  function alertBox(t) {
+    var d = document.createElement("div");
+    d.className = "fx-toast";
+    d.textContent = t;
+    document.body.appendChild(d);
+    setTimeout(function () { d.remove(); }, 4000);
+  }
+  /* Abmelden im Demo-Konto beendet die Demo und setzt alles zurück */
+  document.addEventListener("click", function (e) {
+    if (!window.FP_DEMO_ACC) return;
+    var b = e.target && e.target.closest && e.target.closest("button");
+    if (!b) return;
+    var t = (b.textContent || "").trim();
+    if (/^Abmelden$/.test(t)) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      window.FP_DEMO_END();
+    }
+  }, true);
+  if (a) {
+    var addBadge = function () {
+      if (document.getElementById("fx-demo")) return;
+      var d = document.createElement("div");
+      d.id = "fx-demo";
+      d.innerHTML = '<span>Demo-Konto</span><button type="button">Beenden</button>';
+      d.querySelector("button").onclick = window.FP_DEMO_END;
+      document.body.appendChild(d);
+    };
+    if (document.body) addBadge(); else document.addEventListener("DOMContentLoaded", addBadge);
+  }
+})();
+</script>
 <style>body{margin:0}/* Layout: Seitenleiste ab 960px, darunter schwebende Tab-Bar; Inhalt in einer Lesespalte. Neutral, ein Akzent, keine Leuchteffekte. */
 :root{
   --bg:#f7f9fc; --surface:#ffffff; --surface2:#f0f4fa; --fg:#0f172a; --muted:#5b6b82; --line:rgba(190,204,228,.65);
@@ -5680,6 +5759,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     client = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true, storageKey: "fallpfad-lehrer-auth" } });
     return client;
   }
+  window.FP_SB = isDemo ? null : sb;
   var Cloud = {
     async session() {
       const c = await sb();
@@ -6059,8 +6139,8 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   var uuid = () => crypto.randomUUID ? crypto.randomUUID() : "id-" + Math.random().toString(36).slice(2);
   function seedDemo(mods) {
     if (db()) return;
-    const cA = { id: uuid(), name: "Kurs 24A", code: "K24A01", created_at: (/* @__PURE__ */ new Date()).toISOString() }, cB = { id: uuid(), name: "Kurs 25B", code: "K25B02", created_at: (/* @__PURE__ */ new Date()).toISOString() };
-    const names = [["Mila Krause", cA, 2], ["Jonas Peters", cA, 2], ["Aylin Demir", cA, 2], ["Lukas Brandt", cB, 1], ["Sophie Wagner", cB, 1], ["Elias Hoffmann", cB, 1]];
+    const cA = { id: uuid(), name: "Kurs 24A \xB7 3. Jahr", code: "K24A01", created_at: (/* @__PURE__ */ new Date()).toISOString() }, cB = { id: uuid(), name: "Kurs 25B \xB7 2. Jahr", code: "K25B02", created_at: (/* @__PURE__ */ new Date()).toISOString() }, cC = { id: uuid(), name: "Kurs 26C \xB7 1. Jahr", code: "K26C03", created_at: (/* @__PURE__ */ new Date()).toISOString() };
+    const names = [["Mila Krause", cB, 2], ["Jonas Peters", cB, 2], ["Aylin Demir", cB, 2], ["Lukas Brandt", cA, 3], ["Sophie Wagner", cA, 3], ["Elias Hoffmann", cC, 1], ["Clara Vogt", cB, 2], ["Leon Schulz", cB, 2], ["Hannah Becker", cB, 2], ["Emre Kaya", cB, 2], ["Emma Fischer", cB, 2], ["Paul Richter", cB, 2], ["Marie Koch", cA, 3], ["Tim Bauer", cA, 3], ["Zeynep Arslan", cA, 3], ["Felix Wolf", cA, 3], ["Johanna Klein", cA, 3], ["David Neumann", cA, 3], ["Lina Schr\xF6der", cC, 1], ["Noah Zimmermann", cC, 1], ["Amelie Hartmann", cC, 1], ["Jan Kr\xFCger", cC, 1], ["Sara Haddad", cC, 1], ["Moritz Lange", cC, 1]];
     let seed = 7;
     const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
     const students = [], progress = [];
@@ -6068,7 +6148,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
       const id = uuid();
       students.push({ id, email: n.toLowerCase().replace(/ /g, ".") + "@beispiel.de", display_name: n, role: "student", course_id: c.id, year: y, updated_at: (/* @__PURE__ */ new Date()).toISOString() });
       const res = {}, done = {};
-      const mine = mods.filter((m) => m.year <= y).slice(0, 4 + i);
+      const pool = mods.filter((m) => m.year <= y), fleiss = [0.9, 0.55, 0.75, 0.95, 0.6, 0.35, 0.8, 0.45, 0.7, 1, 0.5, 0.85][i % 12], mine = pool.slice(0, Math.max(2, Math.round(pool.length * fleiss)));
       mine.forEach((m, mi) => {
         const share = mi === 0 ? 1 : rnd();
         m.chapters.forEach((ch, ci) => {
@@ -6088,14 +6168,24 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
         });
         if (share === 1) done[m.id + ":outro"] = true;
       });
-      const t = Date.now() - Math.floor(rnd() * 6 * 864e5);
+      const t = Date.now() - (i % 7 === 5 ? 16 * 864e5 : 0) - Math.floor(rnd() * 5 * 864e5);
       progress.push({ user_id: id, updated_at: new Date(t).toISOString(), data: { name: students[i].display_name, year: y, res, done, course: { id: c.id, name: c.name }, act: {} } });
     });
     const H = (h) => new Date(Date.now() + h * 36e5).toISOString();
-    const a1 = { id: uuid(), course_id: cA.id, title: "Schmerzmanagement bis Freitag", kind: "module", module_id: (mods.find((m) => m.year === 2) || mods[0]).id, instructions: "Bearbeitet das Modul vollst\xE4ndig. Wir besprechen die Ergebnisse am Montag.", questions: [], announce_at: H(-96), opens_at: H(-72), due_at: H(48), allow_late: true, created_at: H(-96) };
-    const a2 = { id: uuid(), course_id: cA.id, title: "Reflexion: \xDCbergabe am Bett", kind: "custom", module_id: null, instructions: "Beschreibt eine \xDCbergabe aus eurem Einsatz und beantwortet die Fragen.", questions: ["Was lief gut?", "Was w\xFCrdest du beim n\xE4chsten Mal anders machen?"], announce_at: H(-24), opens_at: H(48), due_at: H(168), allow_late: false, created_at: H(-24) };
+    const a1 = { id: uuid(), course_id: cB.id, title: "Schmerzmanagement bis Freitag", kind: "module", module_id: (mods.find((m) => m.year === 2) || mods[0]).id, instructions: "Bearbeitet das Modul vollst\xE4ndig. Wir besprechen die Ergebnisse am Montag.", questions: [], announce_at: H(-96), opens_at: H(-72), due_at: H(48), allow_late: true, created_at: H(-96) };
+    const a2 = { id: uuid(), course_id: cB.id, title: "Reflexion: \xDCbergabe am Bett", kind: "custom", module_id: null, instructions: "Beschreibt eine \xDCbergabe aus eurem Einsatz und beantwortet die Fragen.", questions: ["Was lief gut?", "Was w\xFCrdest du beim n\xE4chsten Mal anders machen?"], announce_at: H(-24), opens_at: H(48), due_at: H(168), allow_late: false, created_at: H(-24) };
     const subs = [{ assignment_id: a1.id, user_id: students[0].id, status: "submitted", answers: {}, score: { pct: 100, e: 0, max: 0, finished: true }, submitted_at: H(-20), feedback: null, updated_at: H(-20) }, { assignment_id: a1.id, user_id: students[1].id, status: "started", answers: {}, score: null, submitted_at: null, feedback: null, updated_at: H(-30) }];
-    mem = { courses: [cA, cB], students, progress, modules: [], invites: [], assignments: [a1, a2], submissions: subs, me: { id: "demo-lehrkraft", email: "lehrkraft@beispiel.de", display_name: "Demo-Lehrkraft", role: "teacher" } };
+    const xtra = (() => {
+      const A = (c, title, kind, module_id, ins, o, d) => ({ id: uuid(), course_id: c.id, title, kind, module_id, instructions: ins, questions: [], announce_at: H(o - 24), opens_at: H(o), due_at: H(d), allow_late: true, created_at: H(o - 24) });
+      const inC = (c) => students.filter((x) => x.course_id === c.id);
+      const y1 = mods.find((m) => m.year === 1) || mods[0];
+      const a = [A(cA, "Praktisches Examen: Innere Medizin \xFCben", "training", "praxexamen:innere", "Spielt den Pr\xFCfungstag einmal komplett durch und notiert, was euch schwerfiel.", -50, 70), A(cA, "Team-Krankenhaus: Herr Petersen", "team", "petersen", "Arbeitet zu dritt. Am Ende stellt jede Gruppe ihre SBAR-\xDCbergabe vor.", -20, 30), A(cC, "Vitalzeichen bis Mittwoch", "module", y1.id, "Bearbeitet das Modul bis zur Station 4.", -70, 26)];
+      const s = [];
+      inC(cA).forEach((x, i) => { if (i < 5) s.push({ assignment_id: a[0].id, user_id: x.id, status: i < 3 ? "submitted" : "started", answers: { r: "Die Medikamentenkontrolle war schwierig, beim n\xE4chsten Mal gehe ich die R-Regeln strukturierter durch." }, score: i < 3 ? { pct: [86, 72, 94][i], finished: true } : null, submitted_at: i < 3 ? H(-10 - i * 5) : null, feedback: i === 0 ? "Sehr gute Reflexion, weiter so!" : null, updated_at: H(-10 - i * 5) }); });
+      inC(cC).forEach((x, i) => { if (i < 4) s.push({ assignment_id: a[2].id, user_id: x.id, status: i < 2 ? "submitted" : "started", answers: {}, score: i < 2 ? { pct: [100, 81][i], e: 0, max: 0, finished: true } : null, submitted_at: i < 2 ? H(-6 - i * 3) : null, feedback: null, updated_at: H(-6 - i * 3) }); });
+      return { a, s };
+    })();
+    mem = { courses: [cB, cA, cC], students, progress, modules: [], invites: [], assignments: [a1, a2, ...xtra.a], submissions: [...subs, ...xtra.s], me: { id: "demo-lehrkraft", email: window.FP_DEMO_ACC ? "lehrer@demo.fallpfad.de" : "lehrkraft@beispiel.de", display_name: window.FP_DEMO_ACC ? "Frau Demir" : "Demo-Lehrkraft", role: "teacher" } };
     save();
   }
   function demoTimetable(courses) {
@@ -6426,6 +6516,14 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   }
   var Demo = {
     async session() {
+      try {
+        if (window.FP_DEMO_ACC && db() && localStorage.getItem("fp-demo-auto")) {
+          localStorage.removeItem("fp-demo-auto");
+          db().loggedIn = true;
+          save();
+        }
+      } catch (e) {
+      }
       return db() && db().loggedIn ? { id: db().me.id, email: db().me.email } : null;
     },
     async signIn() {
@@ -6439,6 +6537,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     async signOut() {
       db().loggedIn = false;
       save();
+      if (window.FP_DEMO_ACC && window.FP_DEMO_END) window.FP_DEMO_END();
     },
     async reset() {
     },
@@ -6948,6 +7047,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   // lehrer_src/ui.jsx
   var P = {
     chat: "M4 5h16v11H9l-5 4zM8 9.5h8M8 12.5h5",
+    school: "M3 20.5h18M5 20.5V10l7-5 7 5v10.5M10 20.5v-5h4v5",
     list: "M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01",
     bell: "M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20.5a2 2 0 0 0 4 0",
     star: "M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z",
@@ -9329,6 +9429,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   function LivePage({ me }) {
     const lehrer = useLehrer(), myId = me && me.id || null, [hk, setHk] = (0, import_react8.useState)("alle");
     const [own, setOwn] = (0, import_react8.useState)([]), [missing, setMissing] = (0, import_react8.useState)(false), [edit, setEdit] = (0, import_react8.useState)(null), [run, setRun] = (0, import_react8.useState)(null), [err, setErr] = (0, import_react8.useState)(null), [busy, setBusy] = (0, import_react8.useState)(null), [prev, setPrev] = (0, import_react8.useState)(null);
+    window.FP_liveEdit = (d) => setEdit({ data: d });
     const load2 = async () => {
       try {
         setOwn(await API.liveCases() || []);
@@ -9710,6 +9811,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   function TeamPage({ data, me }) {
     const courses = data.courses || [], lehrer = useLehrer(), myId = me && me.id || null, [hk, setHk] = (0, import_react9.useState)("alle");
     const [scope, setScope] = (0, import_react9.useState)("alle"), [build, setBuild] = (0, import_react9.useState)(null), [rows, setRows] = (0, import_react9.useState)([]), [rooms, setRooms] = (0, import_react9.useState)([]), [edit, setEdit] = (0, import_react9.useState)(null), [view, setView] = (0, import_react9.useState)(null), [off, setOff] = (0, import_react9.useState)(false), [err, setErr] = (0, import_react9.useState)(null);
+    window.FP_teamBuild = (seed) => setBuild({ seed });
     const load2 = async () => {
       try {
         const [a, b] = await Promise.all([API.teamCases(), API.teamRooms()]);
@@ -12283,7 +12385,7 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
         setErr(e.message);
       }
     }, []);
-    const teacher = me && me.role === "teacher";
+    const teacher = me && (me.role === "teacher" || me.role === "admin");
     (0, import_react21.useEffect)(() => {
       if (teacher) reload();
     }, [teacher]);
@@ -12317,6 +12419,11 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
       setEdit({ initial: m, row, isBase: isB });
       window.scrollTo(0, 0);
     };
+    window.FP_openEditor = (m) => {
+      setTab("module");
+      setEdit({ initial: m, row: null, isBase: false, meta: { area: m.area || "", difficulty: m.difficulty || "Einsteiger" } });
+      window.scrollTo(0, 0);
+    };
     const create = (area, lvl) => {
       setTab("module");
       setEdit({ initial: newModule(area || "", lvl || "Einsteiger"), row: null, isBase: false, meta: { area: area || "", difficulty: lvl || "Einsteiger" } });
@@ -12324,7 +12431,7 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     if (user === void 0 || user && !me && !err) return /* @__PURE__ */ import_react21.default.createElement("div", { className: "splash2" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("p", { className: "muted" }, "Fallpfad Lehrer-Portal wird geladen \u2026"));
     if (!user) return /* @__PURE__ */ import_react21.default.createElement(import_react21.default.Fragment, null, /* @__PURE__ */ import_react21.default.createElement(Login, { onIn: setUser }), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad floating" }, err));
     if (!teacher) return /* @__PURE__ */ import_react21.default.createElement(NotTeacher, { me: me || { email: user.email }, onRedeem: () => loadMe(user), signOut });
-    const tabs = [["start", "\xDCbersicht", "home"], ["kurse", "Kurse & Sch\xFCler", "users"], ["module", "Module", "layers"], ["aufgaben", "Aufgaben", "clip"], ["nachweis", "Ausbildungsnachweis", "seal"], ["feedback", "Feedback", "chat"], ["pruefen", "Pr\xFCfen", "exam"], ["nachrichten", "Nachrichten", "mail"], ["stundenplan", "Stundenplan", "cal"], ["live", "Live", "play"], ["team", "Team-Krankenhaus", "hosp"], ["einstellungen", "Einstellungen", "gear"]];
+    const tabs = [["start", "\xDCbersicht", "home"], ["kurse", "Kurse & Sch\xFCler", "users"], ["module", "Module", "layers"], ["aufgaben", "Aufgaben", "clip"], ["nachweis", "Ausbildungsnachweis", "seal"], ["feedback", "Feedback", "chat"], ["pruefen", "Pr\xFCfen", "exam"], ["nachrichten", "Nachrichten", "mail"], ["stundenplan", "Stundenplan", "cal"], ["live", "Live", "play"], ["team", "Team-Krankenhaus", "hosp"], ["einstellungen", "Einstellungen", "gear"], ...me && me.role === "admin" ? [["schulen", "Schulen", "school"]] : []];
     const nav = tabs.map(([k, l, ic]) => /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", key: k, className: "tab", "aria-current": tab === k && !edit ? "page" : void 0, onClick: stop(() => go(k)) }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: ic, w: tab === k ? 2.2 : 1.8 }), /* @__PURE__ */ import_react21.default.createElement("span", null, l)));
     return /* @__PURE__ */ import_react21.default.createElement("div", { className: "shell" }, /* @__PURE__ */ import_react21.default.createElement("nav", { className: "side", "aria-label": "Hauptnavigation" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "brand" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("div", null, /* @__PURE__ */ import_react21.default.createElement("b", null, "Fallpfad"), /* @__PURE__ */ import_react21.default.createElement("span", null, "Lehrer-Portal"))), nav, /* @__PURE__ */ import_react21.default.createElement("div", { className: "foot" }, isDemo ? "Demo-Modus \xB7 erfundene Daten" : "Online", /* @__PURE__ */ import_react21.default.createElement("br", null), me.email || user.email)), /* @__PURE__ */ import_react21.default.createElement("main", { className: "main" }, /* @__PURE__ */ import_react21.default.createElement("header", { className: "topbar" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "t" }, "Fallpfad Lehrer-Portal", /* @__PURE__ */ import_react21.default.createElement("small", null, isDemo ? "Demo-Modus" : me.display_name || me.email)), /* @__PURE__ */ import_react21.default.createElement("a", { className: "iconbtn", href: SETTINGS.appUrl, target: "_blank", rel: "noopener", "aria-label": "Sch\xFCler-App \xF6ffnen", title: "Sch\xFCler-App \xF6ffnen" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "eye" })), /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "switch", role: "switch", "aria-checked": theme === "dark", "aria-label": "Dunkelmodus", onClick: stop(() => setTheme(theme === "dark" ? "light" : "dark")) }, /* @__PURE__ */ import_react21.default.createElement("i", null, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: theme === "dark" ? "moon" : "sun" })))), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", style: { marginTop: 14 } }, err, " ", /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setErr(null)) }, "Ausblenden")), edit ? /* @__PURE__ */ import_react21.default.createElement(
       Editor,
@@ -12355,7 +12462,7 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     ) : tab === "module" ? /* @__PURE__ */ import_react21.default.createElement(Modules, { base, rows, chars: content.chars, open: openMod, create, onAssign: (p) => {
       setPreset(p);
       go("aufgaben");
-    }, courses: data.courses, reload, me }) : tab === "live" ? /* @__PURE__ */ import_react21.default.createElement(LivePage, { me }) : tab === "team" ? /* @__PURE__ */ import_react21.default.createElement(TeamPage, { data, me }) : tab === "nachweis" ? /* @__PURE__ */ import_react21.default.createElement(NachweisPage, { data, me }) : tab === "nachrichten" ? /* @__PURE__ */ import_react21.default.createElement(MessagesPage, { data, me }) : tab === "stundenplan" ? /* @__PURE__ */ import_react21.default.createElement(StundenplanPage, { data, me, mods: eff, go, onAssign: (p) => { setPreset(p); go("aufgaben"); } }) : tab === "aufgaben" ? /* @__PURE__ */ import_react21.default.createElement(Aufgaben, { data, mods: eff, I, reload, user, preset, clearPreset: () => setPreset(null) }) : tab === "kurse" ? /* @__PURE__ */ import_react21.default.createElement(KursSchuelerPage, { key: "ks" + nonce, data, me, reload, lernstand: /* @__PURE__ */ import_react21.default.createElement(Students, { data, mods: eff, I, reload, embedded: true }), verwaltung: /* @__PURE__ */ import_react21.default.createElement(Courses, { data, reload, mods: eff, I, base, rows, embedded: true }), openLernstand: (s) => setLs(s) }) : tab === "feedback" ? /* @__PURE__ */ import_react21.default.createElement(FeedbackPage, { key: "fb" + nonce, data, go }) : tab === "pruefen" ? /* @__PURE__ */ import_react21.default.createElement(PruefenPage, { key: "pr" + nonce, data, me }) : tab === "einstellungen" ? /* @__PURE__ */ import_react21.default.createElement(Settings, { me, user, theme, setTheme, signOut }) : /* @__PURE__ */ import_react21.default.createElement(Home, { me, data, mods: eff, I, rows, go, create: () => create() })), !edit && /* @__PURE__ */ import_react21.default.createElement("nav", { className: "tabbar", "aria-label": "Hauptnavigation" }, nav), ls && /* @__PURE__ */ import_react21.default.createElement(StudentDetail2, { st: ls, p: data.progress.find((p) => p.user_id === ls.id), mods: eff, I, courses: data.courses, close: () => setLs(null), onCourse: async (id, c) => {
+    }, courses: data.courses, reload, me }) : tab === "live" ? /* @__PURE__ */ import_react21.default.createElement(LivePage, { me }) : tab === "team" ? /* @__PURE__ */ import_react21.default.createElement(TeamPage, { data, me }) : tab === "nachweis" ? /* @__PURE__ */ import_react21.default.createElement(NachweisPage, { data, me }) : tab === "nachrichten" ? /* @__PURE__ */ import_react21.default.createElement(MessagesPage, { data, me }) : tab === "stundenplan" ? /* @__PURE__ */ import_react21.default.createElement(StundenplanPage, { data, me, mods: eff, go, onAssign: (p) => { setPreset(p); go("aufgaben"); } }) : tab === "aufgaben" ? /* @__PURE__ */ import_react21.default.createElement(Aufgaben, { data, mods: eff, I, reload, user, preset, clearPreset: () => setPreset(null) }) : tab === "kurse" ? /* @__PURE__ */ import_react21.default.createElement(KursSchuelerPage, { key: "ks" + nonce, data, me, reload, lernstand: /* @__PURE__ */ import_react21.default.createElement(Students, { data, mods: eff, I, reload, embedded: true }), verwaltung: /* @__PURE__ */ import_react21.default.createElement(Courses, { data, reload, mods: eff, I, base, rows, embedded: true }), openLernstand: (s) => setLs(s) }) : tab === "feedback" ? /* @__PURE__ */ import_react21.default.createElement(FeedbackPage, { key: "fb" + nonce, data, go }) : tab === "pruefen" ? /* @__PURE__ */ import_react21.default.createElement(PruefenPage, { key: "pr" + nonce, data, me }) : tab === "einstellungen" ? /* @__PURE__ */ import_react21.default.createElement(Settings, { me, user, theme, setTheme, signOut }) : tab === "schulen" && window.FP_AdminPage ? /* @__PURE__ */ import_react21.default.createElement(window.FP_AdminPage, null) : /* @__PURE__ */ import_react21.default.createElement(Home, { me, data, mods: eff, I, rows, go, create: () => create() })), !edit && /* @__PURE__ */ import_react21.default.createElement("nav", { className: "tabbar", "aria-label": "Hauptnavigation" }, nav), ls && /* @__PURE__ */ import_react21.default.createElement(StudentDetail2, { st: ls, p: data.progress.find((p) => p.user_id === ls.id), mods: eff, I, courses: data.courses, close: () => setLs(null), onCourse: async (id, c) => {
       await API.setStudentCourse(id, c);
       setLs({ ...ls, course_id: c });
       reload();
@@ -12379,6 +12486,1062 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
   };
   (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ import_react21.default.createElement(Guard, null, /* @__PURE__ */ import_react21.default.createElement(App, null)));
 })();
+</script>
+<style id="fx-css">
+/* ===== Fallpfad Design-Ebene: Kacheln, farbige Bereiche, Tutorial, Demo ===== */
+:root{--pc:#0062FF}
+/* Navigation: jede Rubrik hat ihre Farbe */
+.tab.fx-nav svg{color:var(--c);transition:transform .2s var(--ease,ease)}
+.side .tab.fx-nav{position:relative}
+.side .tab.fx-nav:hover{background:color-mix(in srgb,var(--c) 8%,transparent)}
+.side .tab.fx-nav:hover svg{transform:scale(1.08)}
+.side .tab.fx-nav[aria-current=page],.side .tab.fx-nav.on{background:color-mix(in srgb,var(--c) 12%,var(--surface,#fff));color:color-mix(in srgb,var(--c) 62%,var(--fg,#0f172a));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 18%,transparent)}
+.side .tab.fx-nav[aria-current=page]::before,.side .tab.fx-nav.on::before{content:"";position:absolute;left:-8px;top:10px;bottom:10px;width:4px;border-radius:4px;background:var(--c)}
+.tab.fx-nav[aria-current=page] svg,.tab.fx-nav.on svg{color:var(--c)}
+/* Seitenkopf in der Farbe der Rubrik */
+main.main{background-image:radial-gradient(1100px 300px at 12% -80px,color-mix(in srgb,var(--pc) 9%,transparent),transparent 72%);background-repeat:no-repeat;transition:background-image .4s}
+main.main .hello .eyebrow{color:color-mix(in srgb,var(--pc) 78%,var(--fg,#0f172a))}
+/* Kacheln */
+.fx-t{position:relative;isolation:isolate;overflow:hidden;border:1px solid color-mix(in srgb,var(--c) 20%,var(--line,#e2e8f0))!important;background:linear-gradient(160deg,color-mix(in srgb,var(--c) 8%,var(--surface,#fff)) 0%,var(--surface,#fff) 62%)!important;transition:transform .25s var(--ease,ease),box-shadow .25s var(--ease,ease),border-color .25s}
+.fx-t::after{content:"";position:absolute;z-index:-1;right:-40px;top:-40px;width:130px;height:130px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 16%,transparent),transparent);pointer-events:none}
+button.fx-t,a.fx-t,.fx-t.acard,.fx-t.mod{cursor:pointer}
+button.fx-t:hover,a.fx-t:hover{transform:translateY(-3px);box-shadow:0 14px 30px -14px color-mix(in srgb,var(--c) 45%,transparent);border-color:color-mix(in srgb,var(--c) 42%,var(--line,#e2e8f0))!important}
+button.fx-t:active,a.fx-t:active{transform:scale(.985)}
+button.fx-t:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.fx-t .eyebrow,.fx-t>small:first-child{color:color-mix(in srgb,var(--c) 72%,var(--fg,#0f172a))!important}
+.fx-t .bar>i,.fx-t .bar>span,.fx-t progress{background:var(--c)}
+/* Modulkarten: farbiger Fortschrittsrand oben */
+button.mod.fx-t{border-top:4px solid var(--c)!important}
+.mp.fx-t{border:0!important;border-left:4px solid var(--c)!important;border-radius:10px;padding-left:12px}
+.mp.fx-t::after{display:none}
+/* KPI-Kacheln */
+.nwkpis>.fx-t,.stats>.stat.fx-t{border-radius:16px}
+.nwkpis>.fx-t b,.nwkpis>.fx-t strong,.stats>.stat.fx-t b{color:color-mix(in srgb,var(--c) 75%,var(--fg,#0f172a))}
+.nwtop.fx-t,.card.resume.fx-t,.card.today.fx-t,.ttcard.fx-t{background:linear-gradient(165deg,color-mix(in srgb,var(--c) 6%,var(--surface,#fff)) 0%,var(--surface,#fff) 45%)!important}
+@media (prefers-reduced-motion:reduce){.fx-t,button.fx-t:hover{transition:none;transform:none}}
+
+/* Schnellaktionen (Praxis und Home) */
+.fx-qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:4px 0 22px}
+.fx-qa h3{grid-column:1/-1;margin:0 0 2px;font-size:15px;color:var(--muted)}
+.fx-qa button{--c:#0062FF;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:14px;border-radius:18px;text-align:left;font:inherit;color:var(--fg);cursor:pointer;min-height:112px}
+.fx-qa .fx-ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,var(--surface,#fff));color:var(--c);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent)}
+.fx-qa .fx-ic svg{width:21px;height:21px}
+.fx-qa b{font-size:15px;line-height:1.25;letter-spacing:-.01em}
+.fx-qa small{color:var(--muted);font-size:12.5px;line-height:1.35;margin-top:-4px}
+.fx-qa .fx-n{margin-left:auto;align-self:flex-start;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--c);color:#fff}
+.fx-qa .fx-row{display:flex;width:100%;align-items:flex-start}
+@media (max-width:560px){.fx-qa{grid-template-columns:1fr 1fr}.fx-qa button{min-height:100px;padding:12px}}
+
+/* Tutorial */
+.fx-tour-bg{position:fixed;inset:0;z-index:9998;background:rgba(15,23,42,.42);backdrop-filter:blur(2px);animation:fxfade .25s ease both}
+.fx-tour-hole{position:fixed;z-index:9999;border-radius:16px;box-shadow:0 0 0 4px var(--tc,#0062FF),0 0 0 9999px rgba(15,23,42,.42);pointer-events:none;transition:all .35s cubic-bezier(.22,1,.36,1)}
+.fx-tour{position:fixed;z-index:10000;width:min(380px,calc(100vw - 32px));background:var(--surface,#fff);color:var(--fg,#0f172a);border-radius:22px;padding:20px 20px 16px;box-shadow:0 24px 60px -18px rgba(15,23,42,.45);border:1px solid color-mix(in srgb,var(--tc,#0062FF) 22%,var(--line,#e2e8f0));transition:top .35s cubic-bezier(.22,1,.36,1),left .35s cubic-bezier(.22,1,.36,1);animation:fxpop .35s cubic-bezier(.22,1,.36,1) both;isolation:isolate;overflow:hidden;overflow:clip}
+.fx-tour::after{content:"";position:absolute;z-index:-1;right:-50px;top:-50px;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--tc,#0062FF) 18%,transparent),transparent)}
+.fx-tour .fx-tic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--tc) 14%,var(--surface,#fff));color:var(--tc);margin-bottom:12px}
+.fx-tour .fx-tic svg{width:24px;height:24px}
+.fx-tour h3{margin:0 0 6px;font-size:19px;letter-spacing:-.02em}
+.fx-tour p{margin:0;color:var(--muted,#5b6b82);font-size:14.5px;line-height:1.5}
+.fx-tour .fx-tnav{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;margin-top:16px}
+.fx-tour .fx-dots{display:flex;gap:5px;flex:1 0 100%;margin-bottom:6px}
+.fx-tour .fx-dots i{width:7px;height:7px;border-radius:9px;background:color-mix(in srgb,var(--tc) 22%,var(--line,#e2e8f0));transition:width .25s,background .25s}
+.fx-tour .fx-dots i.on{width:20px;background:var(--tc)}
+.fx-tour button{font:inherit;font-size:14px;font-weight:600;border-radius:12px;padding:9px 14px;border:0;cursor:pointer}
+.fx-tour .fx-next{background:var(--tc);color:#fff}
+.fx-tour .fx-next:hover{filter:brightness(1.08)}
+.fx-tour .fx-skip{background:transparent;color:var(--muted,#5b6b82)}
+.fx-tour .fx-skip:hover{color:var(--fg)}
+.fx-tour .fx-back{background:var(--surface2,#f0f4fa);color:var(--fg)}
+@keyframes fxpop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes fxfade{from{opacity:0}to{opacity:1}}
+
+/* Demo-Hinweis */
+#fx-demo{position:fixed;z-index:9000;right:14px;bottom:14px;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border-radius:99px;background:rgba(15,23,42,.86);color:#fff;font:600 12.5px/1 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;box-shadow:0 8px 24px -10px rgba(0,0,0,.5);backdrop-filter:blur(8px)}
+#fx-demo span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:9px;background:#22c55e;margin-right:7px;vertical-align:1px}
+#fx-demo button{font:inherit;border:0;border-radius:99px;padding:6px 10px;background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+#fx-demo button:hover{background:rgba(255,255,255,.28)}
+@media (max-width:959px){#fx-demo{bottom:calc(92px + env(safe-area-inset-bottom,0px));right:10px;font-size:11.5px;padding:4px 4px 4px 10px}}
+.fx-toast{position:fixed;z-index:10001;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 16px;border-radius:14px;font:500 14px/1.4 -apple-system,BlinkMacSystemFont,"Inter",sans-serif;box-shadow:0 12px 30px -12px rgba(0,0,0,.5);animation:fxpop .3s ease both}
+.fx-tour .fx-skip{margin-right:auto}
+
+/* ===== Lehrer-Portal: Folien-Import, Schulen, Schulanzeige ===== */
+.btn.fx-aibtn{background:linear-gradient(135deg,#7C3AED 0%,#0062FF 100%);color:#fff;border:0;box-shadow:0 8px 20px -10px rgba(124,58,237,.6);display:inline-flex;align-items:center;gap:7px}
+.btn.fx-aibtn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.btn.fx-aibtn svg{flex:none}
+.fx-school{display:inline-block;margin-left:10px;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:600;background:color-mix(in srgb,var(--pc,#0062FF) 11%,var(--surface));color:color-mix(in srgb,var(--pc,#0062FF) 70%,var(--fg));vertical-align:1px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:700px){.fx-school{display:block;margin:2px 0 0;width:max-content}}
+
+.fxi-bg{position:fixed;inset:0;z-index:9500;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow:auto;animation:fxfade .2s ease both}
+.fxi{width:min(720px,100%);background:var(--surface);color:var(--fg);border-radius:24px;padding:22px;box-shadow:0 30px 80px -24px rgba(15,23,42,.5);border:1px solid color-mix(in srgb,var(--c) 20%,var(--line));animation:fxpop .3s cubic-bezier(.22,1,.36,1) both;position:relative;isolation:isolate;overflow:hidden}
+.fxi::after{content:"";position:absolute;z-index:-1;right:-80px;top:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 16%,transparent),transparent)}
+.fxi-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.fxi-head>div{flex:1;min-width:0}
+.fxi-head b{display:block;font-size:19px;letter-spacing:-.02em}
+.fxi-head small{color:var(--muted);font-size:13.5px}
+.fxi-hic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#7C3AED,#0062FF);flex:none;box-shadow:0 8px 18px -8px rgba(124,58,237,.6)}
+.fxi-ziele{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.fxi-ziel{text-align:left;padding:12px 14px;border-radius:16px;border:1.5px solid var(--line);background:var(--surface);font:inherit;color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .2s,background .2s,transform .2s}
+.fxi-ziel b{font-size:15px}
+.fxi-ziel small{color:var(--muted);font-size:12.5px;line-height:1.35}
+.fxi-ziel:hover{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
+.fxi-ziel.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 8%,var(--surface));box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 14%,transparent)}
+.fxi-ziel.on b{color:color-mix(in srgb,var(--c) 75%,var(--fg))}
+@media (max-width:600px){.fxi-ziele{grid-template-columns:1fr}}
+.fxi-drop{border:2px dashed color-mix(in srgb,var(--c) 35%,var(--line));border-radius:20px;padding:34px 18px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;cursor:pointer;background:color-mix(in srgb,var(--c) 4%,var(--surface));transition:background .2s,border-color .2s,transform .2s}
+.fxi-drop:hover,.fxi-drop.over,.fxi-drop:focus-visible{background:color-mix(in srgb,var(--c) 9%,var(--surface));border-color:var(--c);outline:none}
+.fxi-drop.over{transform:scale(1.01)}
+.fxi-drop b{font-size:16px}
+.fxi-drop small{color:var(--muted)}
+.fxi-dic{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 13%,var(--surface));margin-bottom:6px}
+.fxi-busy{display:flex;align-items:center;gap:10px;color:var(--muted)}
+.fxi-spin{width:20px;height:20px;border-radius:50%;border:3px solid color-mix(in srgb,var(--c) 22%,transparent);border-top-color:var(--c);animation:fxspin .8s linear infinite}
+@keyframes fxspin{to{transform:rotate(360deg)}}
+.fxi-note{font-size:12.5px;color:var(--muted);margin:12px 0 0;line-height:1.5}
+.fxi-file{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--surface2);margin-bottom:14px;color:var(--c)}
+.fxi-file>div{flex:1;min-width:0;color:var(--fg)}
+.fxi-file b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fxi-file small{color:var(--muted)}
+.fxi-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:12px}
+@media (max-width:600px){.fxi-grid{grid-template-columns:1fr}}
+.fxi-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fxi-seg button{font:inherit;text-align:left;padding:10px 12px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.fxi-seg button b{text-transform:capitalize}
+.fxi-seg button small{color:var(--muted);font-size:12px;line-height:1.3}
+.fxi-seg button.on{border-color:var(--c);background:color-mix(in srgb,var(--c) 8%,var(--surface))}
+.fxi-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;max-height:230px;overflow:auto;padding:2px}
+.fxi-img{position:relative;padding:0;border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface2);cursor:pointer;aspect-ratio:4/3}
+.fxi-img img{width:100%;height:100%;object-fit:cover;display:block}
+.fxi-img span{position:absolute;left:5px;bottom:5px;font-size:11px;font-weight:700;background:rgba(15,23,42,.7);color:#fff;border-radius:6px;padding:1px 5px}
+.fxi-img i{position:absolute;right:5px;top:5px;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center}
+.fxi-img.on{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 18%,transparent)}
+.fxi-ai{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;background:var(--surface2);font-size:13.5px;color:var(--muted);line-height:1.45;margin-top:4px}
+.fxi-ai svg{flex:none;color:var(--muted);margin-top:1px}
+.fxi-ai.on{background:linear-gradient(135deg,color-mix(in srgb,#7C3AED 9%,var(--surface)),color-mix(in srgb,#0062FF 7%,var(--surface)))}
+.fxi-ai.on svg{color:#7C3AED}
+.fxi-ai b{color:var(--fg)}
+.fxi-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.fxi-gen{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:26px 8px 12px}
+.fxi-gen small{color:var(--muted)}
+.fxi-orb{width:76px;height:76px;border-radius:24px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#7C3AED,#0062FF);animation:fxorb 2.2s ease-in-out infinite;box-shadow:0 14px 34px -12px rgba(124,58,237,.7)}
+@keyframes fxorb{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.06) rotate(6deg)}}
+.fxi-bar{width:min(420px,100%);height:8px;border-radius:9px;background:var(--surface2);overflow:hidden}
+.fxi-bar i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#7C3AED,#0062FF);transition:width .5s cubic-bezier(.22,1,.36,1)}
+.fxi-okhead{display:flex;gap:12px;align-items:center;padding:14px;border-radius:16px;background:color-mix(in srgb,var(--c) 8%,var(--surface));margin-bottom:12px}
+.fxi-okhead>span{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#fff;flex:none}
+.fxi-okhead b{display:block;font-size:17px}
+.fxi-okhead small{color:var(--muted)}
+.fxi-out{margin:0;padding:0 0 0 2px;list-style:none;display:grid;gap:6px;max-height:300px;overflow:auto}
+.fxi-out li{padding:10px 12px;border-radius:12px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}
+.fxi-out small{color:var(--muted);font-size:12.5px}
+@media (prefers-reduced-motion:reduce){.fxi-orb,.fxi-spin{animation:none}}
+
+/* Schulen (Admin) */
+.adm-view{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.adm-view b{display:block}
+.adm-view small{color:var(--muted)}
+.adm-view select{max-width:320px}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.adm-card{text-align:left;font:inherit;color:var(--fg);display:flex;flex-direction:column;gap:8px;cursor:pointer}
+.adm-card.on{box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent)}
+.adm-name{font-size:17px;letter-spacing:-.01em}
+.adm-mini{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.adm-mini b{color:var(--fg)}
+.adm-detail h3{margin:22px 0 8px;font-size:16px}
+.adm-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-top:16px}
+.adm-kpis>div{padding:12px;border-radius:14px;background:var(--surface2)}
+.adm-kpis b{display:block;font-size:20px}
+.adm-kpis small{color:var(--muted)}
+.adm-form{display:grid;gap:4px;margin-top:12px}
+.adm-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:640px){.adm-row{grid-template-columns:1fr}}
+.adm-check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--surface2);margin:4px 0 10px;cursor:pointer}
+.adm-check.sm{margin:0;padding:9px 12px}
+.adm-check small{display:block;color:var(--muted);font-size:12.5px}
+.adm-fresh{margin-top:12px;display:grid;gap:8px}
+.adm-codes{display:flex;flex-wrap:wrap;gap:8px}
+.adm-codes code,.adm-li code{font:600 15px/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,#4F46E5 10%,var(--surface));color:color-mix(in srgb,#4F46E5 75%,var(--fg))}
+.adm-li code{padding:4px 8px;font-size:13.5px}
+.adm-list{display:grid;gap:6px}
+.adm-li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--surface2);flex-wrap:wrap}
+.adm-li small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.adm-grid>.card{margin:0}
+.fxi-consent{display:flex;gap:10px;align-items:flex-start;margin-top:10px;padding:12px 14px;border-radius:14px;border:1.5px solid color-mix(in srgb,#F59E0B 45%,var(--line));background:color-mix(in srgb,#F59E0B 8%,var(--surface));font-size:13.5px;line-height:1.45;cursor:pointer}
+.fxi-consent.on{border-color:color-mix(in srgb,#10B981 50%,var(--line));background:color-mix(in srgb,#10B981 8%,var(--surface))}
+.fxi-consent input{margin-top:3px;flex:none;width:17px;height:17px}
+.fxi-consent small{display:block;color:var(--muted);margin-top:4px}
+.btn.fx-aibtn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3);transform:none}
+
+</style>
+<script>
+/* Fallpfad Design-Ebene: färbt Navigation, Seitenkopf und Karten wie die Trainingskacheln.
+   Arbeitet nur über Klassen und CSS-Variablen, ändert keine Inhalte. */
+(function () {
+  var C = {
+    blue: "#0062FF", violet: "#7C3AED", teal: "#0D9488", green: "#059669", orange: "#EA580C", red: "#E11D48",
+    pink: "#DB2777", indigo: "#4F46E5", cyan: "#0891B2", sky: "#0284C7", amber: "#D97706", purple: "#9333EA", slate: "#64748B"
+  };
+  var NAV = {
+    "Home": C.blue, "Übersicht": C.blue, "Lernmodule": C.violet, "Module": C.violet, "Training": C.teal, "Praxis": C.green,
+    "Aufgaben": C.orange, "Fortschritt": C.pink, "Patientenakte": C.slate, "Kurse & Schüler": C.cyan, "Ausbildungsnachweis": C.green,
+    "Feedback": C.pink, "Prüfen": C.indigo, "Nachrichten": C.sky, "Stundenplan": C.amber, "Live": C.red, "Team-Krankenhaus": C.purple,
+    "Einstellungen": C.slate, "Schulen": C.indigo, "Mehr": C.slate
+  };
+  var KW = [
+    [/live/i, C.red], [/team/i, C.purple], [/training|praktisches examen|simulation/i, C.teal], [/eigene|reflexion/i, C.orange],
+    [/prüf|examen|osce/i, C.indigo], [/feedback|puls/i, C.pink], [/nachweis|einsatz|praxis/i, C.green], [/nachricht/i, C.sky],
+    [/stundenplan|unterricht/i, C.amber], [/modul/i, C.blue]
+  ];
+  var YEAR = { 1: C.blue, 2: C.violet, 3: C.teal };
+  var ROT = [C.blue, C.violet, C.teal, C.orange, C.pink, C.indigo, C.green, C.amber];
+  function kw(t, def) {
+    for (var i = 0; i < KW.length; i++) if (KW[i][0].test(t)) return KW[i][1];
+    return def;
+  }
+  function tile(el, c, extra) {
+    if (!el || (el.dataset.fx === c && el.classList.contains("fx-t") && el.style.getPropertyValue("--c"))) return;
+    el.dataset.fx = c;
+    el.style.setProperty("--c", c);
+    el.classList.add("fx-t");
+    if (extra) el.classList.add(extra);
+  }
+  function txt(el, sel) {
+    var x = sel ? el.querySelector(sel) : el;
+    return x ? x.textContent || "" : "";
+  }
+  var RULES = [];
+  window.FX = { C: C, NAV: NAV, kw: kw, tile: tile, txt: txt, YEAR: YEAR, ROT: ROT, rule: function (sel, fn) { RULES.push([sel, fn]); } };
+  function run() {
+    var act = null;
+    document.querySelectorAll(".tab").forEach(function (t) {
+      var name = (t.textContent || "").replace(/\d+$/, "").trim();
+      var c = NAV[name];
+      if (c && (t.dataset.fxc !== c || !t.classList.contains("fx-nav"))) { t.dataset.fxc = c; t.style.setProperty("--c", c); t.classList.add("fx-nav"); }
+      if (c && (t.getAttribute("aria-current") === "page" || t.classList.contains("on") || t.getAttribute("aria-selected") === "true")) act = c;
+    });
+    if (act && document.documentElement.style.getPropertyValue("--pc") !== act) document.documentElement.style.setProperty("--pc", act);
+    RULES.forEach(function (r) {
+      document.querySelectorAll(r[0]).forEach(function (el, i) {
+        try { var c = r[1](el, i); if (c) tile(el, c); } catch (e) {}
+      });
+    });
+  }
+  var q = false;
+  function sched() {
+    if (q) return;
+    q = true;
+    requestAnimationFrame(function () { q = false; run(); });
+  }
+  function start() {
+    run();
+    new MutationObserver(sched).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["aria-current", "class"] });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+
+/* Lehrer-Portal: Farbregeln für Karten */
+(function () {
+  var X = window.FX, C = X.C;
+  function head(el) { var e = el.querySelector(".eyebrow, small, .k, .muted"); return e ? e.textContent : ""; }
+  X.rule(".acard", function (el) { return X.kw(head(el) + " " + X.txt(el).slice(0, 60), C.blue); });
+  X.rule(".lcase", function () { return C.red; });
+  X.rule(".tmcase", function () { return C.purple; });
+  X.rule(".prc", function () { return C.indigo; });
+  X.rule(".fbg", function (el, i) { return X.ROT[i % X.ROT.length]; });
+  X.rule(".card.fbk", function () { return C.pink; });
+  X.rule(".card.mcompose", function () { return C.sky; });
+  X.rule(".card.hu-c", function () { return C.amber; });
+  X.rule(".mod.tmod", function (el) { var m = /Jahr\s*(\d)/i.exec(X.txt(el)); return m ? X.YEAR[m[1]] : C.violet; });
+  X.rule(".fx-modgrid > *", function (el) { var m = /Jahr\s*(\d)/i.exec(X.txt(el)); return m ? X.YEAR[m[1]] : C.violet; });
+  X.rule(".stat4 > *, .kpis > *", function (el, i) { return [C.blue, C.cyan, C.violet, C.orange][i % 4]; });
+  X.rule(".adm-card", function (el, i) { return X.ROT[i % X.ROT.length]; });
+})();
+
+/* Kurze Einführung beim ersten Anmelden: hebt die wichtigsten Bereiche hervor. */
+(function () {
+  var KIND = window.FP_APP_KIND || "schueler", KEY = "fp-tour-" + KIND;
+  var X = window.FX || { C: {}, NAV: {} }, C = X.C;
+  var ICON = {
+    hi: '<path d="M7 11.5V6.8a1.6 1.6 0 0 1 3.2 0v4M10.2 10.5V5.3a1.6 1.6 0 0 1 3.2 0v5.2M13.4 10.8V6.6a1.6 1.6 0 0 1 3.2 0v6.6c0 4-2.6 7.3-6.4 7.3-2.4 0-4-1.2-5.3-3.4L3.2 13.6a1.5 1.5 0 0 1 2.4-1.8L7 13.5"/>',
+    home: '<path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+    book: '<path d="M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3z"/><path d="M5 16.5a3 3 0 0 1 3-3h11"/>',
+    cap: '<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c1.6 1.6 3.4 2.3 5.5 2.3s3.9-.7 5.5-2.3V11"/>',
+    clip: '<rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 4.5h6v3H9zM8.5 12l2.2 2.2 4.8-4.7"/>',
+    list: '<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>',
+    chart: '<path d="M4 20h16M7 16v-5M12 16V6M17 16v-8"/>',
+    search: '<circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.4 3.5 5.2"/>',
+    layers: '<path d="M12 3.5 21 8l-9 4.5L3 8z"/><path d="m3 12.5 9 4.5 9-4.5M3 16.5l9 4.5 9-4.5"/>',
+    up: '<path d="M12 16V4.5M7 9l5-5 5 5"/><path d="M4.5 15v4.5h15V15"/>',
+    play: '<path d="M8 5.5v13l10.5-6.5z"/>',
+    mail: '<rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/>',
+    ok: '<path d="M5 12.5 10 17l9-10"/>',
+    school: '<path d="M3 20.5h18M5 20.5V10l7-5 7 5v10.5M10 20.5v-5h4v5"/>'
+  };
+  var STEPS = {
+    schueler: [
+      { ic: "hi", c: C.blue, t: "Willkommen bei Fallpfad", p: "In einer Minute zeigen wir dir die wichtigsten Bereiche. Du kannst die Einführung jederzeit überspringen und später unter Fortschritt wieder starten." },
+      { tab: "Home", ic: "home", t: "Home: dein Startpunkt", p: "Hier siehst du wichtige Nachrichten deiner Lehrkräfte, dein aktuelles Modul zum Weiterlernen, deinen Stundenplan und kleine Tagesaufträge." },
+      { tab: "Lernmodule", ic: "book", t: "Lernmodule", p: "Alle Fallmodule nach Ausbildungsjahr. Jedes Modul begleitet einen Menschen über mehrere Stationen mit Aufgaben, Quiz und Patientenakte." },
+      { tab: "Training", ic: "cap", t: "Training", p: "Üben fürs Examen: Praktisches Examen, Simulationen, Karteikarten, PharmakoLab und mehr. Ideal für zwischendurch." },
+      { tab: "Praxis", ic: "clip", t: "Praxis: dein Ausbildungsnachweis", p: "Arbeitstage und Praxisanleitung eintragen und direkt auf deinem Handy von der Praxisanleitung unterschreiben lassen. Ohne Papier." },
+      { tab: "Aufgaben", ic: "list", t: "Aufgaben", p: "Was dir deine Lehrkraft stellt, mit Abgabetermin. Ein roter Punkt zeigt, dass etwas Neues da ist." },
+      { tab: "Fortschritt", ic: "chart", t: "Fortschritt und Einstellungen", p: "Punkte, Lernkalender und Kompetenzen. Hier stellst du auch Hell oder Dunkel, Schriftgröße und deinen Kurs ein." },
+      { sel: ".topbar .iconbtn, header .iconbtn", ic: "search", c: C.slate, t: "Suche", p: "Über die Lupe findest du jedes Thema, jeden Begriff und jedes Modul. Tastenkürzel am Computer: /" },
+      { ic: "ok", c: C.green, t: "Alles klar, los geht’s!", p: "Tipp: Fang mit „Weiterlernen“ auf Home an. Viel Erfolg!", last: true }
+    ],
+    lehrer: [
+      { ic: "hi", c: C.blue, t: "Willkommen im Lehrer-Portal", p: "Eine kurze Tour durch die wichtigsten Bereiche. Du kannst sie jederzeit überspringen und unter Einstellungen wieder starten." },
+      { tab: "Übersicht", ic: "home", t: "Übersicht", p: "Dein Unterricht heute, Schnellzugriff und alle Benachrichtigungen. Wichtige Hinweise sind rot markiert." },
+      { tab: "Kurse & Schüler", ic: "users", t: "Kurse & Schüler", p: "Jeder Kurs mit Lernstand, Einsatz und Unterrichtsfeedback. Ein Klick auf eine Person öffnet die Schülerakte." },
+      { tab: "Module", ic: "layers", t: "Module bauen und anpassen", p: "Alle Fallmodule ansehen, bearbeiten oder eigene bauen. Neu: Lade eine PowerPoint oder PDF hoch und Fallpfad erstellt daraus ein interaktives Modul." },
+      { tab: "Aufgaben", ic: "list", t: "Aufgaben stellen", p: "Module, Trainings, Team- oder Live-Fälle als Aufgabe mit Termin. Du siehst sofort, wer abgegeben hat." },
+      { tab: "Ausbildungsnachweis", ic: "clip", t: "Ausbildungsnachweis", p: "Stunden, Praxisanleitung und Unterschriften aller Lernenden. Was fehlt, steht in der Schülerakte." },
+      { tab: "Live", ic: "play", t: "Live im Unterricht", p: "Ein Fall am Beamer, die Klasse stimmt per Handy ab. Auch Live-Fälle lassen sich aus Folien erstellen." },
+      { tab: "Nachrichten", ic: "mail", t: "Nachrichten", p: "An Kurse oder einzelne Lernende. Du wählst, wie lange sie sichtbar bleiben." },
+      { tab: "Einstellungen", ic: "school", c: C.slate, t: "Einstellungen", p: "Darstellung, Einladungscodes für Kolleginnen und Kollegen und diese Einführung noch einmal ansehen." },
+      { ic: "ok", c: C.green, t: "Fertig!", p: "Tipp: Unter Module > „Aus Folien erstellen“ probierst du den Folien-Import direkt aus.", last: true }
+    ]
+  };
+  function svg(k) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICON[k] || ICON.ok) + "</svg>"; }
+  function visTab(name) {
+    var all = document.querySelectorAll(".tab");
+    for (var i = 0; i < all.length; i++) {
+      var t = all[i], r = t.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0 && (t.textContent || "").replace(/\d+$/, "").trim() === name) return t;
+    }
+    return null;
+  }
+  var root = null, idx = 0, steps = [];
+  function end(done) {
+    if (root) { root.forEach(function (n) { n.remove(); }); root = null; }
+    window.removeEventListener("resize", draw);
+    document.removeEventListener("keydown", onKey, true);
+    try { localStorage.setItem(KEY, done ? "1" : "skip"); } catch (e) {}
+  }
+  function onKey(e) {
+    if (!root) return;
+    if (e.key === "Escape") { e.preventDefault(); end(false); }
+    else if (e.key === "ArrowRight" || e.key === "Enter") { e.preventDefault(); next(); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); if (idx > 0) { idx--; draw(); } }
+  }
+  function next() { if (idx >= steps.length - 1) end(true); else { idx++; draw(); } }
+  function draw() {
+    if (!root) return;
+    var st = steps[idx], bg = root[0], hole = root[1], card = root[2];
+    var el = st.tab ? visTab(st.tab) : st.sel ? document.querySelector(st.sel) : null;
+    if (el && el.getBoundingClientRect().width === 0) el = null;
+    var c = st.c || (st.tab && X.NAV[st.tab]) || "#0062FF";
+    card.style.setProperty("--tc", c);
+    hole.style.setProperty("--tc", c);
+    card.innerHTML = '<div class="fx-tic">' + svg(st.ic) + "</div><h3>" + st.t + "</h3><p>" + st.p + '</p><div class="fx-tnav"><span class="fx-dots">' + steps.map(function (s, i) { return '<i class="' + (i === idx ? "on" : "") + '"></i>'; }).join("") + "</span>" + (st.last ? "" : '<button type="button" class="fx-skip">Überspringen</button>') + (idx > 0 && !st.last ? '<button type="button" class="fx-back">Zurück</button>' : "") + '<button type="button" class="fx-next">' + (st.last ? "Los geht’s" : idx === 0 ? "Tour starten" : "Weiter") + "</button></div>";
+    card.querySelector(".fx-next").onclick = next;
+    var sk = card.querySelector(".fx-skip"); if (sk) sk.onclick = function () { end(false); };
+    var bk = card.querySelector(".fx-back"); if (bk) bk.onclick = function () { idx--; draw(); };
+    card.setAttribute("aria-label", st.t);
+    var W = innerWidth, H = innerHeight, cw = card.offsetWidth || 360, ch = card.offsetHeight || 220;
+    if (el) {
+      var r = el.getBoundingClientRect(), pad = 6;
+      bg.style.display = "none";
+      hole.style.display = "block";
+      hole.style.left = r.left - pad + "px"; hole.style.top = r.top - pad + "px";
+      hole.style.width = r.width + pad * 2 + "px"; hole.style.height = r.height + pad * 2 + "px";
+      var left, top;
+      if (r.right + 16 + cw < W && r.left < W / 2) { left = r.right + 18; top = r.top + r.height / 2 - ch / 2; }
+      else if (r.top > H / 2) { left = r.left + r.width / 2 - cw / 2; top = r.top - ch - 18; }
+      else { left = r.left + r.width / 2 - cw / 2; top = r.bottom + 18; }
+      card.style.left = Math.max(16, Math.min(W - cw - 16, left)) + "px";
+      card.style.top = Math.max(16, Math.min(H - ch - 16, top)) + "px";
+    } else {
+      hole.style.display = "none";
+      bg.style.display = "block";
+      card.style.left = (W - cw) / 2 + "px";
+      card.style.top = Math.max(16, (H - ch) / 2) + "px";
+    }
+    var nb = card.querySelector(".fx-next"); if (nb) nb.focus({ preventScroll: true });
+  }
+  function start() {
+    if (root) return;
+    steps = STEPS[KIND] || STEPS.schueler;
+    idx = 0;
+    var bg = document.createElement("div"); bg.className = "fx-tour-bg";
+    var hole = document.createElement("div"); hole.className = "fx-tour-hole";
+    var card = document.createElement("div"); card.className = "fx-tour"; card.setAttribute("role", "dialog"); card.setAttribute("aria-modal", "true");
+    bg.onclick = function () {};
+    document.body.appendChild(bg); document.body.appendChild(hole); document.body.appendChild(card);
+    root = [bg, hole, card];
+    draw();
+    requestAnimationFrame(draw);
+    window.addEventListener("resize", draw);
+    document.addEventListener("keydown", onKey, true);
+  }
+  window.FP_TOUR = { start: start };
+  function ready() {
+    if (KIND === "schueler") return document.querySelector("main .hello") && visTab("Home");
+    return document.querySelector(".side .tab, .tab") && document.querySelector("main .topbar, header.topbar") && !document.querySelector(".lwrap");
+  }
+  function seen() { try { return !!localStorage.getItem(KEY); } catch (e) { return true; } }
+  var tries = 0;
+  function poll() {
+    if (seen() || root) return;
+    if (ready()) { setTimeout(function () { if (!seen() && ready()) start(); }, 900); return; }
+    setTimeout(poll, ++tries < 120 ? 500 : 1500);
+  }
+  /* "Einführung ansehen" in den Einstellungen */
+  function addLink() {
+    var host = KIND === "schueler" ? document.querySelector(".card.account") : Array.prototype.find.call(document.querySelectorAll("main .card"), function (c) { var h = c.querySelector("h3"); return h && /^Verbindung$/.test(h.textContent.trim()); });
+    if (!host || host.querySelector(".fx-tourlink")) return;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn ghost sm fx-tourlink";
+    b.style.marginTop = "12px";
+    b.textContent = "Einführung noch einmal ansehen";
+    b.onclick = function () { start(); };
+    host.appendChild(b);
+  }
+  function boot() {
+    poll();
+    new MutationObserver(function () { addLink(); }).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+})();
+
+/* Folien-Import im Lehrer-Portal: PowerPoint (.pptx) oder PDF hochladen und daraus
+   ein Lernmodul, einen Live-Fall oder eine Gruppenarbeit erstellen.
+   Ablauf: Datei im Browser auslesen -> Gliederung -> Stationen (KI über Supabase Edge Function
+   "folien-import", ohne KI ein Schnellentwurf aus den Folien) -> Vorschau -> im Editor öffnen. */
+(function () {
+  var R = window.React, RD = window.ReactDOM;
+  if (!R || !RD) return;
+  var h = R.createElement, useState = R.useState, useEffect = R.useEffect, useRef = R.useRef;
+  var LIB = {
+    zip: "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+    pdf: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
+    pdfw: "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"
+  };
+  var ZIEL = {
+    modul: { t: "Lernmodul", d: "Interaktives Fallmodul mit Stationen, Szenen, Wissen, Quiz und Übungen", c: "#7C3AED" },
+    live: { t: "Live-Fall", d: "Fall für den Unterricht am Beamer, die Klasse entscheidet per Handy", c: "#E11D48" },
+    team: { t: "Gruppenarbeit", d: "Fall für das Team-Krankenhaus mit Material und Arbeitsaufträgen", c: "#9333EA" }
+  };
+  var LAENGE = { kurz: [3, "kurz", "3 Stationen, ca. 1 Unterrichtsstunde"], mittel: [5, "mittel", "5 Stationen, ca. 2 Unterrichtsstunden"], lang: [7, "lang", "7 Stationen, ca. 3 bis 4 Unterrichtsstunden"] };
+  var CHARS = {
+    alt_m: ["WB", "HK", "HS", "JW", "HE", "HL", "WO", "RO", "PH", "KF", "KA"],
+    alt_w: ["MK", "EN", "GH", "IA", "HM", "BR", "MZ", "RL", "WE", "SE", "UF", "GL"],
+    jung: ["DY", "LN", "TF", "ML", "NO"],
+    team: ["AN", "PA", "DK", "LE", "TI"]
+  };
+  function load(src) {
+    return new Promise(function (res, rej) {
+      if (document.querySelector('script[src="' + src + '"]')) return res();
+      var s = document.createElement("script");
+      s.src = src; s.onload = function () { res(); }; s.onerror = function () { rej(new Error("Eine Bibliothek zum Lesen der Datei konnte nicht geladen werden. Bitte Internetverbindung prüfen.")); };
+      document.head.appendChild(s);
+    });
+  }
+  var rid = function (p) { return (p || "x") + "_" + Math.random().toString(36).slice(2, 8); };
+  var esc = function (t) { return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var clean = function (t) { return String(t || "").replace(/\s+/g, " ").trim(); };
+
+  /* ---------- Bilder verkleinern ---------- */
+  function shrink(blob, max, q) {
+    return new Promise(function (res) {
+      var u = URL.createObjectURL(blob), img = new Image();
+      img.onload = function () {
+        var w = img.naturalWidth, hh = img.naturalHeight, f = Math.min(1, (max || 1100) / Math.max(w, hh));
+        if (w < 160 || hh < 120) { URL.revokeObjectURL(u); return res(null); }
+        var c = document.createElement("canvas");
+        c.width = Math.round(w * f); c.height = Math.round(hh * f);
+        var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+        URL.revokeObjectURL(u);
+        res({ src: c.toDataURL("image/jpeg", q || 0.82), w: c.width, h: c.height });
+      };
+      img.onerror = function () { URL.revokeObjectURL(u); res(null); };
+      img.src = u;
+    });
+  }
+
+  /* ---------- PowerPoint lesen ---------- */
+  async function readPptx(file, onStep) {
+    await load(LIB.zip);
+    var zip = await window.JSZip.loadAsync(file);
+    var names = Object.keys(zip.files).filter(function (n) { return /^ppt\/slides\/slide\d+\.xml$/.test(n); })
+      .sort(function (a, b) { return Number(a.match(/(\d+)\.xml/)[1]) - Number(b.match(/(\d+)\.xml/)[1]); });
+    var P = new DOMParser(), slides = [], imgCount = 0;
+    for (var i = 0; i < names.length && i < 120; i++) {
+      onStep && onStep("Folie " + (i + 1) + " von " + names.length + " wird gelesen …");
+      var xml = P.parseFromString(await zip.file(names[i]).async("string"), "application/xml");
+      var titel = "", zeilen = [];
+      var shapes = xml.getElementsByTagName("p:sp");
+      for (var s = 0; s < shapes.length; s++) {
+        var ph = shapes[s].getElementsByTagName("p:ph")[0], typ = ph ? ph.getAttribute("type") || "" : "";
+        var paras = shapes[s].getElementsByTagName("a:p"), txt = [];
+        for (var p = 0; p < paras.length; p++) {
+          var ts = paras[p].getElementsByTagName("a:t"), line = "";
+          for (var t = 0; t < ts.length; t++) line += ts[t].textContent;
+          line = clean(line);
+          if (line) txt.push(line);
+        }
+        if (!txt.length) continue;
+        if ((typ === "title" || typ === "ctrTitle") && !titel) titel = txt.join(" ");
+        else if (typ !== "sldNum" && typ !== "dt" && typ !== "ftr") zeilen = zeilen.concat(txt);
+      }
+      // Tabellen
+      var cells = xml.getElementsByTagName("a:tc");
+      if (cells.length && !zeilen.length) for (var c = 0; c < cells.length; c++) { var ct = clean(cells[c].textContent); if (ct) zeilen.push(ct); }
+      var num = names[i].match(/(\d+)\.xml/)[1], relN = "ppt/slides/_rels/slide" + num + ".xml.rels", notiz = "", bilder = [];
+      if (zip.file(relN)) {
+        var rel = P.parseFromString(await zip.file(relN).async("string"), "application/xml").getElementsByTagName("Relationship");
+        for (var r = 0; r < rel.length; r++) {
+          var type = rel[r].getAttribute("Type") || "", target = rel[r].getAttribute("Target") || "";
+          var path = "ppt/" + target.replace(/^\.\.\//, "");
+          if (/notesSlide$/.test(type) && zip.file(path)) {
+            var nx = P.parseFromString(await zip.file(path).async("string"), "application/xml");
+            var nsp = nx.getElementsByTagName("p:sp"), nt = [];
+            for (var q = 0; q < nsp.length; q++) {
+              var nph = nsp[q].getElementsByTagName("p:ph")[0], ntyp = nph ? nph.getAttribute("type") || "" : "";
+              if (ntyp === "body" || !nph) { var np = nsp[q].getElementsByTagName("a:p"); for (var z = 0; z < np.length; z++) { var l = clean(np[z].textContent); if (l) nt.push(l); } }
+            }
+            notiz = nt.join("\n");
+          } else if (/\/image$/.test(type) && /\.(png|jpe?g|gif|bmp|webp)$/i.test(path) && zip.file(path) && imgCount < 24) {
+            var blob = await zip.file(path).async("blob");
+            if (blob.size > 3000) {
+              var im = await shrink(blob, 1100, 0.82);
+              if (im) { bilder.push(im); imgCount++; }
+            }
+          }
+        }
+      }
+      slides.push({ n: i + 1, titel: titel, text: zeilen.join("\n"), notiz: notiz, bilder: bilder });
+    }
+    return slides;
+  }
+
+  /* ---------- PDF lesen ---------- */
+  async function readPdf(file, onStep) {
+    await load(LIB.pdf);
+    var L = window.pdfjsLib;
+    L.GlobalWorkerOptions.workerSrc = LIB.pdfw;
+    var doc = await L.getDocument({ data: await file.arrayBuffer() }).promise, slides = [];
+    var n = Math.min(doc.numPages, 120);
+    for (var i = 1; i <= n; i++) {
+      onStep && onStep("Seite " + i + " von " + n + " wird gelesen …");
+      var page = await doc.getPage(i), tc = await page.getTextContent(), lines = [], lastY = null, cur = "";
+      tc.items.forEach(function (it) {
+        var y = it.transform ? Math.round(it.transform[5]) : 0;
+        if (lastY !== null && Math.abs(y - lastY) > 4) { if (clean(cur)) lines.push(clean(cur)); cur = ""; }
+        cur += it.str + (it.hasEOL ? " " : "");
+        lastY = y;
+      });
+      if (clean(cur)) lines.push(clean(cur));
+      var bilder = [];
+      if (i <= 40) {
+        var vp = page.getViewport({ scale: 1 }), sc = Math.min(2, 1000 / vp.width), v2 = page.getViewport({ scale: sc });
+        var cv = document.createElement("canvas"); cv.width = Math.round(v2.width); cv.height = Math.round(v2.height);
+        await page.render({ canvasContext: cv.getContext("2d"), viewport: v2 }).promise;
+        bilder.push({ src: cv.toDataURL("image/jpeg", 0.78), w: cv.width, h: cv.height, seite: true });
+      }
+      slides.push({ n: i, titel: lines[0] || "", text: lines.slice(1).join("\n"), notiz: "", bilder: bilder });
+    }
+    return slides;
+  }
+
+  /* ---------- KI-Aufruf über Supabase Edge Function ---------- */
+  async function aiAvailable() {
+    if (!window.FP_SB) return false;
+    try { var c = await window.FP_SB(); return !!c; } catch (e) { return false; }
+  }
+  async function callAi(body) {
+    var c = await window.FP_SB();
+    var r = await c.functions.invoke("folien-import", { body: Object.assign({ bestaetigt: true }, body), region: "eu-central-1" });
+    if (r.error) {
+      var m = r.error.message || String(r.error);
+      try { if (r.error.context && r.error.context.json) { var j = await r.error.context.json(); if (j && j.error) m = j.error; } } catch (e) {}
+      throw new Error(m);
+    }
+    if (!r.data || r.data.error) throw new Error((r.data && r.data.error) || "Keine Antwort vom KI-Dienst.");
+    if (r.data.meta) LASTMETA = r.data.meta;
+    return r.data.result;
+  }
+  var LASTMETA = null;
+  /* Datenminimierung im Browser: E-Mail, Telefon, Datumsangaben, Geburtsdaten entfernen */
+  var SCRUB = [
+    [/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[E-Mail entfernt]"],
+    [/(\+49|0049|\b0)[\s\/\-]?\d{2,5}[\s\/\-]?\d{3,}[\s\-]?\d{0,6}/g, "[Telefon entfernt]"],
+    [/\b\d{1,2}\.\s?\d{1,2}\.\s?(19|20)\d{2}\b/g, "[Datum entfernt]"],
+    [/\b(geb\.?|geboren am)\s*[^\n,;]{0,25}/gi, "[Geburtsdatum entfernt]"]
+  ];
+  function scrub(t) { var x = String(t || ""); SCRUB.forEach(function (r) { x = x.replace(r[0], r[1]); }); return x; }
+  function scrubCount(slides) {
+    var n = 0;
+    slides.forEach(function (sl) { [sl.titel, sl.text, sl.notiz].forEach(function (t) { SCRUB.forEach(function (r) { var m = String(t || "").match(r[0]); if (m) n += m.length; }); }); });
+    return n;
+  }
+  function slideText(slides) {
+    return slides.map(function (s) {
+      return { n: s.n, titel: scrub(s.titel).slice(0, 200), text: scrub(s.text).slice(0, 2500), notiz: scrub(s.notiz).slice(0, 1500) };
+    });
+  }
+
+  /* ---------- Bereinigen: nur bekannte Bausteine und Felder ---------- */
+  function html(x) {
+    var s = String(x || "").replace(/<\s*(script|style|iframe|object|embed)[\s\S]*?<\/\s*\1\s*>/gi, "").replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "").replace(/javascript:/gi, "");
+    if (!/<p|<ul|<ol|<table|<h\d/i.test(s)) s = "<p>" + s + "</p>";
+    return s;
+  }
+  var str = function (x, n) { return String(x == null ? "" : x).slice(0, n || 2000); };
+  function fixBlock(b, mid, ci, bi) {
+    if (!b || typeof b !== "object") return null;
+    var id = mid + "_c" + (ci + 1) + "b" + (bi + 1);
+    switch (b.type) {
+      case "scene": return { type: "scene", who: str(b.who, 4) || "AN", name: b.name ? str(b.name, 60) : undefined, mood: ["neutral", "happy", "worried", "sad", "pain", "angry"].indexOf(b.mood) >= 0 ? b.mood : "neutral", html: html(b.html) };
+      case "knowledge": return { type: "knowledge", label: ["Lernblock", "Praxiswissen", "Vertiefung", "Ergänzung"].indexOf(b.label) >= 0 ? b.label : "Lernblock", title: str(b.title, 140), html: html(b.html) };
+      case "merke": return { type: "merke", html: html(b.html) };
+      case "challenge": return { type: "challenge", title: str(b.title, 140) || "Herausforderung", html: html(b.html) };
+      case "case": return { type: "case", title: str(b.title, 140), rows: (b.rows || []).filter(Array.isArray).slice(0, 10).map(function (r) { return [str(r[0], 60), str(r[1], 300)]; }), html: b.html ? html(b.html) : "" };
+      case "bild": return b.src ? { type: "bild", src: b.src, alt: str(b.alt, 200), caption: str(b.caption, 300), quelle: str(b.quelle, 200) } : null;
+      case "quiz":
+        var qs = (b.questions || []).map(function (q) {
+          var o = (q.o || []).map(function (x) { return str(x, 400); }).filter(Boolean).slice(0, 5), a = Number(q.a);
+          if (!q.q || o.length < 2 || !(a >= 0 && a < o.length)) return null;
+          return { q: str(q.q, 400), o: o, a: a, e: str(q.e, 600) };
+        }).filter(Boolean);
+        return qs.length ? { type: "quiz", id: id, title: str(b.title, 140) || "Kurzquiz", questions: qs } : null;
+      case "cards":
+        var cs = (b.cards || []).filter(function (c) { return Array.isArray(c) && c[0] && c[1]; }).slice(0, 14).map(function (c) { return [str(c[0], 120), str(c[1], 400)]; });
+        return cs.length >= 2 ? { type: "cards", title: str(b.title, 140) || "Lernkarten", cards: cs } : null;
+      case "reflect": return b.question ? { type: "reflect", id: id, question: str(b.question, 600), hint: str(b.hint, 300), model: str(b.model, 1500) } : null;
+      case "mythos":
+        var it = (b.items || []).filter(function (x) { return x && x.t; }).slice(0, 8).map(function (x) { return { t: str(x.t, 300), ok: !!x.ok, e: str(x.e, 500) }; });
+        return it.length >= 3 ? { type: "mythos", id: id, points: it.length, items: it } : null;
+      case "bucket":
+        var cats = (b.cats || []).map(function (x) { return str(x, 60); }).filter(Boolean).slice(0, 4);
+        var bi2 = (b.items || []).filter(function (x) { return x && x.t && Number(x.c) >= 0 && Number(x.c) < cats.length; }).slice(0, 10).map(function (x) { return { t: str(x.t, 200), c: Number(x.c) }; });
+        return cats.length >= 2 && bi2.length >= 3 ? { type: "bucket", id: id, points: Math.min(6, bi2.length), q: str(b.q, 300), cats: cats, items: bi2, fb: str(b.fb, 600) } : null;
+      case "verlauf":
+        var st = (b.steps || []).map(function (s) {
+          var op = (s.opts || []).filter(function (o) { return o && o.t; }).slice(0, 4).map(function (o) { return { t: str(o.t, 300), ok: o.ok ? 1 : 0, c: str(o.c, 400) }; });
+          return s.sit && op.length >= 2 && op.some(function (o) { return o.ok; }) ? { sit: str(s.sit, 600), opts: op } : null;
+        }).filter(Boolean);
+        return st.length ? { type: "verlauf", id: id, points: st.length, steps: st, end: str(b.end, 600) } : null;
+      case "fehler":
+        var ln = (b.lines || []).filter(function (l) { return l && l.t; }).slice(0, 10).map(function (l) { return l.e ? { t: str(l.t, 300), e: str(l.e, 400) } : { t: str(l.t, 300) }; });
+        var nf = ln.filter(function (l) { return l.e; }).length;
+        return ln.length >= 3 && nf ? { type: "fehler", id: id, points: nf, who: str(b.who, 120) || "Übergabe", lines: ln } : null;
+      case "schaetz":
+        var mn = Number(b.min), mx = Number(b.max), an = Number(b.ans);
+        return isFinite(mn) && isFinite(mx) && isFinite(an) && mx > mn && b.q ? { type: "schaetz", id: id, points: 2, q: str(b.q, 300), min: mn, max: mx, step: Number(b.step) || 1, unit: str(b.unit, 20), ans: an, tol: Math.abs(Number(b.tol)) || 0, fb: str(b.fb, 500) } : null;
+      case "praxis": return b.auftrag ? { type: "praxis", id: id, title: str(b.title, 140), auftrag: str(b.auftrag, 600), steps: (b.steps || []).map(function (x) { return str(x, 300); }).filter(Boolean).slice(0, 8), q: str(b.q, 400) } : null;
+      case "doku":
+        var di = (b.items || []).filter(function (x) { return x && x.l && x.r; }).slice(0, 8).map(function (x) { var r = String(x.r); try { new RegExp(r, "i"); } catch (e) { r = String(x.l).toLowerCase().replace(/[^a-zäöüß0-9]+/g, "|"); } return { l: str(x.l, 80), r: r }; });
+        return b.prompt && di.length ? { type: "doku", id: id, time: str(b.time, 10) || "10:00", prompt: str(b.prompt, 500), items: di, model: str(b.model, 1500), points: di.length } : null;
+      default: return null;
+    }
+  }
+  function kiMeta() { return { ki_generiert: true, anbieter: LASTMETA ? LASTMETA.anbieter : "OpenAI", modell: LASTMETA ? LASTMETA.modell : "", region: LASTMETA ? LASTMETA.region : "EU", erstellt: new Date().toISOString(), werkzeug: "Fallpfad Folien-Import", hinweis: "KI-generierter Entwurf, von der Lehrkraft zu pr\u00fcfen" }; }
+  function fixModule(m, opt) {
+    var id = "cm_" + Math.random().toString(36).slice(2, 8);
+    var chapters = (m.chapters || []).map(function (c, ci) {
+      var blocks = (c.blocks || []).map(function (b, bi) { return fixBlock(b, id, ci, bi); }).filter(Boolean);
+      if (!blocks.length) return null;
+      return { id: id + "_s" + (ci + 1), title: str(c.title, 120) || "Station " + (ci + 1), time: str(c.time, 80), place: str(c.place, 120), goal: str(c.goal, 300), tags: (c.tags || []).slice(0, 4).map(function (t) { return str(t, 40); }), akte: c.akte && Array.isArray(c.akte.facts) ? { facts: c.akte.facts.filter(Array.isArray).slice(0, 6).map(function (r) { return [str(r[0], 60), str(r[1], 200)]; }) } : undefined, blocks: blocks };
+    }).filter(Boolean);
+    var p = m.patient || {};
+    var ch = str(p.char, 4) || "IA";
+    return {
+      id: id, title: str(m.title, 140) || "Neues Modul", subtitle: str(m.subtitle, 200), navTitle: str(m.navTitle, 80) || "Stationen", eyebrow: "",
+      year: Number(opt.jahr) || 1, order: 50, duration: str(m.duration, 60) || LAENGE[opt.laenge][2].split(", ")[1], passPercent: 60,
+      cast: (m.cast || [ch, "AN"]).slice(0, 5).map(function (x) { return str(x, 4); }),
+      patient: { name: str(p.name, 80), initials: str(p.name, 80).split(/\s+/).map(function (x) { return x[0] || ""; }).join("").slice(0, 2).toUpperCase(), char: ch, born: str(p.born, 40), diagnosis: str(p.diagnosis, 200) },
+      akteBase: (m.akteBase || []).filter(Array.isArray).slice(0, 8).map(function (r) { return [str(r[0], 60), str(r[1], 300)]; }),
+      intro: html(m.intro || "<p>Worum geht es in diesem Fall?</p>"), outcomes: (m.outcomes || []).map(function (x) { return str(x, 240); }).filter(Boolean).slice(0, 6),
+      chapters: chapters, outro: html(m.outro || "<p>Geschafft.</p>"), sources: (m.sources || []).map(function (x) { return str(x, 400); }).slice(0, 10).concat(opt.ki ? ["Mit KI-Unterst\u00fctzung erstellt (" + (LASTMETA ? LASTMETA.anbieter + ", " + LASTMETA.modell : "KI") + ") aus Unterrichtsfolien der Lehrkraft und von der Lehrkraft fachlich gepr\u00fcft."] : []),
+      area: "", difficulty: opt.jahr === "1" ? "Einsteiger" : opt.jahr === "3" ? "Pr\u00fcfungsniveau" : "Fortgeschritten",
+      imported: { datei: opt.datei, at: new Date().toISOString(), ki: !!opt.ki },
+      ki: opt.ki ? kiMeta() : undefined
+    };
+  }
+
+  /* ---------- Schnellentwurf ohne KI ---------- */
+  function bulletsOf(s) { return s.text.split("\n").map(clean).filter(function (l) { return l.length > 3; }); }
+  function pick(arr, n, seed) { var a = arr.slice(), out = []; while (a.length && out.length < n) { seed = (seed * 9301 + 49297) % 233280; out.push(a.splice(Math.floor(seed / 233280 * a.length), 1)[0]); } return out; }
+  function groups(slides, n) {
+    var useful = slides.filter(function (s) { return clean(s.titel + s.text).length > 10; });
+    if (useful.length > 3 && clean(useful[0].text).length < 120) useful = useful.slice(1);
+    if (!useful.length) useful = slides;
+    n = Math.max(1, Math.min(n, useful.length));
+    var g = [], size = useful.length / n;
+    for (var i = 0; i < n; i++) g.push(useful.slice(Math.round(i * size), Math.round((i + 1) * size)));
+    return g.filter(function (x) { return x.length; });
+  }
+  function draftModule(slides, opt) {
+    var g = groups(slides, LAENGE[opt.laenge][0]);
+    var all = []; slides.forEach(function (s) { bulletsOf(s).forEach(function (b) { all.push({ b: b, n: s.n }); }); });
+    var title = clean(opt.titel) || clean((slides[0] || {}).titel) || opt.datei.replace(/\.[^.]+$/, "");
+    var who = CHARS.alt_w[Math.floor(Math.random() * CHARS.alt_w.length)];
+    var chapters = g.map(function (grp, gi) {
+      var ct = clean(grp[0].titel) || "Station " + (gi + 1), blocks = [];
+      blocks.push({ type: "scene", who: "AN", mood: "neutral", html: "<p>" + (gi === 0 ? "Willkommen auf Station! Heute geht es um „" + esc(title) + "“. " : "") + "Als Nächstes schauen wir uns „" + esc(ct) + "“ genauer an. Lies dir die Infos durch und probier dann die Aufgabe aus.</p>" });
+      grp.forEach(function (s) {
+        var bl = bulletsOf(s);
+        if (!bl.length && !s.notiz) return;
+        blocks.push({ type: "knowledge", label: "Lernblock", title: clean(s.titel) || ct, html: (bl.length ? "<ul>" + bl.map(function (b) { return "<li>" + esc(b) + "</li>"; }).join("") + "</ul>" : "") + (s.notiz ? "<p>" + esc(s.notiz).replace(/\n/g, "<br>") + "</p>" : "") });
+        (opt.bilder[s.n] || []).forEach(function (im) { blocks.push({ type: "bild", src: im.src, alt: clean(s.titel) || "Folie " + s.n, caption: "Folie " + s.n + (s.titel ? ": " + esc(clean(s.titel)) : ""), quelle: "Unterrichtsfolien" }); });
+      });
+      var own = []; grp.forEach(function (s) { bulletsOf(s).forEach(function (b) { if (b.length > 12 && b.length < 220) own.push({ b: b, s: s }); }); });
+      var others = all.filter(function (x) { return grp.every(function (s) { return s.n !== x.n; }) && x.b.length > 12 && x.b.length < 220; });
+      var qs = pick(own, 3, gi + 7).map(function (x, k) {
+        var d = pick(others, 2, gi * 13 + k + 3).map(function (o) { return o.b; });
+        if (d.length < 2) return null;
+        var o = d.concat([x.b]), a = (gi + k) % 3; var tmp = o[a]; o[a] = o[2]; o[2] = tmp;
+        return { q: "Welche Aussage gehört zum Thema „" + clean(x.s.titel || ct) + "“?", o: o, a: a, e: "Diese Aussage stammt aus dem Abschnitt „" + clean(x.s.titel || ct) + "“." };
+      }).filter(Boolean);
+      if (qs.length) blocks.push({ type: "quiz", title: "Kurzquiz: " + ct, questions: qs });
+      var cards = []; grp.forEach(function (s) { bulletsOf(s).forEach(function (b) { var m = b.match(/^([^:–\-]{2,40})\s*[:–-]\s+(.{6,200})$/); if (m) cards.push([m[1], m[2]]); }); });
+      if (cards.length >= 2) blocks.push({ type: "cards", title: "Lernkarten: " + ct, cards: cards.slice(0, 10) });
+      var last = own.length ? own[own.length - 1].b : null;
+      if (last) blocks.push({ type: "merke", html: "<p>" + esc(last) + "</p>" });
+      return { title: ct, time: "", place: "", goal: "Du kannst die wichtigsten Punkte zu „" + ct + "“ erklären.", blocks: blocks };
+    });
+    if (chapters.length) chapters[chapters.length - 1].blocks.push({ type: "reflect", question: "Was nimmst du aus dem Thema „" + title + "“ für deinen nächsten Praxiseinsatz mit? Beschreibe eine konkrete Situation.", hint: "Denk an eine Person, die du gepflegt hast.", model: "Individuelle Antwort. Gut ist eine konkrete Situation mit einer begründeten pflegerischen Handlung." });
+    return fixModule({ title: title, subtitle: "Aus den Folien „" + opt.datei + "“", patient: { name: "", char: who }, cast: [who, "AN"], intro: "<p>Dieses Modul wurde aus den Unterrichtsfolien „" + esc(opt.datei) + "“ erstellt.</p>", outcomes: chapters.map(function (c) { return c.title; }).slice(0, 5), chapters: chapters, outro: "<p>Du hast alle Stationen zu „" + esc(title) + "“ bearbeitet.</p>" }, opt);
+  }
+  function draftLive(slides, opt) {
+    var g = groups(slides, 5), all = []; slides.forEach(function (s) { bulletsOf(s).forEach(function (b) { all.push({ b: b, n: s.n }); }); });
+    var title = clean(opt.titel) || clean((slides[0] || {}).titel) || "Neuer Live-Fall";
+    var steps = g.map(function (grp, gi) {
+      var own = []; grp.forEach(function (s) { bulletsOf(s).forEach(function (b) { if (b.length > 10 && b.length < 200) own.push(b); }); });
+      var oth = all.filter(function (x) { return grp.every(function (s) { return s.n !== x.n; }); }).map(function (x) { return x.b; }).filter(function (b) { return b.length > 10 && b.length < 200; });
+      var r = pick(own, 2, gi + 3), f = pick(oth, 2, gi + 9);
+      var opts = r.map(function (t) { return [t, true, "Passt zu „" + clean(grp[0].titel) + "“.", {}]; }).concat(f.map(function (t) { return [t, false, "Gehört zu einem anderen Thema.", {}]; }));
+      return { t: String(8 + gi).padStart(2, "0") + ":00", sit: "Thema: " + (clean(grp[0].titel) || "Abschnitt " + (gi + 1)) + ". Bitte Situation ergänzen.", v: {}, akte: "", q: "Was trifft zu?", multi: r.length > 1, opts: opts.length >= 2 ? opts : [["Antwort A", true, "", {}], ["Antwort B", false, "", {}]], exp: grp.map(function (s) { return clean(s.titel); }).join(", ") };
+    });
+    return { t: title, kurz: "Aus den Folien „" + opt.datei + "“", lvl: "Jahr " + opt.jahr, ber: "Eigener Fall", p: { name: "Bitte Namen ergänzen", alter: 70, sex: "w", station: "", diag: "", allergie: "keine bekannt", anam: "" }, v: { hf: 80, rrs: 130, rrd: 80, af: 16, spo2: 96, temp: 36.8, bz: 110, gcs: 15, schmerz: 0, o2: "Raumluft" }, labs: [], akte: [], steps: steps };
+  }
+  function draftTeam(slides, opt) {
+    var title = clean(opt.titel) || clean((slides[0] || {}).titel) || "Neue Gruppenarbeit";
+    var info = slides.filter(function (s) { return clean(s.text).length > 20; }).slice(0, 8).map(function (s, i) { return { id: rid("x"), type: "info", title: clean(s.titel) || "Material " + (i + 1), hint: "", text: s.text + (s.notiz ? "\n\n" + s.notiz : "") }; });
+    var tasks = groups(slides, 5).map(function (grp, i) { return { id: "t" + (i + 1), kind: i === 0 ? "auftrag" : i % 2 ? "leitfrage" : "fokus", t: "Erarbeitet: " + (clean(grp[0].titel) || "Abschnitt " + (i + 1)), d: "Nutzt das Material und haltet eure Ergebnisse gemeinsam fest." }; });
+    return { t: title, ber: "Eigene Gruppenarbeit", lvl: opt.jahr + ". Ausbildungsjahr", dur: "60 Minuten", p: { name: "", alter: "", station: "", diag: "", allergie: "" }, ueber: "Aus den Folien „" + opt.datei + "“ erstellt. Bitte Fallsituation ergänzen.", sozial: "", medis: "", oton: "", befunde: [["", ""]], blocks: info.concat([{ id: "sbar", type: "sbar" }]), tasks: tasks };
+  }
+  function fixLive(c, opt) {
+    var b = draftLive([], opt);
+    var steps = (c.steps || []).map(function (s, i) {
+      var opts = (s.opts || []).map(function (o) { return Array.isArray(o) ? [str(o[0], 300), !!o[1], str(o[2], 500), o[3] && typeof o[3] === "object" ? o[3] : {}] : o && o.t ? [str(o.t, 300), !!o.ok, str(o.fb || o.e, 500), o.fx || {}] : null; }).filter(Boolean).slice(0, 6);
+      if (!s.q || opts.length < 2 || !opts.some(function (o) { return o[1]; })) return null;
+      return { t: str(s.t, 10) || String(8 + i).padStart(2, "0") + ":00", sit: str(s.sit, 900), v: s.v && typeof s.v === "object" ? s.v : {}, akte: str(s.akte, 300), q: str(s.q, 300), multi: !!s.multi, opts: opts, exp: str(s.exp, 900) };
+    }).filter(Boolean);
+    var p = c.p || {};
+    return { t: str(c.t, 120) || b.t, kurz: str(c.kurz, 200), lvl: str(c.lvl, 20) || b.lvl, ber: str(c.ber, 60) || "Eigener Fall", p: { name: str(p.name, 80) || "Unbenannt", alter: Number(p.alter) || 70, sex: p.sex === "m" ? "m" : "w", station: str(p.station, 120), diag: str(p.diag, 200), allergie: str(p.allergie, 120) || "keine bekannt", anam: str(p.anam, 600) }, v: Object.assign({}, b.v, c.v || {}), labs: [], akte: (c.akte || []).map(function (x) { return str(x, 300); }).slice(0, 6), steps: steps.length ? steps : b.steps };
+  }
+  function fixTeam(c, opt) {
+    var p = c.p || {};
+    var blocks = (c.blocks || []).map(function (b) {
+      if (!b || !b.type) return null;
+      if (["vit", "eigen", "sis", "risk", "mass", "sbar"].indexOf(b.type) >= 0) return { id: b.type, type: b.type };
+      if (b.type === "info") return { id: rid("x"), type: "info", title: str(b.title, 120), hint: "", text: str(b.text, 4000) };
+      if (b.type === "text") return { id: rid("x"), type: "text", title: str(b.title, 120), hint: str(b.hint, 300) };
+      if (b.type === "choice") { var o = (b.opts || []).map(function (x) { return str(x, 200); }).filter(Boolean); return o.length >= 2 ? { id: rid("x"), type: "choice", title: str(b.title, 120), hint: str(b.hint, 300), q: str(b.q, 300), opts: o } : null; }
+      if (b.type === "check") return { id: rid("x"), type: "check", title: str(b.title, 120), hint: "", items: (Array.isArray(b.items) ? b.items : String(b.items || "").split("\n")).map(function (x) { return str(x, 200); }).filter(Boolean).join("\n") };
+      if (b.type === "table") return { id: rid("x"), type: "table", title: str(b.title, 120), hint: str(b.hint, 300), cols: Array.isArray(b.cols) ? b.cols.join(", ") : str(b.cols, 200) || "Spalte 1, Spalte 2", rows: Math.min(8, Number(b.rows) || 3) };
+      return null;
+    }).filter(Boolean);
+    var tasks = (c.tasks || []).filter(function (t) { return t && t.t; }).slice(0, 10).map(function (t, i) { return { id: "t" + (i + 1), kind: ["auftrag", "leitfrage", "fokus"].indexOf(t.kind) >= 0 ? t.kind : "auftrag", t: str(t.t, 140), d: str(t.d, 600) }; });
+    return { t: str(c.t, 120) || "Neue Gruppenarbeit", ber: str(c.ber, 80) || "Eigene Gruppenarbeit", lvl: str(c.lvl, 40) || opt.jahr + ". Ausbildungsjahr", dur: str(c.dur, 30) || "60 Minuten", p: { name: str(p.name, 80), alter: p.alter || "", station: str(p.station, 120), diag: str(p.diag, 200), allergie: str(p.allergie, 120) }, ueber: str(c.ueber, 2500), sozial: str(c.sozial, 1500), medis: str(c.medis, 800), oton: str(c.oton, 400), befunde: (c.befunde || []).filter(Array.isArray).slice(0, 14).map(function (r) { return [str(r[0], 60), str(r[1], 200)]; }), blocks: blocks.length ? blocks : draftTeam([], opt).blocks, tasks: tasks.length ? tasks : [{ id: "t1", kind: "auftrag", t: "Fall bearbeiten", d: "" }] };
+  }
+
+  /* ---------- Erzeugen ---------- */
+  async function generate(slides, opt, onStep) {
+    var useAi = opt.ki;
+    var folien = slideText(slides);
+    if (opt.ziel === "modul") {
+      if (!useAi) { onStep("Schnellentwurf aus den Folien wird gebaut …", 0.6); return draftModule(slides, opt); }
+      onStep("Gliederung wird geplant …", 0.08);
+      var g = await callAi({ schritt: "gliederung", ziel: "modul", jahr: opt.jahr, laenge: opt.laenge, stationen: LAENGE[opt.laenge][0], hinweis: scrub(opt.hinweis), titel: opt.titel, datei: opt.datei, folien: folien });
+      var chs = g.chapters || [], done = 0;
+      onStep("Stationen werden geschrieben (0 von " + chs.length + ") …", 0.15);
+      var res = await Promise.all(chs.map(function (c, i) {
+        var sub = folien.filter(function (f) { return (c.folien || []).indexOf(f.n) >= 0; });
+        if (!sub.length) sub = folien.slice(Math.floor(i * folien.length / chs.length), Math.ceil((i + 1) * folien.length / chs.length));
+        return callAi({ schritt: "station", ziel: "modul", jahr: opt.jahr, hinweis: scrub(opt.hinweis), gliederung: { title: g.title, patient: g.patient, cast: g.cast, chapters: chs.map(function (x) { return { title: x.title, goal: x.goal }; }) }, station: c, index: i, anzahl: chs.length, folien: sub }).then(function (r) {
+          done++; onStep("Stationen werden geschrieben (" + done + " von " + chs.length + ") …", 0.15 + 0.8 * done / chs.length);
+          return r;
+        });
+      }));
+      g.chapters = chs.map(function (c, i) {
+        var blocks = (res[i] && res[i].blocks) || [];
+        (c.folien || []).forEach(function (n) { (opt.bilder[n] || []).forEach(function (im) { blocks.splice(Math.min(2, blocks.length), 0, { type: "bild", src: im.src, alt: "Folie " + n, caption: "Folie " + n, quelle: "Unterrichtsfolien" }); }); });
+        return Object.assign({}, c, { blocks: blocks, akte: res[i] && res[i].akte });
+      });
+      return fixModule(g, opt);
+    }
+    if (opt.ziel === "live") {
+      if (!useAi) return draftLive(slides, opt);
+      onStep("Live-Fall wird geschrieben …", 0.3);
+      var lv = fixLive(await callAi({ schritt: "live", ziel: "live", jahr: opt.jahr, hinweis: scrub(opt.hinweis), titel: opt.titel, folien: folien }), opt);
+      lv.ki = kiMeta();
+      return lv;
+    }
+    if (!useAi) return draftTeam(slides, opt);
+    onStep("Gruppenarbeit wird geschrieben …", 0.3);
+    var t = fixTeam(await callAi({ schritt: "team", ziel: "team", jahr: opt.jahr, hinweis: scrub(opt.hinweis), titel: opt.titel, folien: folien }), opt);
+    t.ki = kiMeta();
+    Object.keys(opt.bilder).forEach(function (n) { opt.bilder[n].forEach(function (im) { t.blocks.unshift({ id: rid("x"), type: "bild", src: im.src, alt: "Folie " + n, caption: "Folie " + n }); }); });
+    return t;
+  }
+
+  /* ---------- Oberfläche ---------- */
+  function Icon(p) { return h("svg", { viewBox: "0 0 24 24", width: p.s || 20, height: p.s || 20, fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true }, h("path", { d: p.d })); }
+  var IC = { up: "M12 16V4.5M7 9l5-5 5 5M4.5 15v4.5h15V15", x: "M6 6l12 12M18 6 6 18", spark: "M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z", file: "M7 3.5h7l4 4v13H7zM14 3.5v4h4", ok: "M5 12.5 10 17l9-10", back: "M15 6l-6 6 6 6" };
+  function Modal(p) {
+    var st = useState("start"), step = st[0], setStep = st[1];
+    var o = useState({ ziel: p.ziel || "modul", jahr: "2", laenge: "mittel", hinweis: "", titel: "" }), opt = o[0], setOpt = o[1];
+    var f = useState(null), file = f[0], setFile = f[1];
+    var sl = useState(null), slides = sl[0], setSlides = sl[1];
+    var pr = useState({ t: "", v: 0 }), prog = pr[0], setProg = pr[1];
+    var er = useState(null), err = er[0], setErr = er[1];
+    var rs = useState(null), result = rs[0], setResult = rs[1];
+    var ai = useState(null), hasAi = ai[0], setHasAi = ai[1];
+    var sel = useState({}), pickImg = sel[0], setPick = sel[1];
+    var drag = useState(false), over = drag[0], setOver = drag[1];
+    var cn = useState(false), cons = cn[0], setCons = cn[1];
+    var inp = useRef(null);
+    useEffect(function () { aiAvailable().then(setHasAi); var k = function (e) { if (e.key === "Escape") p.close(); }; document.addEventListener("keydown", k); return function () { document.removeEventListener("keydown", k); }; }, []);
+    var set = function (k, v) { setOpt(function (x) { var y = Object.assign({}, x); y[k] = v; return y; }); };
+    async function take(fl) {
+      setErr(null);
+      if (!fl) return;
+      if (!/\.(pptx|pdf)$/i.test(fl.name)) { setErr("Bitte eine PowerPoint-Datei (.pptx) oder ein PDF wählen. Alte .ppt-Dateien bitte vorher in PowerPoint als .pptx speichern."); return; }
+      if (fl.size > 60 * 1024 * 1024) { setErr("Die Datei ist größer als 60 MB. Bitte Bilder komprimieren oder als PDF speichern."); return; }
+      setFile(fl); setStep("read"); setProg({ t: "Datei wird geöffnet …", v: 0.05 });
+      try {
+        var s = /\.pdf$/i.test(fl.name) ? await readPdf(fl, function (t) { setProg({ t: t, v: 0.5 }); }) : await readPptx(fl, function (t) { setProg({ t: t, v: 0.5 }); });
+        var chars = s.reduce(function (a, x) { return a + x.titel.length + x.text.length + x.notiz.length; }, 0);
+        if (chars < 80) throw new Error("In der Datei wurde kaum Text gefunden. Enthält sie nur Bilder oder eingescannte Seiten? Dann bitte eine Fassung mit Text verwenden.");
+        setSlides(s);
+        set("titel", clean((s[0] || {}).titel).slice(0, 100));
+        setStep("opts");
+      } catch (e) { setErr(e.message); setStep("start"); }
+    }
+    async function run() {
+      setErr(null); setStep("gen");
+      var bilder = {};
+      slides.forEach(function (s) { s.bilder.forEach(function (im, i) { if (pickImg[s.n + ":" + i]) (bilder[s.n] = bilder[s.n] || []).push(im); }); });
+      var o2 = Object.assign({}, opt, { datei: file.name, bilder: bilder, ki: !!hasAi });
+      try {
+        var r = await generate(slides, o2, function (t, v) { setProg({ t: t, v: v || 0.5 }); });
+        try { if (hasAi) { var c = await window.FP_SB(); await c.from("fp_import_log").insert({ ziel: opt.ziel, seiten: slides.length, zeichen: JSON.stringify(slideText(slides)).length }); } } catch (e) {}
+        window.FP_IMPORT.last = r;
+        setResult(r); setStep("done");
+      } catch (e) { setErr(e.message || String(e)); setStep("opts"); }
+    }
+    function open() {
+      if (opt.ziel === "modul" && window.FP_openEditor) window.FP_openEditor(result);
+      else if (opt.ziel === "live" && window.FP_liveEdit) window.FP_liveEdit(result);
+      else if (opt.ziel === "team" && window.FP_teamBuild) window.FP_teamBuild(result);
+      p.close();
+    }
+    var Z = ZIEL[opt.ziel];
+    var imgs = slides ? slides.reduce(function (a, s) { s.bilder.forEach(function (im, i) { a.push({ k: s.n + ":" + i, im: im, n: s.n }); }); return a; }, []) : [];
+    var body;
+    if (step === "start" || step === "read") {
+      body = h("div", null,
+        h("div", { className: "fxi-ziele" }, Object.keys(ZIEL).map(function (k) {
+          return h("button", { key: k, type: "button", className: "fxi-ziel" + (opt.ziel === k ? " on" : ""), style: { "--c": ZIEL[k].c }, onClick: function () { set("ziel", k); } }, h("b", null, ZIEL[k].t), h("small", null, ZIEL[k].d));
+        })),
+        h("div", { className: "fxi-drop" + (over ? " over" : ""), onDragOver: function (e) { e.preventDefault(); setOver(true); }, onDragLeave: function () { setOver(false); }, onDrop: function (e) { e.preventDefault(); setOver(false); take(e.dataTransfer.files[0]); }, onClick: function () { inp.current && inp.current.click(); }, role: "button", tabIndex: 0, onKeyDown: function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inp.current.click(); } } },
+          step === "read" ? h("div", { className: "fxi-busy" }, h("i", { className: "fxi-spin" }), h("span", null, prog.t)) : h(R.Fragment, null,
+            h("span", { className: "fxi-dic" }, h(Icon, { d: IC.up, s: 28 })),
+            h("b", null, "PowerPoint oder PDF hierher ziehen"),
+            h("small", null, "oder klicken zum Auswählen · .pptx oder .pdf, bis 60 MB")),
+          h("input", { ref: inp, type: "file", accept: ".pptx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation", hidden: true, onChange: function (e) { take(e.target.files[0]); e.target.value = ""; } })),
+        h("p", { className: "fxi-note" }, "Die Datei wird in deinem Browser gelesen und nicht hochgeladen. ", hasAi ? "Für die Erstellung gehen nur die Folientexte an OpenAI (Verarbeitung in der EU, ohne Speicherung, nicht für Training). E-Mail-Adressen, Telefonnummern und Datumsangaben entfernt Fallpfad vorher automatisch." : "Ohne eingerichteten KI-Dienst erstellt Fallpfad einen Schnellentwurf direkt aus den Folien, den du im Editor ausbaust."));
+    } else if (step === "opts") {
+      body = h("div", null,
+        h("div", { className: "fxi-file" }, h(Icon, { d: IC.file }), h("div", null, h("b", null, file.name), h("small", null, slides.length + (/\.pdf$/i.test(file.name) ? " Seiten" : " Folien") + " gelesen · Ziel: " + Z.t)), h("button", { type: "button", className: "btn ghost sm", onClick: function () { setStep("start"); setSlides(null); setFile(null); } }, "Andere Datei")),
+        h("div", { className: "fxi-grid" },
+          h("div", { className: "field" }, h("label", { htmlFor: "fxi-t" }, "Titel"), h("input", { id: "fxi-t", className: "input", value: opt.titel, onChange: function (e) { set("titel", e.target.value); }, placeholder: "z. B. Herzinsuffizienz: Atemnot verstehen" })),
+          h("div", { className: "field" }, h("label", { htmlFor: "fxi-j" }, "Ausbildungsjahr"), h("select", { id: "fxi-j", className: "input", value: opt.jahr, onChange: function (e) { set("jahr", e.target.value); } }, h("option", { value: "1" }, "1. Ausbildungsjahr"), h("option", { value: "2" }, "2. Ausbildungsjahr"), h("option", { value: "3" }, "3. Ausbildungsjahr")))),
+        opt.ziel === "modul" && h("div", { className: "field" }, h("label", null, "Umfang"), h("div", { className: "fxi-seg" }, Object.keys(LAENGE).map(function (k) { return h("button", { key: k, type: "button", className: opt.laenge === k ? "on" : "", onClick: function () { set("laenge", k); } }, h("b", null, LAENGE[k][1]), h("small", null, LAENGE[k][2])); }))),
+        h("div", { className: "field" }, h("label", { htmlFor: "fxi-h" }, "Was ist dir wichtig? (optional)"), h("textarea", { id: "fxi-h", className: "input", rows: 3, value: opt.hinweis, onChange: function (e) { set("hinweis", e.target.value); }, placeholder: "z. B. Fokus auf Krankenbeobachtung und Beratung, Patientin im Pflegeheim, viele Übungen zur Dokumentation" })),
+        imgs.length > 0 && h("div", { className: "field" }, h("label", null, "Bilder aus der Datei übernehmen (antippen zum Auswählen)"), h("div", { className: "fxi-imgs" }, imgs.slice(0, 40).map(function (x) { return h("button", { key: x.k, type: "button", className: "fxi-img" + (pickImg[x.k] ? " on" : ""), onClick: function () { setPick(function (pp) { var y = Object.assign({}, pp); y[x.k] = !y[x.k]; return y; }); }, title: "Folie " + x.n }, h("img", { src: x.im.src, alt: "Folie " + x.n }), h("span", null, x.n), pickImg[x.k] && h("i", null, h(Icon, { d: IC.ok, s: 14 }))); }))),
+        h("div", { className: "fxi-ai" + (hasAi ? " on" : "") }, h(Icon, { d: IC.spark }), h("span", null, hasAi ? h(R.Fragment, null, h("b", null, "KI-Erstellung aktiv (OpenAI, EU). "), "Fallpfad schreibt eine Fallgeschichte mit Szenen, Wissen, Quiz und interaktiven Übungen auf Basis deiner Folien. Das Ergebnis ist ein KI-Entwurf, den du fachlich prüfst.") : h(R.Fragment, null, h("b", null, "Schnellentwurf ohne KI. "), "Die Folien werden in Stationen mit Wissensblöcken, Quiz und Lernkarten umgewandelt. Für ausgearbeitete Fallgeschichten richtet die Administration den KI-Dienst ein."))),
+        hasAi && h("label", { className: "fxi-consent" + (cons ? " on" : "") }, h("input", { type: "checkbox", checked: cons, onChange: function (e) { setCons(e.target.checked); } }), h("span", null, h("b", null, "Ich bestätige: "), "Die Folien enthalten keine Namen oder sonstigen Daten echter Patientinnen und Patienten, Lernender oder Kolleginnen und Kollegen. Fallbeispiele sind erfunden oder anonymisiert.", scrubCount(slides) ? h("small", null, scrubCount(slides) + " Angaben (E-Mail, Telefon, Datum) werden vor dem Versand automatisch entfernt.") : null)));
+    } else if (step === "gen") {
+      body = h("div", { className: "fxi-gen" }, h("div", { className: "fxi-orb", style: { "--c": Z.c } }, h(Icon, { d: IC.spark, s: 30 })), h("b", null, prog.t), h("div", { className: "fxi-bar" }, h("i", { style: { width: Math.round(prog.v * 100) + "%" } })), h("small", null, hasAi ? "Das dauert je nach Umfang etwa eine bis drei Minuten. Du kannst das Fenster offen lassen." : "Einen Moment …"));
+    } else if (step === "done") {
+      var parts = opt.ziel === "modul" ? result.chapters.map(function (c, i) {
+        var cnt = {}; c.blocks.forEach(function (b) { cnt[b.type] = (cnt[b.type] || 0) + 1; });
+        return h("li", { key: i }, h("b", null, (i + 1) + ". " + c.title), h("small", null, Object.keys(cnt).map(function (k) { return cnt[k] + "× " + ({ scene: "Szene", knowledge: "Wissen", quiz: "Quiz", cards: "Lernkarten", merke: "Merke", reflect: "Reflexion", mythos: "Mythen-Check", bucket: "Zuordnen", verlauf: "Fallverlauf", fehler: "Fehlersuche", schaetz: "Schätzfrage", doku: "Pflegebericht", praxis: "Praxisauftrag", bild: "Bild", "case": "Fallvignette", challenge: "Herausforderung" }[k] || k); }).join(" · ")));
+      }) : opt.ziel === "live" ? result.steps.map(function (s, i) { return h("li", { key: i }, h("b", null, s.t + " · " + s.q), h("small", null, s.opts.length + " Antworten")); }) : result.tasks.map(function (t, i) { return h("li", { key: i }, h("b", null, t.t), h("small", null, t.d)); });
+      body = h("div", null, h("div", { className: "fxi-okhead", style: { "--c": Z.c } }, h("span", null, h(Icon, { d: IC.ok, s: 22 })), h("div", null, h("b", null, opt.ziel === "modul" ? result.title : result.t), h("small", null, Z.t + " erstellt" + (hasAi ? " mit KI, als KI-Entwurf gekennzeichnet" : " (Schnellentwurf)") + " · noch nicht veröffentlicht"))), h("ol", { className: "fxi-out" }, parts), h("p", { className: "fxi-note" }, "Im Editor prüfst und änderst du alles, bevor die Lernenden es sehen. Bitte Inhalte fachlich gegenlesen."));
+    }
+    var foot = step === "opts" ? h("div", { className: "fxi-foot" }, h("button", { type: "button", className: "btn ghost", onClick: p.close }, "Abbrechen"), h("button", { type: "button", className: "btn fx-aibtn", onClick: run, disabled: !!hasAi && !cons, title: hasAi && !cons ? "Bitte zuerst bestätigen" : "" }, h(Icon, { d: IC.spark, s: 18 }), Z.t + " erstellen"))
+      : step === "done" ? h("div", { className: "fxi-foot" }, h("button", { type: "button", className: "btn ghost", onClick: function () { setStep("opts"); } }, "Neu erstellen"), h("button", { type: "button", className: "btn", onClick: open }, "Im Editor öffnen")) : null;
+    return h("div", { className: "fxi-bg", onMouseDown: function (e) { if (e.target === e.currentTarget && step !== "gen") p.close(); } },
+      h("div", { className: "fxi", role: "dialog", "aria-modal": true, "aria-label": "Aus Folien erstellen", style: { "--c": Z.c } },
+        h("div", { className: "fxi-head" }, h("span", { className: "fxi-hic" }, h(Icon, { d: IC.spark })), h("div", null, h("b", null, "Aus Folien erstellen"), h("small", null, "PowerPoint oder PDF in ein interaktives " + Z.t.replace("Lernmodul", "Lernmodul") + " verwandeln")), step !== "gen" && h("button", { type: "button", className: "iconbtn", "aria-label": "Schließen", onClick: p.close }, h(Icon, { d: IC.x }))),
+        err && h("div", { className: "notice bad", role: "alert", style: { margin: "0 0 12px" } }, err),
+        body, foot));
+  }
+  var host = null, root = null;
+  window.FP_IMPORT = {
+    open: function (ziel) {
+      if (!host) { host = document.createElement("div"); host.id = "fxi-root"; document.body.appendChild(host); root = RD.createRoot(host); }
+      root.render(h(Modal, { key: Date.now(), ziel: ziel, close: function () { root.render(null); } }));
+    },
+    _test: { draftModule: draftModule, draftLive: draftLive, draftTeam: draftTeam, fixModule: fixModule, fixLive: fixLive, fixTeam: fixTeam }
+  };
+  /* Knöpfe neben "Neues Modul", "Eigenen Fall erstellen", "Neue Gruppenarbeit" */
+  var ANCH = [[/^Neues Modul$/, "modul"], [/^Eigenen Fall erstellen$/, "live"], [/^Neue Gruppenarbeit$/, "team"]];
+  function addButtons() {
+    document.querySelectorAll("main .btn").forEach(function (b) {
+      var t = (b.textContent || "").trim();
+      ANCH.forEach(function (a) {
+        if (!a[0].test(t)) return;
+        var nx = b.nextElementSibling;
+        if (nx && nx.classList.contains("fx-aibtn")) return;
+        var x = document.createElement("button");
+        x.type = "button";
+        x.className = "btn fx-aibtn";
+        x.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + IC.spark + '"/></svg>Aus Folien erstellen';
+        x.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); window.FP_IMPORT.open(a[1]); });
+        b.parentNode.insertBefore(x, b.nextSibling);
+      });
+    });
+  }
+  var q = false;
+  function tick() { if (q) return; q = true; requestAnimationFrame(function () { q = false; addButtons(); }); }
+  function start() { tick(); new MutationObserver(tick).observe(document.body, { childList: true, subtree: true }); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+})();
+
+/* Lehrer-Portal: Schul-Anzeige und Admin-Bereich "Schulen" (nur für Rolle admin). */
+(function () {
+  var R = window.React;
+  if (!R) return;
+  var h = R.createElement, useState = R.useState, useEffect = R.useEffect;
+  function rpc(fn, args) {
+    return window.FP_SB().then(function (c) { return c.rpc(fn, args || {}); }).then(function (r) { if (r.error) throw new Error(r.error.message); return r.data; });
+  }
+  /* Schule oben im Portal anzeigen */
+  var schoolName = null, asked = false;
+  function badge() {
+    var t = document.querySelector(".topbar .t");
+    if (!t) return;
+    if (!asked) {
+      asked = true;
+      if (!window.FP_SB) schoolName = "Pflegeschule am Klinikum Beispielstadt";
+      else rpc("fp_my_school").then(function (d) {
+        var r = d && d[0];
+        window.FP_ME_ROLE = r ? r.rolle : null;
+        schoolName = r ? (r.name || (r.rolle === "admin" ? "Alle Schulen (Administration)" : "")) : "";
+        badge();
+      }).catch(function () { schoolName = ""; });
+    }
+    if (!schoolName) return;
+    var b = t.querySelector(".fx-school");
+    if (b && b.textContent === schoolName) return;
+    if (!b) { b = document.createElement("span"); b.className = "fx-school"; t.appendChild(b); }
+    b.textContent = schoolName;
+  }
+  window.FP_SCHOOL_RELOAD = function () { asked = false; schoolName = null; badge(); };
+  new MutationObserver(function () { badge(); }).observe(document.documentElement, { childList: true, subtree: true });
+
+  var fmt = function (d) { return d ? new Date(d).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }) : "–"; };
+  function SchoolForm(p) {
+    var s = p.s || {}, st = useState({ name: s.name || "", ort: s.ort || "", kontakt: s.kontakt || "", max: s.max_lernende || "", notiz: s.notiz || "", aktiv: s.aktiv !== false }), f = st[0], setF = st[1];
+    var b = useState(false), busy = b[0], setBusy = b[1];
+    var set = function (k, v) { setF(function (x) { var y = Object.assign({}, x); y[k] = v; return y; }); };
+    return h("form", { className: "adm-form", onSubmit: function (e) {
+      e.preventDefault(); setBusy(true);
+      rpc("fp_admin_school_save", { p_id: s.id || null, p_name: f.name, p_ort: f.ort || null, p_kontakt: f.kontakt || null, p_aktiv: f.aktiv, p_max: f.max ? Number(f.max) : null, p_notiz: f.notiz || null })
+        .then(function () { p.done(); }).catch(function (x) { p.err(x.message); }).then(function () { setBusy(false); });
+    } },
+      h("div", { className: "adm-row" },
+        h("div", { className: "field" }, h("label", { htmlFor: "as-n" }, "Name der Schule"), h("input", { id: "as-n", className: "input", required: true, minLength: 2, value: f.name, onChange: function (e) { set("name", e.target.value); }, placeholder: "z. B. Pflegeschule am Klinikum Musterstadt" })),
+        h("div", { className: "field" }, h("label", { htmlFor: "as-o" }, "Ort"), h("input", { id: "as-o", className: "input", value: f.ort, onChange: function (e) { set("ort", e.target.value); } }))),
+      h("div", { className: "adm-row" },
+        h("div", { className: "field" }, h("label", { htmlFor: "as-k" }, "Ansprechperson / Kontakt"), h("input", { id: "as-k", className: "input", value: f.kontakt, onChange: function (e) { set("kontakt", e.target.value); }, placeholder: "Name, E-Mail, Telefon" })),
+        h("div", { className: "field" }, h("label", { htmlFor: "as-m" }, "Lizenz: max. Lernende (optional)"), h("input", { id: "as-m", className: "input", type: "number", min: 1, value: f.max, onChange: function (e) { set("max", e.target.value); } }))),
+      h("div", { className: "field" }, h("label", { htmlFor: "as-x" }, "Notiz (nur für dich)"), h("textarea", { id: "as-x", className: "input", rows: 2, value: f.notiz, onChange: function (e) { set("notiz", e.target.value); } })),
+      h("label", { className: "adm-check" }, h("input", { type: "checkbox", checked: f.aktiv, onChange: function (e) { set("aktiv", e.target.checked); } }), h("span", null, h("b", null, "Freigeschaltet"), h("small", null, "Ausgeschaltet sehen Lehrkräfte und Lernende dieser Schule keine Daten mehr."))),
+      h("div", { className: "row", style: { gap: 8 } }, h("button", { type: "submit", className: "btn", disabled: busy }, s.id ? "Speichern" : "Schule anlegen"), h("button", { type: "button", className: "btn ghost", onClick: p.cancel }, "Abbrechen")));
+  }
+  function SchoolDetail(p) {
+    var s = p.s;
+    var c = useState(null), codes = c[0], setCodes = c[1];
+    var pp = useState(null), people = pp[0], setPeople = pp[1];
+    var n = useState(2), anz = n[0], setAnz = n[1];
+    var sl = useState(false), leit = sl[0], setLeit = sl[1];
+    var fr = useState(null), fresh = fr[0], setFresh = fr[1];
+    var ed = useState(false), edit = ed[0], setEdit = ed[1];
+    var load = function () {
+      rpc("fp_admin_codes", { p_school: s.id }).then(setCodes).catch(function (x) { p.err(x.message); });
+      rpc("fp_admin_people", { p_school: s.id }).then(setPeople).catch(function (x) { p.err(x.message); });
+    };
+    useEffect(load, [s.id]);
+    var mail = fresh ? "Hallo,\n\nhier sind eure Zugänge zum Fallpfad Lehrer-Portal (" + s.name + "):\n\n1. Portal öffnen: " + location.origin + location.pathname + "\n2. „Neues Konto mit Einladungscode“ wählen und mit der dienstlichen E-Mail registrieren\n3. E-Mail bestätigen, anmelden und einen dieser Codes eingeben (jeder Code gilt einmal):\n\n" + fresh.join("\n") + "\n\nViele Grüße" : "";
+    return h("div", { className: "card adm-detail" },
+      h("div", { className: "row", style: { justifyContent: "space-between", alignItems: "flex-start", gap: 12 } },
+        h("div", null, h("div", { className: "eyebrow" }, s.aktiv ? "Freigeschaltet" : "Gesperrt"), h("h2", { style: { margin: "6px 0 2px" } }, s.name), h("p", { className: "muted", style: { margin: 0 } }, [s.ort, s.kontakt].filter(Boolean).join(" · ") || "Keine weiteren Angaben")),
+        h("div", { className: "row", style: { gap: 8 } }, h("button", { type: "button", className: "btn ghost sm", onClick: function () { setEdit(!edit); } }, edit ? "Schließen" : "Bearbeiten"), h("button", { type: "button", className: "btn sm", onClick: function () { p.view(s.id); } }, "Als diese Schule ansehen"), h("button", { type: "button", className: "iconbtn", "aria-label": "Zurück", onClick: p.close }, "×"))),
+      edit && h(SchoolForm, { s: s, done: function () { setEdit(false); p.reload(); }, cancel: function () { setEdit(false); }, err: p.err }),
+      h("div", { className: "adm-kpis" }, [["Lehrkräfte", s.lehrkraefte], ["Lernende", s.lernende + (s.max_lernende ? " / " + s.max_lernende : "")], ["Kurse", s.kurse], ["Eigene Module", s.module], ["Zuletzt aktiv", fmt(s.zuletzt_aktiv)]].map(function (k, i) { return h("div", { key: i }, h("b", null, k[1]), h("small", null, k[0])); })),
+      h("h3", null, "Lehrkräfte einladen"),
+      h("p", { className: "muted" }, "Jeder Code schaltet genau ein Konto als Lehrkraft dieser Schule frei. Lernende brauchen keinen Code: Sie treten mit dem Kurscode bei, den die Lehrkraft unter Kurse findet."),
+      h("div", { className: "row", style: { gap: 10, alignItems: "flex-end" } },
+        h("div", { className: "field", style: { margin: 0 } }, h("label", { htmlFor: "ac-n" }, "Anzahl"), h("input", { id: "ac-n", className: "input", type: "number", min: 1, max: 50, value: anz, style: { width: 90 }, onChange: function (e) { setAnz(e.target.value); } })),
+        h("label", { className: "adm-check sm" }, h("input", { type: "checkbox", checked: leit, onChange: function (e) { setLeit(e.target.checked); } }), h("span", null, h("b", null, "als Schulleitung"))),
+        h("button", { type: "button", className: "btn", onClick: function () { rpc("fp_admin_invites", { p_school: s.id, p_anzahl: Number(anz) || 1, p_schulleitung: leit }).then(function (d) { setFresh(d); load(); p.reload(true); }).catch(function (x) { p.err(x.message); }); } }, "Codes erzeugen")),
+      fresh && h("div", { className: "adm-fresh" }, h("div", { className: "adm-codes" }, fresh.map(function (c) { return h("code", { key: c }, c); })), h("textarea", { className: "input", rows: 7, readOnly: true, value: mail, onFocus: function (e) { e.target.select(); } }), h("button", { type: "button", className: "btn ghost sm", onClick: function () { try { navigator.clipboard.writeText(mail); } catch (e) {} } }, "Text kopieren")),
+      h("h3", null, "Lehrkräfte"),
+      !people ? h("p", { className: "muted" }, "Wird geladen …") : !people.length ? h("p", { className: "muted" }, "Noch keine Lehrkraft. Erzeuge oben einen Code.") :
+        h("div", { className: "adm-list" }, people.map(function (u) {
+          return h("div", { key: u.id, className: "adm-li" }, h("div", null, h("b", null, u.display_name || u.email), h("small", null, u.email + (u.schulleitung ? " · Schulleitung" : "") + (u.role === "admin" ? " · Administration" : ""))),
+            u.role !== "admin" && h("div", { className: "row", style: { gap: 6 } },
+              h("button", { type: "button", className: "btn ghost sm", onClick: function () { rpc("fp_admin_person", { p_user: u.id, p_school: null, p_role: null, p_schulleitung: !u.schulleitung }).then(load).catch(function (x) { p.err(x.message); }); } }, u.schulleitung ? "Schulleitung entfernen" : "Zur Schulleitung"),
+              h("button", { type: "button", className: "btn ghost sm", onClick: function () { if (confirm("Lehrkraft-Zugang von " + (u.display_name || u.email) + " entziehen? Das Konto bleibt bestehen, sieht aber das Portal nicht mehr.")) rpc("fp_admin_person", { p_user: u.id, p_school: null, p_role: "student", p_schulleitung: false }).then(load).catch(function (x) { p.err(x.message); }); } }, "Zugang entziehen")));
+        })),
+      h("h3", null, "Einladungscodes"),
+      !codes ? null : !codes.length ? h("p", { className: "muted" }, "Noch keine Codes.") : h("div", { className: "adm-list" }, codes.map(function (c) {
+        return h("div", { key: c.code, className: "adm-li" }, h("div", null, h("code", null, c.code), h("small", null, (c.schulleitung ? "Schulleitung · " : "") + "erstellt " + fmt(c.created_at))), h("span", { className: "pill " + (c.used_at ? "ok" : "") }, c.used_at ? "benutzt von " + (c.used_email || "?") : "offen"));
+      })));
+  }
+  function AdminPage() {
+    var l = useState(null), list = l[0], setList = l[1];
+    var e = useState(null), err = e[0], setErr = e[1];
+    var o = useState(null), open = o[0], setOpen = o[1];
+    var n = useState(false), neu = n[0], setNeu = n[1];
+    var v = useState(null), view = v[0], setView = v[1];
+    var load = function () {
+      rpc("fp_admin_schools").then(function (d) { setList(d || []); }).catch(function (x) { setErr(x.message); });
+      rpc("fp_my_school").then(function (d) { setView(d && d[0] ? d[0].id : null); }).catch(function () {});
+    };
+    useEffect(load, []);
+    var doView = function (id) {
+      rpc("fp_admin_view", { p_school: id }).then(function () { location.hash = "start"; location.reload(); }).catch(function (x) { setErr(x.message); });
+    };
+    if (!window.FP_SB) return h("div", { className: "wrap wide" }, h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", null, "Schulen")), h("div", { className: "card" }, h("p", { className: "muted" }, "Im Demo-Modus gibt es keine Schulverwaltung.")));
+    var cur = open && list && list.find(function (x) { return x.id === open; });
+    var tot = (list || []).reduce(function (a, s) { a.l += Number(s.lernende) || 0; a.t += Number(s.lehrkraefte) || 0; return a; }, { l: 0, t: 0 });
+    return h("div", { className: "wrap wide" },
+      h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", { style: { marginTop: 8 } }, "Schulen"), h("p", null, "Hier legst du Schulen an, schaltest sie frei, erzeugst Einladungscodes für Lehrkräfte und siehst, wie aktiv jede Schule ist. Jede Schule sieht nur ihre eigenen Daten.")),
+      err && h("div", { className: "notice bad" }, err, " ", h("button", { type: "button", className: "skip", onClick: function () { setErr(null); } }, "Ausblenden")),
+      h("div", { className: "card adm-view" }, h("div", null, h("b", null, "Ansicht im Portal"), h("small", null, view ? "Du siehst gerade das Portal wie eine Lehrkraft dieser Schule." : "Du siehst gerade die Daten aller Schulen zusammen.")),
+        h("select", { className: "input", value: view || "", onChange: function (ev) { doView(ev.target.value || null); } }, h("option", { value: "" }, "Alle Schulen"), (list || []).map(function (s) { return h("option", { key: s.id, value: s.id }, s.name); }))),
+      h("div", { className: "row", style: { justifyContent: "space-between", margin: "22px 0 10px" } }, h("h2", { style: { margin: 0, fontSize: 20 } }, (list ? list.length : 0) + " Schulen · " + tot.t + " Lehrkräfte · " + tot.l + " Lernende"), h("button", { type: "button", className: "btn", onClick: function () { setNeu(true); setOpen(null); } }, "+ Neue Schule")),
+      neu && h("div", { className: "card" }, h("h3", { style: { marginTop: 0 } }, "Neue Schule"), h(SchoolForm, { s: null, done: function () { setNeu(false); load(); }, cancel: function () { setNeu(false); }, err: setErr })),
+      cur && h(SchoolDetail, { s: cur, close: function () { setOpen(null); }, reload: load, view: doView, err: setErr }),
+      !list ? h("p", { className: "muted" }, "Wird geladen …") : h("div", { className: "adm-grid" }, list.map(function (s) {
+        return h("button", { key: s.id, type: "button", className: "card adm-card" + (open === s.id ? " on" : ""), onClick: function () { setOpen(s.id); setNeu(false); window.scrollTo({ top: 0, behavior: "smooth" }); } },
+          h("div", { className: "row", style: { justifyContent: "space-between", gap: 8 } }, h("span", { className: "eyebrow" }, s.ort || "Schule"), h("span", { className: "pill " + (s.aktiv ? "ok" : "bad") }, s.aktiv ? "aktiv" : "gesperrt")),
+          h("b", { className: "adm-name" }, s.name),
+          h("div", { className: "adm-mini" }, h("span", null, h("b", null, s.lehrkraefte), " Lehrkräfte"), h("span", null, h("b", null, s.lernende), " Lernende"), h("span", null, h("b", null, s.kurse), " Kurse")),
+          h("small", { className: "muted" }, "Zuletzt aktiv: " + fmt(s.zuletzt_aktiv) + (Number(s.offene_codes) ? " · " + s.offene_codes + " offene Codes" : "")));
+      })));
+  }
+  window.FP_AdminPage = AdminPage;
+})();
+
 </script>
 </body>
 </html>
