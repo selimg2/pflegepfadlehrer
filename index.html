@@ -9,6 +9,92 @@
 <meta name="theme-color" content="#0062FF">
 <script>window.addEventListener("error",function(e){if(/config\.js/.test(e.filename||""))window.FALLPFAD_CONFIG_ERROR=String(e.message||"Syntaxfehler");});</script>
 <script src="config.js"></script>
+<script>
+/* Zusätzliche Live-Klassenfälle mit Vitalzeichen (Format wie die eingebauten Fälle) */
+window.FP_EXTRA_CASES = [
+  {
+    id: "nachblut", t: "Der Verband wird immer dicker", kurz: "Postoperative Nachblutung nach Hüft-TEP", lvl: "Jahr 2", ber: "Akutpflege",
+    p: { name: "Gerda Lindemann", alter: 76, sex: "w", station: "Unfallchirurgie, Zimmer 7", diag: "Hüft-TEP rechts (OP heute, 11 Uhr)", allergie: "keine bekannt", anam: "Vorhofflimmern, Apixaban bis vor zwei Tagen pausiert. Redon-Drainage rechts." },
+    v: { hf: 84, rrs: 132, rrd: 78, af: 16, spo2: 96, temp: 36.6, bz: 128, gcs: 15, schmerz: 3, o2: "Raumluft" },
+    labs: [["hb", "Hämoglobin", 11.2, "g/dl", 12, 16]], akte: ["14:00 Rückverlegung aus dem Aufwachraum, Verband trocken, Redon 50 ml."],
+    steps: [
+      { t: "17:30", sit: "Frau Lindemann klagt über zunehmende Schmerzen in der Hüfte. Der Verband ist großflächig durchgeblutet, in der Redonflasche sind 350 ml.", v: { hf: 104, rrs: 112, rrd: 66, schmerz: 6 }, akte: "17:30 Verband durchgeblutet, Redon 350 ml.", q: "Was tust du zuerst?", multi: true,
+        opts: [["Vitalzeichen engmaschig kontrollieren und die Ärztin sofort informieren", true, "Steigender Puls und fallender Blutdruck bei sichtbarer Blutung sind Warnzeichen.", { a: "17:32 Ärztin informiert." }], ["Verband nicht abnehmen, sondern zusätzlich komprimierend überwickeln", true, "Den Verband belassen und markieren, damit die Ärztin den Verlauf sieht.", {}], ["Das Bein hochlagern und ein Schmerzmittel aus dem Schrank geben", false, "Medikamente nur nach Anordnung. Die Ursache der Schmerzen muss erst geklärt werden.", { v: { hf: 6 } }], ["Die Redondrainage abklemmen, damit weniger Blut verloren geht", false, "Abklemmen ist ärztliche Entscheidung und kann zu einem Hämatom führen.", { v: { schmerz: 2 } }]],
+        exp: "Bei einer Nachblutung zählen Kreislaufüberwachung, Information der Ärztin und das Bereitstellen von Material. Das Ausmaß wird dokumentiert, z. B. Verband umranden und Uhrzeit notieren." },
+      { t: "17:45", sit: "Frau Lindemann wird blass, kaltschweißig und unruhig. Sie sagt, ihr sei schwindelig.", v: { hf: 124, rrs: 92, rrd: 54, af: 22, spo2: 94 }, akte: "17:45 Blässe, Kaltschweißigkeit, Schwindel.", q: "Wie deutest du die Situation?",
+        opts: [["Beginnender hypovolämischer Schock", true, "Tachykardie, Hypotonie, Blässe und Unruhe zeigen einen Volumenmangel.", {}], ["Eine typische Reaktion auf die Narkose", false, "Die Werte verschlechtern sich zu deutlich für eine Narkosenachwirkung.", {}], ["Eine Lungenembolie, sicher", false, "Möglich, aber die sichtbare Blutung erklärt das Bild besser.", {}]],
+        exp: "Der Schockindex (Puls geteilt durch systolischen Blutdruck) liegt über 1. Das ist ein Hinweis auf einen relevanten Blutverlust." },
+      { t: "17:47", sit: "Die Ärztin ist auf dem Weg. Sie ordnet am Telefon eine Infusion und ein Blutbild an.", v: {}, akte: "17:47 Telefonische Anordnung: Vollelektrolytlösung 500 ml, Blutbild, Kreuzblut.", q: "Welche Maßnahmen übernimmst du?", multi: true,
+        opts: [["Schocklagerung: Beine hoch, Oberkörper flach, sofern die Hüftlagerung es erlaubt", true, "Das verbessert den Rückfluss zum Herzen. Die Hüfte dabei nicht in eine verbotene Position bringen.", { v: { rrs: 6 } }], ["Infusion nach Anordnung vorbereiten und mit der Pflegefachperson anhängen", true, "Infusionen nach Anordnung, als Auszubildende gemeinsam mit einer Pflegefachperson.", { v: { rrs: 10, hf: -8 } }], ["Blutentnahme vorbereiten und Kreuzblutröhrchen beschriften", true, "Für eine mögliche Transfusion wird Kreuzblut gebraucht.", {}], ["Frau Lindemann allein lassen und den Notfallwagen holen", false, "Bei instabilen Personen bleibst du und lässt Material bringen.", { v: { hf: 6 } }]],
+        exp: "Volumengabe nach Anordnung, Schocklagerung und Vorbereitung einer Transfusion sind die nächsten Schritte." },
+      { t: "19:00", sit: "Nach Infusion und einer Bluttransfusion ist Frau Lindemann stabiler. Sie fragt, ob das wieder passieren kann.", v: { hf: 92, rrs: 118, rrd: 70, af: 17, spo2: 96 }, akte: "19:00 Kreislauf stabil, Verband markiert, keine weitere Zunahme.", q: "Was ist jetzt wichtig?",
+        opts: [["Engmaschige Kontrollen fortsetzen, Verband und Drainage beobachten, ihr die Situation ruhig erklären", true, "Sicherheit entsteht durch Information und weitere Überwachung.", {}], ["Ihr sagen, dass jetzt alles vorbei ist", false, "Keine Versprechen, die du nicht halten kannst.", {}], ["Sie sofort an die Bettkante mobilisieren", false, "Erst nach ärztlicher Freigabe und stabilem Kreislauf.", {}]],
+        exp: "Nach einer Nachblutung bleibt die Überwachung engmaschig. Antikoagulation wird ärztlich neu bewertet." }
+    ]
+  },
+  {
+    id: "oedem", t: "Rasseln in der Nacht", kurz: "Akutes Lungenödem bei Herzinsuffizienz", lvl: "Jahr 2", ber: "Innere Medizin",
+    p: { name: "Klaus Behrens", alter: 81, sex: "m", station: "Kardiologie, Zimmer 3", diag: "Dekompensierte Herzinsuffizienz", allergie: "keine bekannt", anam: "Herzinsuffizienz NYHA III, Hypertonie. Furosemid morgens. Abends zwei Teller Suppe gegessen." },
+    v: { hf: 92, rrs: 168, rrd: 96, af: 20, spo2: 93, temp: 36.7, bz: 138, gcs: 15, schmerz: 0, o2: "Raumluft" },
+    labs: [["ntprobnp", "NT-proBNP", 4800, "pg/ml", 0, 450]], akte: ["21:00 Gewicht heute 2,1 kg mehr als vor drei Tagen."],
+    steps: [
+      { t: "02:15", sit: "Herr Behrens klingelt. Er sitzt aufrecht, ringt nach Luft und hustet schaumiges Sekret. Man hört ein Brodeln bei jedem Atemzug.", v: { hf: 118, rrs: 186, rrd: 104, af: 32, spo2: 84 }, akte: "02:15 Akute Atemnot, brodelndes Atemgeräusch, schaumiges Sputum.", q: "Was tust du in den ersten zwei Minuten?", multi: true,
+        opts: [["Oberkörper hoch, Beine tief lagern (Herzbettlage)", true, "Das senkt den Rückstrom zum Herzen und entlastet die Lunge.", { v: { spo2: 2 } }], ["Notruf, Ärztin und Hilfe holen", true, "Ein akutes Lungenödem ist lebensbedrohlich.", { a: "02:16 Notfallteam alarmiert." }], ["Sauerstoff nach Notfallstandard geben", true, "Die Sättigung ist kritisch niedrig.", { v: { spo2: 6, o2: "10 l/min Maske" } }], ["Ein großes Glas Wasser zum Abhusten anbieten", false, "Zusätzliche Flüssigkeit belastet das Herz weiter, außerdem besteht Aspirationsgefahr.", { v: { spo2: -2 } }]],
+        exp: "Herzbettlage, Sauerstoff und schnelle Alarmierung sind die ersten Maßnahmen beim kardialen Lungenödem." },
+      { t: "02:20", sit: "Die Ärztin ordnet Furosemid i. v. und Nitro-Spray an. Herr Behrens ist sehr ängstlich.", v: { hf: 110, af: 28, spo2: 90 }, akte: "02:20 Furosemid 40 mg i. v., Nitro 2 Hübe nach Anordnung.", q: "Was beachtest du bei der Gabe von Nitro-Spray?",
+        opts: [["Vorher Blutdruck messen, danach engmaschig kontrollieren", true, "Nitro senkt den Blutdruck. Bei niedrigen Werten ist es gefährlich.", {}], ["Nur geben, wenn der Puls unter 60 ist", false, "Entscheidend ist vor allem der Blutdruck.", {}], ["Es kann auch ohne ärztliche Anordnung gegeben werden", false, "Nitro wird nach Anordnung gegeben.", {}]],
+        exp: "Vor Nitro immer den Blutdruck kontrollieren. Ein systolischer Wert unter etwa 90 bis 100 mmHg spricht dagegen." },
+      { t: "03:30", sit: "Herr Behrens hat 900 ml Urin ausgeschieden. Die Atmung ist ruhiger.", v: { hf: 94, rrs: 142, rrd: 84, af: 22, spo2: 94, o2: "4 l/min Nasenbrille" }, akte: "03:30 Diurese 900 ml, Atmung ruhiger.", q: "Was dokumentierst und beobachtest du jetzt?", multi: true,
+        opts: [["Ein- und Ausfuhr bilanzieren", true, "Die Bilanz zeigt, ob die Entwässerung wirkt.", {}], ["Kalium im Blick behalten (Laborkontrolle nach Anordnung)", true, "Furosemid kann Kalium senken und Herzrhythmusstörungen auslösen.", {}], ["Morgen früh nüchtern wiegen", true, "Das Gewicht ist der beste Verlaufsparameter.", {}], ["Bettruhe für eine Woche", false, "Mobilisation erfolgt schrittweise nach Stabilisierung.", {}]],
+        exp: "Bilanz, Gewicht, Elektrolyte und Atmung zeigen, ob die Behandlung wirkt." },
+      { t: "Zwei Tage später", sit: "Vor der Entlassung fragt Herr Behrens, warum das passiert ist.", v: { hf: 78, rrs: 128, rrd: 76, af: 16, spo2: 96, o2: "Raumluft" }, akte: "Entlassungsgespräch.", q: "Welche Beratung ist am wichtigsten?",
+        opts: [["Tägliches Wiegen, Trinkmenge nach Absprache, Warnzeichen kennen und Medikamente regelmäßig nehmen", true, "Selbstmanagement verhindert erneute Dekompensationen.", {}], ["Nie wieder Suppe essen", false, "Wichtig sind Salz- und Flüssigkeitsmenge insgesamt, kein striktes Verbot.", {}], ["Bei Atemnot erst einmal abwarten", false, "Bei Atemnot in Ruhe sofort Hilfe holen.", {}]],
+        exp: "Gewichtszunahme über 2 kg in drei Tagen ist ein Signal, die Hausärztin anzurufen." }
+    ]
+  },
+  {
+    id: "fieberkrampf", t: "Fieber und Zuckungen", kurz: "Fieberkrampf bei einem Kleinkind", lvl: "Jahr 3", ber: "Pädiatrie",
+    p: { name: "Mia Hoffmann", alter: 2, sex: "w", station: "Kinderstation K2, Zimmer 5", diag: "Fieberhafter Infekt der oberen Luftwege", allergie: "keine bekannt", anam: "Seit gestern Fieber bis 39,5 °C. Bisher gesund. Mutter bleibt über Nacht." },
+    v: { hf: 150, rrs: 98, rrd: 60, af: 32, spo2: 97, temp: 39.4, bz: 92, gcs: 15, schmerz: 2, o2: "Raumluft" },
+    labs: [], akte: ["18:00 Fieber 39,4 °C, trinkt wenig."],
+    steps: [
+      { t: "19:10", sit: "Die Mutter ruft panisch. Mia ist nicht ansprechbar, Arme und Beine zucken rhythmisch, die Lippen sind leicht bläulich.", v: { hf: 170, af: 40, spo2: 89, gcs: 7 }, ekg: "sinustachy", akte: "19:10 Generalisierter Krampfanfall.", q: "Was tust du?", multi: true,
+        opts: [["Uhrzeit merken und Hilfe rufen", true, "Die Anfallsdauer entscheidet über die Behandlung.", { a: "19:10 Notfallknopf gedrückt." }], ["Verletzungen verhindern: Gegenstände weg, Kopf polstern", true, "Während des Anfalls schützen, nicht festhalten.", {}], ["Etwas zwischen die Zähne schieben, damit sie sich nicht auf die Zunge beißt", false, "Gefährlich: Verletzungen und Aspiration. Niemals etwas in den Mund.", { v: { spo2: -3 } }], ["Sauerstoff vorhalten, sobald möglich", true, "Die Sättigung ist erniedrigt.", { v: { spo2: 4 } }]],
+        exp: "Bei einem Krampfanfall schützt du, beobachtest und misst die Zeit. Nichts in den Mund stecken, nicht festhalten." },
+      { t: "19:13", sit: "Der Anfall dauert jetzt drei Minuten. Die Ärztin ist da.", v: { hf: 165, spo2: 92 }, akte: "19:13 Anfall seit 3 Minuten.", q: "Ab wann spricht man meist von einem behandlungsbedürftigen, verlängerten Anfall?",
+        opts: [["nach etwa 5 Minuten", true, "Ab etwa 5 Minuten wird medikamentös durchbrochen, z. B. mit Midazolam nach Anordnung.", {}], ["nach etwa 30 Sekunden", false, "Einfache Fieberkrämpfe dauern meist weniger als 5 Minuten.", {}], ["erst nach 30 Minuten", false, "Viel zu spät.", {}]],
+        exp: "Die meisten Fieberkrämpfe enden von selbst in wenigen Minuten. Nach etwa 5 Minuten wird ärztlich behandelt." },
+      { t: "19:15", sit: "Der Anfall hört auf. Mia ist schläfrig und atmet regelmäßig.", v: { hf: 146, af: 30, spo2: 96, gcs: 12, o2: "2 l/min vorgehalten" }, akte: "19:15 Anfall sistiert nach 5 Minuten, postiktal schläfrig.", q: "Wie lagerst und beobachtest du Mia jetzt?",
+        opts: [["Stabile Seitenlage, Atmung, Bewusstsein und Temperatur engmaschig kontrollieren", true, "Nach dem Anfall Atemwege freihalten und beobachten.", {}], ["Aufsetzen und zum Trinken bringen", false, "Aspirationsgefahr, solange sie schläfrig ist.", {}], ["In eine kalte Badewanne legen, um das Fieber zu senken", false, "Kalte Bäder sind gefährlich und unangenehm. Fiebersenkung nach Anordnung.", {}]],
+        exp: "Postiktal ist die Seitenlage sicher. Fieber wird nach Anordnung gesenkt, aber Fiebersenkung verhindert Fieberkrämpfe nicht sicher." },
+      { t: "20:00", sit: "Die Mutter weint und fragt, ob Mia jetzt Epilepsie hat.", v: { gcs: 15, temp: 38.6 }, akte: "20:00 Wach, Mutter sehr besorgt.", q: "Was antwortest du?",
+        opts: [["Ruhig erklären, dass Fieberkrämpfe bei Kleinkindern häufig sind und meist ohne Folgen bleiben, und die Ärztin das Gespräch vertiefen lassen", true, "Information und Zuwendung helfen der Mutter.", {}], ["„Das kann ich nicht sagen.“", false, "Zu knapp. Die Mutter braucht Orientierung.", {}], ["„Ja, das ist der Beginn einer Epilepsie.“", false, "Falsch. Ein einfacher Fieberkrampf bedeutet keine Epilepsie.", {}]],
+        exp: "Etwa 2 bis 5 von 100 Kindern haben einmal einen Fieberkrampf. Eltern brauchen Erklärung und einen Notfallplan." }
+    ]
+  },
+  {
+    id: "sht", t: "Nur eine kleine Platzwunde", kurz: "Sturz unter Antikoagulation mit verzögerter Hirnblutung", lvl: "Jahr 1", ber: "Langzeitpflege",
+    p: { name: "Werner Kuhn", alter: 84, sex: "m", station: "Pflegeheim, Wohnbereich 2", diag: "Zustand nach Sturz, Vorhofflimmern", allergie: "Pflaster", anam: "Nimmt Rivaroxaban. Leichte Demenz, sonst gut orientiert. Gestürzt um 15 Uhr, Platzwunde am Hinterkopf, versorgt." },
+    v: { hf: 78, rrs: 142, rrd: 84, af: 16, spo2: 96, temp: 36.5, bz: 112, gcs: 15, schmerz: 2, o2: "Raumluft" },
+    labs: [], akte: ["15:10 Sturz, Platzwunde 1 cm okzipital, Hausarzt informiert: Beobachtung im Heim."],
+    steps: [
+      { t: "18:00", sit: "Herr Kuhn isst kaum zu Abend und sagt, er habe Kopfschmerzen. Er ist etwas langsamer als sonst.", v: { schmerz: 4 }, akte: "18:00 Kopfschmerzen, verlangsamt.", q: "Wie schätzt du das ein?",
+        opts: [["Warnzeichen: unter Blutverdünner nach Kopfverletzung kann sich eine Hirnblutung langsam entwickeln", true, "Antikoagulierte Menschen brauchen nach Kopfanprall besondere Wachsamkeit.", {}], ["Er ist einfach müde vom Tag", false, "Gefährliche Verharmlosung.", {}], ["Kopfschmerzen sind nach einer Platzwunde normal, keine Kontrolle nötig", false, "Neue oder zunehmende Beschwerden müssen abgeklärt werden.", {}]],
+        exp: "Kopfschmerz, Verlangsamung und Appetitlosigkeit können frühe Zeichen eines Hämatoms sein." },
+      { t: "18:05", sit: "Du prüfst Bewusstsein und Pupillen. Die rechte Pupille ist etwas weiter als die linke und reagiert träge.", v: { gcs: 13, rrs: 168, rrd: 90, hf: 62 }, akte: "18:05 GCS 13, Pupillendifferenz rechts > links.", q: "Was tust du?",
+        opts: [["Notruf 112, bei ihm bleiben, Vitalzeichen und Bewusstsein weiter kontrollieren, Medikamentenplan bereitlegen", true, "Eine Pupillendifferenz ist ein Notfallzeichen.", { a: "18:06 Notruf." }], ["Den Hausarzt morgen früh anrufen", false, "Viel zu spät.", { v: { gcs: -2 } }], ["Eine Schmerztablette geben und ins Bett legen", false, "Verschleiert Symptome und verzögert Hilfe.", { v: { gcs: -2 } }]],
+        exp: "Steigender Blutdruck, fallender Puls und eine Pupillendifferenz sprechen für steigenden Hirndruck." },
+      { t: "18:12", sit: "Der Rettungsdienst ist unterwegs. Herr Kuhn erbricht im Liegen.", v: { gcs: 12 }, akte: "18:12 Erbrechen.", q: "Wie lagerst du ihn?",
+        opts: [["Seitenlage mit leicht erhöhtem Oberkörper, Mund reinigen, Atemwege freihalten", true, "Schützt vor Aspiration.", {}], ["Flach auf den Rücken", false, "Aspirationsgefahr.", {}], ["Aufsetzen und laufen lassen", false, "Sturz- und Aspirationsgefahr.", {}]],
+        exp: "Bei Bewusstseinsstörung und Erbrechen hat die Sicherung der Atemwege Vorrang." },
+      { t: "18:20", sit: "Du übergibst an den Rettungsdienst.", v: {}, akte: "18:20 Übergabe Rettungsdienst.", q: "Was gehört in deine Übergabe?", multi: true,
+        opts: [["Sturzzeitpunkt und Verletzung", true, "Zeitverlauf ist entscheidend.", {}], ["Antikoagulans mit letzter Einnahme", true, "Wichtig für die Behandlung der Blutung.", {}], ["Verlauf von Bewusstsein und Pupillen", true, "Zeigt die Dynamik.", {}], ["Seine Lieblingsserie im Fernsehen", false, "Nicht relevant für die Notfallübergabe.", {}]],
+        exp: "Eine strukturierte Übergabe nach ISBAR mit Zeitpunkten und Medikation spart wertvolle Zeit." }
+    ]
+  }
+];
+
+</script>
 <script>window.FP_APP_KIND="lehrer";
 /* Fallpfad Demo-Konten: läuft direkt nach config.js, vor der App.
    Zugangsdaten werden nur im Browser erkannt, es gibt kein echtes Konto in der Datenbank. */
@@ -5689,7 +5775,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
         }
       ]
     }
-  ];
+  ].concat(window.FP_EXTRA_CASES || []);
 
   // lehrer_src/api.js
   var LIVE_DEMO_CASE = () => {
@@ -5708,6 +5794,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     appMissing: !APP && !isDemo,
     contentUrl: String(RAW.contentUrl || "").trim() || new URL("content.json", location.href).href
   };
+  window.FP_APPURL = SETTINGS.appUrl;
   var configError = () => {
     const p = configDetail();
     if (p) {
@@ -7002,12 +7089,19 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     mem = null;
   };
   var API = isDemo ? Demo : Cloud;
+  window.FP_API = API;
 
   // lehrer_src/ui.jsx
   var import_react = __toESM(require_shim_react());
 
   // lehrer_src/qr.js
   var import_qrcode_generator = __toESM(require_qrcode());
+  window.FP_QRSVG = (t) => {
+    const q = (0, import_qrcode_generator.default)(0, "M");
+    q.addData(t);
+    q.make();
+    return q.createSvgTag({ cellSize: 6, margin: 2, scalable: true });
+  };
   function qrSvg(text, { cell = 8, margin = 2 } = {}) {
     const qr = (0, import_qrcode_generator.default)(0, "M");
     qr.addData(unescape(encodeURIComponent(text)), "Byte");
@@ -9432,7 +9526,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     window.FP_liveEdit = (d) => setEdit({ data: d });
     const load2 = async () => {
       try {
-        setOwn(await API.liveCases() || []);
+        setOwn((await API.liveCases() || []).filter((r) => !(r.data && r.data.kind === "stunde")));
         setMissing(false);
       } catch (e) {
         if (/Tabelle fehlt|does not exist|Could not find/i.test(e.message)) setMissing(true);
@@ -9459,7 +9553,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
         load2();
       }
     }) }, /* @__PURE__ */ import_react8.default.createElement(Icon, { n: "trash" }))) : ownRow ? /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn ghost sm", onClick: stop(() => setEdit({ data: { ...JSON.parse(JSON.stringify(c)), t: c.t + " (Kopie)" } })) }, /* @__PURE__ */ import_react8.default.createElement(Icon, { n: "copy" }), "Als Kopie bearbeiten") : /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn ghost sm", onClick: stop(() => setEdit({ data: { ...JSON.parse(JSON.stringify(c)), t: c.t + " (eigene Fassung)" } })) }, /* @__PURE__ */ import_react8.default.createElement(Icon, { n: "copy" }), "Als Vorlage")));
-    return /* @__PURE__ */ import_react8.default.createElement("div", { className: "wrap wide" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "hello" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "eyebrow" }, "Pr\xE4senzunterricht"), /* @__PURE__ */ import_react8.default.createElement("h1", { style: { marginTop: 8 } }, "Live-Klassenfall"), /* @__PURE__ */ import_react8.default.createElement("p", null, "Projiziere einen Fall per Beamer. Die Lernenden scannen den QR-Code und stimmen auf dem Smartphone ab, ohne sich anzumelden. Nach dem Aufl\xF6sen wirkt sich die Entscheidung der Klasse auf Vitalzeichen, Labor und Akte aus. Weiter schaltest nur du, auch mit der Pfeiltaste oder Leertaste.")), err && /* @__PURE__ */ import_react8.default.createElement("div", { className: "notice bad" }, err), /* @__PURE__ */ import_react8.default.createElement("div", { className: "row", style: { margin: "8px 0 4px" } }, /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn", onClick: stop(() => setEdit({ data: null })) }, /* @__PURE__ */ import_react8.default.createElement(Icon, { n: "plus" }), "Eigenen Fall erstellen")), own.length > 0 && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "sec" }, /* @__PURE__ */ import_react8.default.createElement("h2", null, "Eigene und geteilte F\xE4lle")), /* @__PURE__ */ import_react8.default.createElement(HerkunftFilter, { value: hk, set: setHk }), /* @__PURE__ */ import_react8.default.createElement("div", { className: "agrid" }, own.filter((r) => sichtbar(r, "live_cases", myId) && (hk === "alle" || herkunft(r, "live_cases", myId) === hk)).map((r) => /* @__PURE__ */ import_react8.default.createElement("div", { key: r.id, className: "lcwrap" }, card(r.data, r), /* @__PURE__ */ import_react8.default.createElement("div", { className: "lcfrg" }, /* @__PURE__ */ import_react8.default.createElement(FreigabeChip, { row: r, table: "live_cases", me: myId, lehrer })))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "sec" }, /* @__PURE__ */ import_react8.default.createElement("h2", null, "Fertige F\xE4lle"), /* @__PURE__ */ import_react8.default.createElement("span", { className: "muted", style: { fontSize: 14 } }, LIVE_CASES.length)), /* @__PURE__ */ import_react8.default.createElement("div", { className: "agrid" }, LIVE_CASES.map((c) => card(c, null))), edit && /* @__PURE__ */ import_react8.default.createElement(CaseEditor, { initial: edit, close: () => setEdit(null), saved: () => {
+    return /* @__PURE__ */ import_react8.default.createElement("div", { className: "wrap wide" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "hello" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "eyebrow" }, "Pr\xE4senzunterricht"), /* @__PURE__ */ import_react8.default.createElement("h1", { style: { marginTop: 8 } }, "Live im Unterricht"), /* @__PURE__ */ import_react8.default.createElement("p", null, "Zeige Live-Stunden, Fallbeispiele oder ein ganzes Modul an der Tafel. Die Lernenden scannen den QR-Code und antworten anonym auf dem Handy, ohne sich anzumelden. Vorne siehst du sofort, wie viele was gew\xE4hlt haben. Weiter schaltest nur du, auch mit Pfeiltaste oder Leertaste.")), window.FP_LiveHub && /* @__PURE__ */ import_react8.default.createElement(window.FP_LiveHub, null), err && /* @__PURE__ */ import_react8.default.createElement("div", { className: "notice bad" }, err), /* @__PURE__ */ import_react8.default.createElement("div", { className: "row", style: { margin: "8px 0 4px" } }, /* @__PURE__ */ import_react8.default.createElement("button", { type: "button", className: "btn", onClick: stop(() => setEdit({ data: null })) }, /* @__PURE__ */ import_react8.default.createElement(Icon, { n: "plus" }), "Eigenen Fall erstellen")), own.length > 0 && /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "sec" }, /* @__PURE__ */ import_react8.default.createElement("h2", null, "Eigene und geteilte F\xE4lle")), /* @__PURE__ */ import_react8.default.createElement(HerkunftFilter, { value: hk, set: setHk }), /* @__PURE__ */ import_react8.default.createElement("div", { className: "agrid" }, own.filter((r) => sichtbar(r, "live_cases", myId) && (hk === "alle" || herkunft(r, "live_cases", myId) === hk)).map((r) => /* @__PURE__ */ import_react8.default.createElement("div", { key: r.id, className: "lcwrap" }, card(r.data, r), /* @__PURE__ */ import_react8.default.createElement("div", { className: "lcfrg" }, /* @__PURE__ */ import_react8.default.createElement(FreigabeChip, { row: r, table: "live_cases", me: myId, lehrer })))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "sec" }, /* @__PURE__ */ import_react8.default.createElement("h2", null, "Fertige F\xE4lle"), /* @__PURE__ */ import_react8.default.createElement("span", { className: "muted", style: { fontSize: 14 } }, LIVE_CASES.length)), /* @__PURE__ */ import_react8.default.createElement("div", { className: "agrid" }, LIVE_CASES.map((c) => card(c, null))), edit && /* @__PURE__ */ import_react8.default.createElement(CaseEditor, { initial: edit, close: () => setEdit(null), saved: () => {
       setEdit(null);
       load2();
     } }), prev && /* @__PURE__ */ import_react8.default.createElement(Modal, { title: "Ablauf: " + prev.t, close: () => setPrev(null), wide: true }, /* @__PURE__ */ import_react8.default.createElement("ol", { className: "lprev" }, prev.steps.map((s, i) => /* @__PURE__ */ import_react8.default.createElement("li", { key: i }, /* @__PURE__ */ import_react8.default.createElement("b", null, s.t ? s.t + " \xB7 " : "", s.q), /* @__PURE__ */ import_react8.default.createElement("p", { className: "muted" }, s.sit), /* @__PURE__ */ import_react8.default.createElement("ul", null, s.opts.map((o, j) => /* @__PURE__ */ import_react8.default.createElement("li", { key: j, className: o[1] ? "ok" : "" }, L[j], ": ", o[0], o[1] ? " \u2713" : ""))))))), run && /* @__PURE__ */ import_react8.default.createElement(Beamer, { c: run.c, session: run.s, close: () => setRun(null) }));
@@ -12409,6 +12503,8 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
       return [...base.map((m) => R[m.id] || m), ...rows.filter((r) => r.status === "published" && !base.some((m) => m.id === r.id)).map((r) => r.data)].filter((m) => m && Array.isArray(m.chapters) && m.chapters.every((c) => c && Array.isArray(c.blocks)));
     }, [base, rows]);
     const I = useIndex(eff);
+    window.FP_MODS = eff;
+    window.FP_CHARS = content ? content.chars : null;
     const signOut = async () => {
       await API.signOut();
       setUser(null);
@@ -12488,6 +12584,220 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
 })();
 </script>
 <style id="fx-css">
+/* ===== Live-Unterricht: Präsentation, Baukasten, Übersicht, Schüleransicht ===== */
+.fxl-start{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 26px}
+@media (max-width:900px){.fxl-start{grid-template-columns:1fr}}
+.fxl-big{position:relative;isolation:isolate;overflow:hidden;text-align:left;display:flex;flex-direction:column;gap:8px;padding:20px;border-radius:22px;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));background:linear-gradient(150deg,color-mix(in srgb,var(--c) 12%,var(--surface)) 0%,var(--surface) 70%);font:inherit;color:var(--fg);cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.fxl-big::after{content:"";position:absolute;z-index:-1;right:-50px;top:-50px;width:170px;height:170px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--c) 20%,transparent),transparent)}
+.fxl-big:hover{transform:translateY(-3px);box-shadow:0 18px 36px -18px color-mix(in srgb,var(--c) 55%,transparent)}
+.fxl-big b{font-size:18px;letter-spacing:-.015em}
+.fxl-big small{color:var(--muted);font-size:13.5px;line-height:1.45}
+.fxl-bic{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:var(--c);color:#fff;box-shadow:0 10px 22px -10px var(--c)}
+.fxl-flt{display:flex;gap:6px;flex-wrap:wrap}
+.fxl-grid .fxl-card{display:flex;flex-direction:column;gap:8px;min-height:230px}
+.fxl-t{font-size:17px;line-height:1.3;letter-spacing:-.01em}
+.fxl-k{margin:0;font-size:13.5px;line-height:1.45}
+.fxl-chips{display:flex;flex-wrap:wrap;gap:5px}
+.fxl-chips span{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:99px;color:color-mix(in srgb,var(--c) 80%,var(--fg));background:color-mix(in srgb,var(--c) 11%,var(--surface))}
+.fxl-meta{font-size:12.5px;color:var(--muted)}
+.fxl-kit{margin-top:22px}
+.fxl-kit summary{cursor:pointer;list-style:none}
+.fxl-kitgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:14px}
+.fxl-kitgrid>div{padding:12px;border-radius:14px;background:color-mix(in srgb,var(--c) 7%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 18%,var(--line))}
+.fxl-kitgrid b{display:block;margin:6px 0 2px}
+.fxl-kitgrid p{margin:0;font-size:13px;color:var(--muted);line-height:1.45}
+.fxb-ic{width:30px;height:30px;border-radius:10px;display:inline-grid;place-items:center;background:color-mix(in srgb,var(--c) 14%,var(--surface));color:var(--c);flex:none}
+
+/* Baukasten */
+.fxb-bg{position:fixed;inset:0;z-index:9400;background:rgba(15,23,42,.45);backdrop-filter:blur(3px);display:flex;justify-content:center;align-items:flex-start;padding:3vh 14px;overflow:auto;animation:fxfade .2s ease both}
+.fxb{width:min(980px,100%);background:var(--bg);border-radius:24px;box-shadow:0 30px 80px -24px rgba(15,23,42,.5);display:flex;flex-direction:column;max-height:94vh;animation:fxpop .3s cubic-bezier(.22,1,.36,1) both;overflow:hidden}
+.fxb-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--line);background:var(--surface)}
+.fxb-head h2{margin:4px 0 0;font-size:21px;letter-spacing:-.02em}
+.fxb-body{padding:18px 22px;overflow:auto;flex:1}
+.fxb-meta{display:grid;grid-template-columns:2fr 2fr 1fr;gap:12px;margin-bottom:12px}
+@media (max-width:700px){.fxb-meta{grid-template-columns:1fr}}
+.fxb-empty{padding:18px;border-radius:16px;border:1.5px dashed var(--line);text-align:center;color:var(--muted);margin-bottom:12px}
+.fxb-empty b{color:var(--fg)}
+.fxb-list{display:grid;gap:12px}
+.fxb-blk{background:var(--surface);border-radius:18px;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-left:4px solid var(--c);padding:14px 16px}
+.fxb-bh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fxb-bh small{color:var(--muted);flex:1;min-width:160px;font-size:12.5px}
+.fxb-tools{display:flex;gap:4px;margin-left:auto}
+.fxb-fields{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:10px}
+.fxb-fields .wide{grid-column:1/-1}
+@media (max-width:700px){.fxb-fields{grid-template-columns:1fr}}
+.fxb-chk{display:flex;gap:8px;align-items:center;font-size:14px;grid-column:1/-1;margin:2px 0 8px}
+.fxb-img{display:flex;gap:10px;align-items:center}
+.fxb-img img{max-height:80px;border-radius:10px}
+.fxb-add{margin-top:18px;padding:14px;border-radius:18px;background:var(--surface)}
+.fxb-types{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin-top:10px}
+.fxb-types button{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:13px;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));background:color-mix(in srgb,var(--c) 5%,var(--surface));font:inherit;font-size:13.5px;font-weight:600;color:var(--fg);cursor:pointer;text-align:left;transition:transform .15s,border-color .15s}
+.fxb-types button:hover{transform:translateY(-1px);border-color:var(--c)}
+.fxb-foot{display:flex;align-items:center;gap:8px;padding:14px 22px;border-top:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.fxm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.fxm-card{text-align:left;font:inherit;color:var(--fg);padding:12px 14px;border-radius:16px;border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-top:4px solid var(--c);background:var(--surface);cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.fxm-card small{color:var(--c);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em}
+.fxm-card span{color:var(--muted);font-size:12.5px}
+.fxm-card:hover{box-shadow:0 10px 24px -14px var(--c)}
+.fxm-chs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.fxm-ch{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--surface);border:1.5px solid var(--line);cursor:pointer}
+.fxm-ch.on{border-color:#0062FF;background:color-mix(in srgb,#0062FF 6%,var(--surface))}
+.fxm-ch small{display:block;color:var(--muted)}
+
+/* Präsentation (Beamer) */
+.fxp{position:fixed;inset:0;z-index:9600;background:#f6f8fc;color:#0f172a;display:flex;flex-direction:column;font-family:var(--font,-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif);animation:fxfade .25s ease both}
+:root[data-theme=dark] .fxp{background:#0b1120;color:#e5e9f2}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .fxp{background:#0b1120;color:#e5e9f2}}
+.fxp-top{display:flex;align-items:center;gap:16px;padding:14px 26px;border-bottom:1px solid rgba(148,163,184,.25)}
+.fxp-brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.fxp-brand b{font-size:15px;white-space:nowrap}
+.fxp-brand span:last-child{color:#64748b;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fxp-dot{width:10px;height:10px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 4px rgba(239,68,68,.18);animation:fxlive 1.6s ease-in-out infinite}
+@keyframes fxlive{50%{box-shadow:0 0 0 8px rgba(239,68,68,.05)}}
+.fxp-prog{display:flex;align-items:center;gap:10px;font-size:13px;color:#64748b;white-space:nowrap}
+.fxp-prog div{width:140px;height:6px;border-radius:9px;background:rgba(148,163,184,.25);overflow:hidden}
+.fxp-prog i{display:block;height:100%;background:linear-gradient(90deg,#7C3AED,#0062FF);border-radius:9px;transition:width .4s}
+.fxp-join{display:flex;align-items:center;gap:10px;border:1px solid rgba(148,163,184,.3);background:transparent;color:inherit;border-radius:14px;padding:6px 12px 6px 6px;cursor:pointer;font:inherit}
+.fxp-join small{display:block;font-size:11px;color:#64748b}
+.fxp-join b{font-size:20px;letter-spacing:.12em;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.fxp-qrs{width:56px;height:56px;background:#fff;border-radius:8px;padding:3px;display:block}
+.fxp-qrs svg,.fxp-qrbig svg{width:100%;height:100%;display:block}
+.fxp-count{display:flex;flex-direction:column;align-items:center;min-width:76px;padding:6px 12px;border-radius:14px;background:rgba(0,98,255,.1);color:#0062FF}
+.fxp-count b{font-size:24px;line-height:1}
+.fxp-count span{font-size:11.5px}
+.fxp-x{border:0;background:rgba(148,163,184,.15);color:inherit;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;cursor:pointer}
+.fxp-err{background:#fef2f2;color:#b91c1c;padding:8px 26px;font-size:14px}
+.fxp-main{flex:1;overflow:auto;padding:30px clamp(20px,5vw,80px);display:flex;justify-content:center}
+.fxp-center{margin:auto;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.fxp-center h1{font-size:clamp(34px,5vw,56px);margin:0;letter-spacing:-.03em}
+.fxp-spin{width:40px;height:40px;border-radius:50%;border:4px solid rgba(0,98,255,.2);border-top-color:#0062FF;animation:fxspin .8s linear infinite}
+.fxp-lobby{margin:auto;display:grid;grid-template-columns:minmax(220px,360px) 1fr;gap:clamp(24px,5vw,70px);align-items:center;max-width:1100px}
+@media (max-width:800px){.fxp-lobby{grid-template-columns:1fr;text-align:center}}
+.fxp-qrbig{background:#fff;border-radius:24px;padding:18px;box-shadow:0 24px 60px -24px rgba(15,23,42,.35);aspect-ratio:1}
+.fxp-lobby h1{font-size:clamp(32px,4.4vw,58px);line-height:1.05;letter-spacing:-.035em;margin:10px 0 12px}
+.fxp-lobby p{font-size:clamp(16px,1.6vw,21px);color:#64748b;margin:0 0 14px;line-height:1.45}
+.fxp-code{font:800 clamp(40px,6vw,76px)/1 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.14em;margin:6px 0 12px;background:linear-gradient(135deg,#7C3AED,#0062FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fxp-eyebrow{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#7C3AED}
+.fxp-small{font-size:13.5px;color:#64748b}
+.fxp-content{width:min(1100px,100%);display:flex;flex-direction:column;gap:16px}
+.fxp-person{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.fxp-person b{font-size:clamp(22px,2.4vw,30px);letter-spacing:-.02em}
+.fxp-person span{color:#64748b;font-size:17px}
+.fxp-av{width:84px;height:84px}
+.fxp-av svg{width:100%;height:100%}
+.fxp-rich{font-size:clamp(18px,1.9vw,25px);line-height:1.55}
+.fxp-rich p{margin:0 0 .6em}
+.fxp-rich ul{margin:0 0 .6em 1.1em;padding:0}
+.fxp-rich li{margin:.25em 0}
+.fxp-img{max-width:100%;max-height:58vh;border-radius:18px;align-self:flex-start;box-shadow:0 18px 40px -20px rgba(15,23,42,.35)}
+.fxp-sit{font-size:clamp(18px,1.9vw,24px);line-height:1.55;padding:18px 22px;border-radius:18px;background:rgba(225,29,72,.07);border-left:5px solid #E11D48}
+.fxp-rows{border-collapse:collapse;font-size:clamp(16px,1.6vw,21px);max-width:720px}
+.fxp-rows td{padding:7px 18px 7px 0;border-bottom:1px solid rgba(148,163,184,.25)}
+.fxp-rows td:first-child{color:#64748b}
+.fxp-q{font-size:clamp(26px,3vw,40px);line-height:1.2;letter-spacing:-.025em;margin:4px 0}
+.fxp-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}
+.fxp-opts.lines{grid-template-columns:1fr}
+.fxp-opt{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:16px;background:rgba(148,163,184,.12);font-size:clamp(17px,1.7vw,22px);line-height:1.35;border-left:5px solid var(--bc,transparent)}
+.fxp-opt i,.fxp-bl i{font-style:normal;font-weight:800;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#0062FF;color:#fff;flex:none;font-size:16px}
+.fxp-bars{display:grid;gap:10px}
+.fxp-bar{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr 96px;gap:14px;align-items:center;padding:10px 14px;border-radius:14px;background:rgba(148,163,184,.1);transition:background .3s}
+.fxp-bars.lines .fxp-bar{grid-template-columns:minmax(0,2fr) 1fr 96px}
+.fxp-bar.ok{background:rgba(16,185,129,.14)}
+.fxp-bar.no{opacity:.72}
+.fxp-bl{display:flex;align-items:center;gap:12px;font-size:clamp(16px,1.6vw,20px);line-height:1.3;min-width:0}
+.fxp-bl em{font-style:normal;font-size:12px;font-weight:700;color:#059669;background:rgba(16,185,129,.15);padding:2px 8px;border-radius:99px;white-space:nowrap}
+.fxp-bt{position:relative;height:22px;border-radius:9px;background:rgba(148,163,184,.2);overflow:hidden}
+.fxp-bt b{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:var(--bc,linear-gradient(90deg,#7C3AED,#0062FF));transition:width .6s cubic-bezier(.22,1,.36,1)}
+.fxp-bt u{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:rgba(148,163,184,.55);text-decoration:none}
+.fxp-bar.ok .fxp-bt b{background:#10B981}
+.fxp-bn{font-size:22px;font-weight:800;text-align:right;line-height:1.1}
+.fxp-bn small{display:block;font-size:11.5px;font-weight:600;color:#64748b}
+.fxp-big{font-size:clamp(18px,1.9vw,24px)}
+.fxp-big b{font-size:1.4em}
+.fxp-big .ok{color:#059669}
+.fxp-order ol{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:o}
+.fxp-order li{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:14px;background:rgba(148,163,184,.12);font-size:clamp(17px,1.7vw,21px);counter-increment:o}
+.fxp-order li::before{content:counter(o);font-weight:800;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:#0891B2;color:#fff;flex:none}
+.fxp-order li em{margin-left:auto;font-style:normal;font-size:14px;color:#64748b;white-space:nowrap}
+.fxp-est{display:flex;flex-direction:column;gap:6px}
+.fxp-hist{display:flex;align-items:flex-end;gap:8px;height:220px;padding:0 4px;border-bottom:2px solid rgba(148,163,184,.4)}
+.fxp-hist div{flex:1;background:linear-gradient(180deg,#F59E0B,#D97706);border-radius:10px 10px 0 0;min-height:2px;position:relative;transition:height .5s}
+.fxp-hist span{position:absolute;top:-24px;left:0;right:0;text-align:center;font-weight:700;font-size:14px}
+.fxp-axis{display:flex;justify-content:space-between;color:#64748b;font-size:13px}
+.fxp-cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 22px;padding:22px;min-height:240px;border-radius:22px;background:rgba(148,163,184,.08)}
+.fxp-cloud span{font-weight:800;letter-spacing:-.02em;line-height:1.1;animation:fxpop .4s ease both}
+.fxp-exp{padding:16px 20px;border-radius:16px;background:rgba(0,98,255,.07);border-left:5px solid #0062FF;font-size:clamp(16px,1.6vw,20px);line-height:1.5}
+.fxp-exp p{margin:.3em 0 0}
+.fxp-exp.peer{background:rgba(124,58,237,.08);border-color:#7C3AED}
+.fxp-bot{display:flex;align-items:center;gap:10px;padding:14px 26px;border-top:1px solid rgba(148,163,184,.25)}
+.fxp-sp{flex:1}
+.fxp-btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:14px;padding:12px 18px;font:600 16px/1 inherit;font-family:inherit;cursor:pointer;background:rgba(148,163,184,.18);color:inherit}
+.fxp-btn:disabled{opacity:.4;cursor:default}
+.fxp-btn.primary{background:#0062FF;color:#fff;box-shadow:0 10px 24px -10px rgba(0,98,255,.7)}
+.fxp-btn.accent{background:#10B981;color:#fff}
+.fxp-tog{display:flex;align-items:center;gap:8px;font-size:14px;color:#64748b}
+
+/* Schüleransicht */
+.fxl-card{display:flex;flex-direction:column;gap:12px}
+.fxl-s .fxl-card{padding:4px 0 20px}
+.fxl-person{display:flex;flex-direction:column;padding:12px 14px;border-radius:14px;background:var(--surface2,#f0f4fa)}
+.fxl-person span{color:var(--muted);font-size:14px}
+.fxl-kicker{font-size:12.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#7C3AED}
+.fxl-info{display:flex;flex-direction:column;gap:10px}
+.fxl-info h2{margin:0;font-size:22px;letter-spacing:-.02em}
+.fxl-info img{max-width:100%;border-radius:14px}
+.fxl-rich p{margin:0 0 .5em;line-height:1.55}
+.fxl-rich ul{margin:0 0 .5em 1.1em;padding:0}
+.fxl-rows{width:100%;border-collapse:collapse;font-size:15px}
+.fxl-rows td{padding:6px 10px 6px 0;border-bottom:1px solid var(--line)}
+.fxl-rows td:first-child{color:var(--muted)}
+.fxl-q{font-size:21px;line-height:1.3;margin:4px 0}
+.fxl-look{color:var(--muted);font-size:14px;text-align:center;padding:10px;border-radius:12px;background:var(--surface2,#f0f4fa)}
+.fxl-opts.scale .lvopt{border-left:6px solid var(--sc,#94a3b8)}
+.fxl-opts.lines .lvopt{text-align:left;font-size:15px}
+.fxl-opts .lvopt i{font-style:normal;font-weight:800;margin-right:8px;color:#0062FF}
+.fxl-order{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.fxl-order li button{width:100%;display:flex;gap:10px;align-items:center;text-align:left;padding:11px 12px;border-radius:12px;border:1.5px solid #0891B2;background:color-mix(in srgb,#0891B2 7%,var(--surface,#fff));font:inherit;color:inherit}
+.fxl-order li b{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#0891B2;color:#fff;flex:none}
+.fxl-order li.ok button{border-color:#10B981}
+.fxl-order li.bad button{border-color:#EF4444}
+.fxl-pool{display:grid;gap:6px}
+.fxl-pool button{text-align:left;padding:11px 12px;border-radius:12px;border:1.5px dashed var(--line);background:var(--surface,#fff);font:inherit;color:inherit}
+.fxl-est{display:flex;align-items:center;gap:10px}
+.fxl-est .input{font-size:22px;font-weight:700;max-width:200px}
+.fxl-word .input{font-size:18px;width:100%;max-width:none}
+.fxl-send{display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.fxl-send .btn{justify-content:center;padding:14px;font-size:16px}
+.fxl-send small{color:var(--muted);text-align:center}
+.fxl-sol,.fxl-exp{padding:12px 14px;border-radius:14px;background:color-mix(in srgb,#10B981 9%,var(--surface,#fff));border-left:4px solid #10B981}
+.fxl-exp{background:color-mix(in srgb,#0062FF 7%,var(--surface,#fff));border-color:#0062FF}
+.fxl-exp p,.fxl-sol ol{margin:.3em 0 0}
+
+/* Module freischalten */
+.fxf-top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:8px}
+.fxf-sum{display:flex;gap:8px;flex-wrap:wrap}
+.fxf-sum span{padding:6px 12px;border-radius:99px;font-size:13px;background:var(--surface)}
+.fxf-sum .s-frei b{color:#059669}.fxf-sum .s-zu b{color:#D97706}.fxf-sum .s-aus b{color:#64748b}
+.fxf-year{margin-top:18px;padding:14px;border-radius:18px;background:var(--surface);border-top:4px solid var(--c)}
+.fxf-yh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.fxf-yh b{font-size:16px;color:color-mix(in srgb,var(--c) 75%,var(--fg))}
+.fxf-list{display:grid;gap:6px}
+.fxf-row{display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;background:var(--surface2);transition:opacity .2s}
+.fxf-row.s-aus{opacity:.55}
+.fxf-n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-weight:700;font-size:13px;background:color-mix(in srgb,var(--c) 14%,var(--surface));color:var(--c);flex:none}
+.fxf-t{flex:1;min-width:0}
+.fxf-t b{display:block;font-size:14.5px;line-height:1.3}
+.fxf-t small{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fxf-seg{display:flex;background:var(--surface);border-radius:11px;padding:3px;gap:2px;flex:none;border:1px solid var(--line)}
+.fxf-seg button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;padding:6px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
+.fxf-seg button.on.frei{background:#10B981;color:#fff}
+.fxf-seg button.on.zu{background:#F59E0B;color:#fff}
+.fxf-seg button.on.aus{background:#64748b;color:#fff}
+.fxf-ok{color:#059669;font-weight:600;font-size:14px}
+@media (max-width:640px){.fxf-row{flex-wrap:wrap}.fxf-seg{width:100%;justify-content:stretch}.fxf-seg button{flex:1}}
+.fxl-grid>.card+.card,.fxl-tiles>.card+.card,.fxl-grid>*+*{margin-top:0}
+.fxl-kitgrid>*+*,.fxl-big>*+*{margin-top:0}
+
 /* ===== Fallpfad Design-Ebene: Kacheln, farbige Bereiche, Tutorial, Demo ===== */
 :root{--pc:#0062FF}
 /* Navigation: jede Rubrik hat ihre Farbe */
@@ -12562,6 +12872,39 @@ button.mod.fx-t{border-top:4px solid var(--c)!important}
 @media (max-width:959px){#fx-demo{bottom:calc(92px + env(safe-area-inset-bottom,0px));right:10px;font-size:11.5px;padding:4px 4px 4px 10px}}
 .fx-toast{position:fixed;z-index:10001;left:50%;bottom:24px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:12px 16px;border-radius:14px;font:500 14px/1.4 -apple-system,BlinkMacSystemFont,"Inter",sans-serif;box-shadow:0 12px 30px -12px rgba(0,0,0,.5);animation:fxpop .3s ease both}
 .fx-tour .fx-skip{margin-right:auto}
+/* Gesperrte Module */
+.fx-locked{position:relative;filter:grayscale(.55);opacity:.72}
+button.mod.fx-locked::before,.card.resume.fx-locked::before{content:"Noch gesperrt";position:absolute;z-index:3;top:12px;right:12px;font:700 11.5px/1 -apple-system,BlinkMacSystemFont,"Inter",sans-serif;padding:6px 9px 6px 24px;border-radius:99px;background:#0f172a;color:#fff;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round'%3E%3Crect x='5' y='11' width='14' height='9' rx='2'/%3E%3Cpath d='M8 11V8a4 4 0 0 1 8 0v3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-size:12px;background-position:8px center}
+
+/* ===== Feinschliff: ruhiger, professioneller ===== */
+html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+body{font-feature-settings:"cv11","ss01","tnum" 0}
+.card{border-radius:20px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px -16px rgba(15,23,42,.14)}
+:root[data-theme=dark] .card,.dark .card{box-shadow:0 1px 2px rgba(0,0,0,.25),0 10px 28px -18px rgba(0,0,0,.6)}
+.topbar{backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.side{border-right:1px solid color-mix(in srgb,var(--line) 80%,transparent)}
+.side .tab{border-radius:12px;font-weight:550;letter-spacing:-.005em}
+.hello h1{font-weight:700;letter-spacing:-.034em}
+h2,h3{letter-spacing:-.018em}
+.eyebrow{letter-spacing:.07em}
+.btn{border-radius:12px}
+.btn:not(.ghost){box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 6px 16px -10px color-mix(in srgb,var(--btn) 70%,transparent);transition:transform .15s,box-shadow .2s,filter .2s}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(1px)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* Kacheln: weniger verspielt, klarere Flächen */
+.fx-t{background:linear-gradient(180deg,color-mix(in srgb,var(--c) 5%,var(--surface,#fff)) 0%,var(--surface,#fff) 70%)!important;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 18px -14px color-mix(in srgb,var(--c) 40%,rgba(15,23,42,.2))}
+.fx-t::after{opacity:.45;width:110px;height:110px;right:-46px;top:-46px}
+.fx-qa button{border-radius:16px;min-height:104px}
+.fx-qa .fx-ic{border-radius:11px}
+.fx-qa b{font-weight:650}
+/* Schlanke Scrollbars */
+*{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--muted,#64748b) 40%,transparent) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--muted,#64748b) 35%,transparent);border-radius:10px;border:3px solid transparent;background-clip:padding-box}
+/* Badges und Hinweise einheitlich */
+.fx-toast{max-width:min(440px,calc(100vw - 32px))}
+@media (max-width:959px){.fx-toast{bottom:96px}}
 
 /* ===== Lehrer-Portal: Folien-Import, Schulen, Schulanzeige ===== */
 .btn.fx-aibtn{background:linear-gradient(135deg,#7C3AED 0%,#0062FF 100%);color:#fff;border:0;box-shadow:0 8px 20px -10px rgba(124,58,237,.6);display:inline-flex;align-items:center;gap:7px}
@@ -12752,6 +13095,7 @@ button.mod.fx-t{border-top:4px solid var(--c)!important}
   X.rule(".mod.tmod", function (el) { var m = /Jahr\s*(\d)/i.exec(X.txt(el)); return m ? X.YEAR[m[1]] : C.violet; });
   X.rule(".fx-modgrid > *", function (el) { var m = /Jahr\s*(\d)/i.exec(X.txt(el)); return m ? X.YEAR[m[1]] : C.violet; });
   X.rule(".stat4 > *, .kpis > *", function (el, i) { return [C.blue, C.cyan, C.violet, C.orange][i % 4]; });
+  X.rule(".fxl-grid > .fxl-card", function (el) { return el.style.getPropertyValue("--c") || C.violet; });
   X.rule(".adm-card", function (el, i) { return X.ROT[i % X.ROT.length]; });
 })();
 
@@ -13540,6 +13884,696 @@ button.mod.fx-t{border-top:4px solid var(--c)!important}
       })));
   }
   window.FP_AdminPage = AdminPage;
+})();
+
+</script>
+<script>
+/* Fallpfad: fertige Live-Stunden und Fallbeispiele (ohne Vitalzeichen-Monitor) */
+(function () {
+  var o = function (t, ok) { return { t: t, ok: !!ok }; };
+  var tf = function (t, ok, e) { return { t: t, ok: ok, e: e }; };
+  var L = function (t, err, e) { return { t: t, err: !!err, e: e }; };
+  var stunden = [
+    { t: "Händehygiene: fünf Momente, null Keime", kurz: "Einstieg ins Hygieneverständnis mit Wortwolke, Reihenfolge und Fehlerjagd.", lvl: "Jahr 1", ber: "Hygiene", blocks: [
+      { type: "wort", q: "Was fällt euch zu Krankenhauskeimen ein?", demo: ["MRSA", "Händedesinfektion", "Handschuhe", "Isolation", "Resistenz", "Schutzkittel", "Keime", "Wunde"] },
+      { type: "folie", titel: "Die fünf Momente der Händedesinfektion", text: "• vor dem Kontakt mit der zu pflegenden Person\n• vor einer aseptischen Tätigkeit\n• nach Kontakt mit potenziell infektiösem Material\n• nach dem Kontakt mit der zu pflegenden Person\n• nach Kontakt mit der unmittelbaren Umgebung\nHände sind der häufigste Übertragungsweg für Krankenhausinfektionen." },
+      { type: "tf", titel: "Richtig oder falsch?", items: [tf("Handschuhe ersetzen die Händedesinfektion.", false, "Nach dem Ausziehen der Handschuhe immer desinfizieren, Handschuhe haben Mikroperforationen."), tf("Die Einwirkzeit beträgt meist 30 Sekunden.", true, "Nach Herstellerangabe, bei den meisten Mitteln 30 Sekunden, die Hände müssen die ganze Zeit feucht sein."), tf("Schmuck und Uhren an Händen und Unterarmen sind bei der Pflege tabu.", true, "Unter Ringen und Uhren überleben Keime, außerdem gelingt die Desinfektion nicht vollständig."), tf("Nach dem Händewaschen braucht man keine Desinfektion mehr.", false, "Waschen entfernt Schmutz, tötet aber nicht zuverlässig Keime. Desinfektion ist das Mittel der Wahl.")] },
+      { type: "reihe", q: "Bringt die Händedesinfektion in die richtige Reihenfolge.", items: ["Hände trocken und schmuckfrei, Mittel in die hohle Hand geben (ca. 3 bis 5 ml)", "Handflächen aneinander reiben", "Handrücken mit verschränkten Fingern einreiben", "Fingerzwischenräume und Fingerkuppen einreiben", "Daumen kreisend einreiben", "Einwirkzeit abwarten, bis die Hände trocken sind"], exp: "Die Reihenfolge der Einreibemethode sorgt dafür, dass keine Stelle vergessen wird. Benetzungslücken liegen oft an Daumen und Fingerkuppen." },
+      { type: "peer", q: "Du hast Frau Adam gewaschen und ziehst die Handschuhe aus. Gleich richtest du ihre Medikamente. Wann desinfizierst du die Hände?", opts: [o("Nur vor dem Richten der Medikamente"), o("Direkt nach dem Ausziehen der Handschuhe und vor dem Richten", true), o("Gar nicht, die Handschuhe haben geschützt"), o("Nur nach dem Verlassen des Zimmers")], exp: "Nach dem Ausziehen der Handschuhe (Moment 3 und 4) und vor einer aseptischen Tätigkeit wie dem Richten von Medikamenten (Moment 2). Zwei Momente, die direkt nacheinander folgen können." },
+      { type: "fehler", titel: "Beobachtung im Frühdienst", lines: [L("Pfleger Tom desinfiziert sich die Hände, bevor er das Zimmer betritt."), L("Er trägt seinen Ehering, weil er „ja nur kurz“ Blutdruck misst.", true, "Ringe sind in der Pflege nicht erlaubt, darunter bleiben Keime und Desinfektionsmittel kommt nicht hin."), L("Nach dem Blutdruckmessen reibt er sich 10 Sekunden die Hände ein.", true, "Die Einwirkzeit beträgt meist 30 Sekunden, die Hände müssen die ganze Zeit feucht sein."), L("Er legt die Blutdruckmanschette auf das Bett der nächsten Patientin.", true, "Medizinprodukte nach Gebrauch wischdesinfizieren, nicht auf fremde Betten legen."), L("Vor dem Verlassen des Zimmers desinfiziert er erneut die Hände.")] },
+      { type: "schaetz", q: "Wie viel Prozent der Krankenhausinfektionen gelten als vermeidbar?", ans: 30, unit: "%", min: 0, max: 100, exp: "Schätzungen gehen von etwa einem Drittel vermeidbarer Krankenhausinfektionen aus. Konsequente Händehygiene ist der wichtigste Hebel." },
+      { type: "ampel", q: "Wie sicher fühlst du dich jetzt bei den fünf Momenten?" }
+    ] },
+    { t: "Vitalzeichen sicher deuten", kurz: "Normwerte, Messfehler und wann du sofort Hilfe holst.", lvl: "Jahr 1", ber: "Beobachtung", blocks: [
+      { type: "schaetz", q: "Ab welcher Atemfrequenz pro Minute sprechen wir bei Erwachsenen von einer Tachypnoe?", ans: 20, unit: "/min", min: 5, max: 40, exp: "Normal sind etwa 12 bis 20 Atemzüge pro Minute. Mehr als 20 gilt als Tachypnoe und ist ein frühes Warnzeichen, zum Beispiel bei Sepsis." },
+      { type: "folie", titel: "Normwerte Erwachsene", text: "• Atemfrequenz 12 bis 20 pro Minute\n• Puls 60 bis 100 pro Minute, regelmäßig\n• Blutdruck optimal unter 120/80 mmHg\n• Sauerstoffsättigung meist 94 bis 98 %\n• Temperatur etwa 36,3 bis 37,4 °C\nEinzelwerte sagen wenig. Wichtig sind Verlauf, Zusammenhang und das Aussehen der Person." },
+      { type: "fall", titel: "Frühdienst, 6:40 Uhr", person: "Herr Schulz, 79 Jahre", info: "Station 3, seit gestern mit Harnwegsinfekt", sit: "Herr Schulz ist schläfrig, aber erweckbar. Gestern war er klar orientiert. Seine Haut fühlt sich warm an.", befunde: [["Atemfrequenz", "26/min"], ["Puls", "112/min"], ["Blutdruck", "98/60 mmHg"], ["Temperatur", "38,9 °C"]], q: "Wie schätzt du die Situation ein?", opts: [o("Typisch für einen Harnwegsinfekt, in zwei Stunden nachmessen"), o("Verdacht auf eine beginnende Sepsis: sofort Pflegefachperson und Ärztin informieren", true), o("Fieber senken und abwarten"), o("Er ist nur müde, die Nacht war unruhig")], exp: "Neue Bewusstseinsveränderung, Atemfrequenz über 22 und systolischer Blutdruck unter 100 mmHg sind die drei qSOFA-Kriterien. Das ist ein Notfall, der sofort ärztlich bewertet werden muss." },
+      { type: "tf", items: [tf("Den Puls zählt man immer mindestens 15 Sekunden und nimmt mal vier.", true, "Bei unregelmäßigem Puls zählst du eine ganze Minute."), tf("Eine zu kleine Blutdruckmanschette misst zu niedrige Werte.", false, "Zu kleine Manschetten messen zu hohe Werte, zu große zu niedrige."), tf("Die Atemfrequenz zählt man am besten, ohne es anzukündigen.", true, "Wer weiß, dass gezählt wird, atmet anders.")] },
+      { type: "frage", q: "Die Sättigung zeigt 82 %, Frau Lenz spricht aber in ganzen Sätzen und ist rosig. Was tust du zuerst?", opts: [o("Sofort den Notruf auslösen"), o("Sensor und Durchblutung der Finger prüfen, neu messen und die Person ansehen", true), o("Sauerstoff hochdrehen"), o("Den Wert dokumentieren")], exp: "Kalte Finger, Nagellack oder Bewegung verfälschen die Messung. Erst den Menschen ansehen, dann die Technik prüfen. Bei echter Atemnot natürlich sofort Hilfe holen." },
+      { type: "ampel", q: "Wie sicher fühlst du dich beim Deuten von Vitalzeichen?" }
+    ] },
+    { t: "Dekubitus: erkennen und vorbeugen", kurz: "Fingertest, Risikofaktoren und Bewegungsförderung nach Expertenstandard.", lvl: "Jahr 1", ber: "Prophylaxe", blocks: [
+      { type: "wort", q: "An welchen Körperstellen entstehen Druckgeschwüre besonders oft?", demo: ["Steißbein", "Fersen", "Hüfte", "Hinterkopf", "Ellenbogen", "Kreuzbein", "Knöchel", "Ohren"] },
+      { type: "folie", titel: "Was ist ein Dekubitus?", text: "Eine lokal begrenzte Schädigung der Haut oder des darunterliegenden Gewebes, meist über Knochenvorsprüngen, durch Druck oder Druck in Verbindung mit Scherkräften.\n• Kategorie 1: nicht wegdrückbare Rötung bei intakter Haut\n• Kategorie 2: Teilverlust der Haut, oft Blase\n• Kategorie 3 und 4: tiefe Gewebeschäden bis auf Muskel oder Knochen" },
+      { type: "frage", q: "Am Steiß von Frau Kurz siehst du eine Rötung. Du drückst mit dem Finger darauf und sie bleibt rot. Was bedeutet das?", opts: [o("Normale Druckrötung, sie verschwindet gleich"), o("Dekubitus Kategorie 1, sofort entlasten und informieren", true), o("Kategorie 3"), o("Allergie gegen das Inkontinenzmaterial")], exp: "Eine nicht wegdrückbare Rötung ist bereits ein Dekubitus der Kategorie 1. Entlasten, dokumentieren, Pflegefachperson informieren." },
+      { type: "tf", items: [tf("Föhnen und Eisen der Haut fördert die Durchblutung.", false, "Veraltete Methode, sie schädigt die Haut. Heute: Druck entlasten und Bewegung fördern."), tf("Ein Fersenfreilagerung entlastet die Fersen wirksam.", true, "Die Fersen frei lagern, zum Beispiel mit einem Kissen unter den Unterschenkeln."), tf("Der Expertenstandard sieht einen starren Zwei-Stunden-Lagerungsplan für alle vor.", false, "Der Bewegungsplan wird individuell nach Risiko und Hautbefund festgelegt.")] },
+      { type: "reihe", q: "Ordnet das Vorgehen bei Dekubitusgefahr.", items: ["Risiko systematisch einschätzen (klinische Einschätzung, ggf. Braden-Skala)", "Haut an gefährdeten Stellen inspizieren", "Individuellen Bewegungsplan mit der Person vereinbaren", "Hilfsmittel wie Wechseldruckmatratze oder Fersenkissen einsetzen", "Wirksamkeit regelmäßig überprüfen und dokumentieren"] },
+      { type: "skala", q: "Frau Kurz will nachts nicht umgelagert werden, weil sie dann nicht schlafen kann. Ihr Wunsch geht vor.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "folie", titel: "Diskussion: Selbstbestimmung und Risiko", text: "• Wunsch ernst nehmen und Gründe erfragen\n• über das Risiko verständlich informieren\n• Alternativen anbieten: Mikrolagerung, Wechseldruckmatratze, Lagerung in Schlafphasen\n• Entscheidung und Beratung dokumentieren" },
+      { type: "ampel" }
+    ] },
+    { t: "Sturz: Risiko erkennen, richtig handeln", kurz: "Sturzrisiko, das Vorgehen nach einem Sturz und Prophylaxe.", lvl: "Jahr 1", ber: "Prophylaxe", blocks: [
+      { type: "schaetz", q: "Wie viel Prozent der über 65-Jährigen stürzen etwa einmal im Jahr?", ans: 30, unit: "%", min: 0, max: 100, exp: "Etwa ein Drittel der über 65-Jährigen stürzt mindestens einmal pro Jahr, im Pflegeheim sind es deutlich mehr." },
+      { type: "wort", q: "Was erhöht das Sturzrisiko?", demo: ["Schwindel", "Medikamente", "Teppich", "Dunkelheit", "Schuhe", "Demenz", "Inkontinenz", "Sehschwäche"] },
+      { type: "fall", titel: "Nachtdienst, 3:10 Uhr", person: "Frau Haas, 84 Jahre", info: "Pflegeheim, lebt mit Demenz, nimmt ein Antikoagulans", sit: "Du findest Frau Haas neben dem Bett auf dem Boden. Sie ist wach und sagt: „Ich wollte zur Toilette.“ An der Stirn hat sie eine kleine blutende Platzwunde.", q: "Was tust du zuerst?", opts: [o("Sie sofort gemeinsam mit einer Kollegin ins Bett heben"), o("Bei ihr bleiben, ansprechen, Hilfe rufen und sie auf Verletzungen und Schmerzen prüfen, bevor sie bewegt wird", true), o("Die Wunde verbinden und schlafen lassen"), o("Die Angehörigen anrufen")], exp: "Erst einschätzen, dann bewegen: Bewusstsein, Schmerzen, Fehlstellungen, Blutungen. Wegen des Blutverdünners und der Kopfverletzung muss ärztlich abgeklärt werden, ob eine Kontrolle im Krankenhaus nötig ist." },
+      { type: "frage", q: "Welche Maßnahmen helfen Frau Haas, künftige Stürze zu vermeiden?", multi: true, opts: [o("Nachtlicht und Weg zur Toilette freiräumen", true), o("Feste Schuhe oder Antirutschsocken", true), o("Bettgitter hochziehen, ohne zu fragen"), o("Regelmäßige Toilettengänge anbieten", true), o("Medikamente von der Ärztin überprüfen lassen", true)], exp: "Bettgitter ohne Einwilligung sind eine freiheitsentziehende Maßnahme und erhöhen oft die Sturzschwere. Wirksam sind Umgebungsanpassung, Toilettentraining und Medikamentenüberprüfung." },
+      { type: "fehler", titel: "Sturzprotokoll", lines: [L("03:10 Uhr Frau Haas vor dem Bett liegend aufgefunden."), L("Sie ist wohl beim Toilettengang gestolpert, weil sie immer so stur ist.", true, "Wertend und vermutend. Beschreibe Beobachtungen, z. B. „gibt an, zur Toilette gewollt zu haben“."), L("Platzwunde an der Stirn, ca. 1 cm, Blutung mit Kompresse gestillt."), L("Ärztlicher Dienst wird morgen früh informiert.", true, "Bei Kopfverletzung unter Antikoagulation sofort ärztlich informieren."), L("Neurologische Kontrolle (Bewusstsein, Pupillen) stündlich geplant.")] },
+      { type: "ampel" }
+    ] },
+    { t: "Schmerz einschätzen, auch ohne Worte", kurz: "Schmerzskalen, Fremdeinschätzung bei Demenz und Schmerzmanagement.", lvl: "Jahr 2", ber: "Schmerz", blocks: [
+      { type: "wort", q: "Woran erkennst du Schmerzen, wenn jemand nicht sprechen kann?", demo: ["Mimik", "Stöhnen", "Unruhe", "Schonhaltung", "Abwehr", "Weinen", "Appetitlosigkeit", "Rückzug"] },
+      { type: "folie", titel: "Selbstauskunft vor Fremdeinschätzung", text: "• Wer sich äußern kann, schätzt selbst ein: NRS 0 bis 10 oder VAS\n• Bei Demenz oder Bewusstseinsstörung: Fremdeinschätzung, z. B. BESD oder BISAD\n• Schmerz ist, was die Person als Schmerz angibt\n• Ziel nach Expertenstandard: stabile Schmerzsituation, akzeptabel für die Person" },
+      { type: "peer", q: "Herr Sahin gibt NRS 6 an, lacht aber und unterhält sich mit seinem Besuch. Wie gehst du mit der Angabe um?", opts: [o("Er übertreibt, ich dokumentiere NRS 3"), o("Ich nehme NRS 6 ernst, frage nach und biete die Bedarfsmedikation an", true), o("Ich warte, bis er wieder allein ist"), o("Schmerz zählt nur, wenn die Vitalzeichen steigen")], exp: "Schmerz ist subjektiv. Menschen gehen unterschiedlich mit Schmerz um, auch kulturell. Die Selbstauskunft gilt." },
+      { type: "fall", titel: "Wohnbereich 2, nach dem Mittagessen", person: "Frau Wolf, 88 Jahre", info: "fortgeschrittene Demenz, Arthrose", sit: "Frau Wolf schreit beim Waschen der Beine, zieht die Stirn zusammen und hält die Hände der Pflegekraft fest. In Ruhe wirkt sie entspannt.", q: "Was ist am sinnvollsten?", opts: [o("Schneller waschen, damit es vorbei ist"), o("Schmerz mit BESD einschätzen, Bedarfsmedikation vor der Mobilisation besprechen und Bewegungen anpassen", true), o("Das Waschen der Beine weglassen"), o("Mit den Angehörigen über ihr Verhalten sprechen")], exp: "Abwehr bei Bewegung ist ein typisches Schmerzzeichen. Eine Fremdeinschätzung und eine geplante Medikation vor belastenden Pflegehandlungen verbessern die Situation." },
+      { type: "tf", items: [tf("Ältere Menschen spüren weniger Schmerz.", false, "Das ist ein Mythos. Ältere äußern Schmerz oft weniger, empfinden ihn aber nicht weniger."), tf("Schmerz wird nach einer Medikamentengabe erneut eingeschätzt.", true, "Die Wirkung wird überprüft und dokumentiert, z. B. 30 bis 60 Minuten nach oraler Gabe."), tf("Opioide machen bei Schmerzpatientinnen fast immer süchtig.", false, "Bei korrekter Anwendung gegen Schmerzen ist eine Abhängigkeit selten. Nebenwirkungen wie Verstopfung beachten.")] },
+      { type: "ampel" }
+    ] },
+    { t: "Diabetes: Unterzucker oder Überzucker?", kurz: "Symptome unterscheiden, schnell handeln, sicher beraten.", lvl: "Jahr 2", ber: "Diabetes", blocks: [
+      { type: "frage", q: "Ab welchem Blutzuckerwert spricht man meist von einer Hypoglykämie?", opts: [o("unter 140 mg/dl"), o("unter 100 mg/dl"), o("unter 70 mg/dl", true), o("unter 40 mg/dl")], exp: "Unter 70 mg/dl (3,9 mmol/l) gilt als Hypoglykämie. Werte unter 54 mg/dl sind klinisch bedeutsam." },
+      { type: "folie", titel: "Hypo oder Hyper?", text: "• Hypoglykämie: plötzlich, Zittern, Schwitzen, Heißhunger, Unruhe, Verwirrtheit\n• Hyperglykämie: langsam, Durst, viel Wasserlassen, Müdigkeit, trockene Haut\n• Im Zweifel: Blutzucker messen\n• Bewusstlos oder kann nicht schlucken: nichts in den Mund, Notruf" },
+      { type: "fall", titel: "Vor dem Mittagessen", person: "Herr Engel, 72 Jahre", info: "Typ-2-Diabetes, Insulin seit drei Monaten", sit: "Herr Engel ist blass, schwitzt stark und wirkt fahrig. Er sagt: „Mir ist so komisch.“ Sein Insulin hat er vor 40 Minuten gespritzt, das Essen kommt erst in 20 Minuten.", befunde: [["Blutzucker", "52 mg/dl"], ["Bewusstsein", "wach, kann schlucken"]], q: "Was tust du?", opts: [o("Warten, das Essen kommt ja gleich"), o("Schnell wirksame Kohlenhydrate geben, z. B. Traubenzucker oder Saft, nach 15 Minuten nachmessen und informieren", true), o("Insulin nachspritzen"), o("Ihn hinlegen und zudecken")], exp: "Bei wacher Person mit Schluckfähigkeit: 15 bis 20 g schnell wirksame Kohlenhydrate, nach 15 Minuten kontrollieren. Ursache klären und dokumentieren." },
+      { type: "reihe", q: "Bringt die Blutzuckermessung in die richtige Reihenfolge.", items: ["Hände der Person waschen lassen oder Finger reinigen", "Händedesinfektion und Handschuhe", "Seitlich an der Fingerbeere stechen", "Ersten Tropfen abwischen", "Zweiten Tropfen auf den Teststreifen geben", "Wert ablesen, bewerten und dokumentieren"], exp: "Zuckerreste an den Fingern verfälschen den Wert. Die seitliche Fingerbeere ist weniger schmerzempfindlich." },
+      { type: "tf", items: [tf("Bei Unterzucker mit Bewusstlosigkeit gibst du Traubenzucker in den Mund.", false, "Aspirationsgefahr. Notruf, stabile Seitenlage, ggf. Glukagon nach Anordnung."), tf("Diabetische Füße werden täglich auf Verletzungen kontrolliert.", true, "Wegen der Neuropathie spüren Betroffene kleine Wunden oft nicht.")] },
+      { type: "ampel" }
+    ] },
+    { t: "Herzinsuffizienz: beobachten und beraten", kurz: "Warnzeichen, Gewicht, Flüssigkeit und Selbstmanagement.", lvl: "Jahr 2", ber: "Innere Medizin", blocks: [
+      { type: "wort", q: "Woran merkt eine Person mit Herzinsuffizienz, dass es schlechter wird?", demo: ["Atemnot", "Ödeme", "Gewicht", "Husten", "Müdigkeit", "Kissen", "Nykturie", "Schwindel"] },
+      { type: "schaetz", q: "Ab wie viel Kilogramm Gewichtszunahme in drei Tagen sollte eine Person mit Herzinsuffizienz ihre Ärztin informieren?", ans: 2, unit: "kg", min: 0, max: 10, exp: "Üblich sind mehr als 1 kg über Nacht oder mehr als 2 kg in drei Tagen. Das ist meist eingelagertes Wasser, kein Fett." },
+      { type: "frage", q: "Wie wird das Gewicht richtig kontrolliert?", opts: [o("Abends nach dem Essen, angezogen"), o("Morgens nach dem ersten Wasserlassen, vor dem Frühstück, gleiche Waage und Kleidung", true), o("Einmal pro Woche reicht"), o("Nur wenn die Beine dick sind")], exp: "Nur gleiche Bedingungen machen Werte vergleichbar." },
+      { type: "fall", titel: "Hausbesuch, ambulanter Dienst", person: "Herr Krämer, 77 Jahre", info: "Herzinsuffizienz, lebt allein", sit: "Herr Krämer schläft seit zwei Nächten im Sessel, weil er im Liegen schlecht Luft bekommt. Die Knöchel sind geschwollen, die Schuhe passen nicht mehr. Sein Gewichtstagebuch zeigt plus 2,8 kg seit Montag.", q: "Was ist jetzt wichtig?", opts: [o("Ihm raten, mehr zu trinken"), o("Hausärztin heute noch informieren, Beobachtungen weitergeben und mit ihm die Warnzeichen besprechen", true), o("Beine hochlegen und nächste Woche wiederkommen"), o("Sofort den Notruf wählen, obwohl er in Ruhe gut Luft bekommt")], exp: "Orthopnoe, Ödeme und Gewichtszunahme sprechen für eine Dekompensation. Das muss heute ärztlich bewertet werden. Notruf bei Atemnot in Ruhe." },
+      { type: "skala", q: "Menschen mit Herzinsuffizienz sollten eher wenig trinken.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "folie", titel: "Auflösung: Trinkmenge", text: "Die Trinkmenge wird individuell ärztlich festgelegt. Oft sind es etwa 1,5 bis 2 Liter am Tag. Zu wenig Trinken ist im Alter genauso gefährlich wie zu viel. Pflegende beraten, dokumentieren und beobachten." },
+      { type: "ampel" }
+    ] },
+    { t: "Delir oder Demenz?", kurz: "Akute Verwirrtheit erkennen, Ursachen suchen, vorbeugen.", lvl: "Jahr 2", ber: "Gerontologie", blocks: [
+      { type: "peer", q: "Frau Lorenz, 86, war gestern klar und ist heute zeitlich nicht orientiert und zupft an der Decke. Was ist am wahrscheinlichsten?", opts: [o("Sie hat eine Demenz, das kommt im Alter"), o("Ein Delir, also eine akute Verwirrtheit mit körperlicher Ursache", true), o("Sie ist müde"), o("Eine Depression")], exp: "Plötzlicher Beginn und schwankender Verlauf sprechen für ein Delir. Ein Delir ist ein Notfall und hat fast immer eine körperliche Ursache." },
+      { type: "folie", titel: "Delir: plötzlich, schwankend, behandelbar", text: "• Beginn: Stunden bis Tage\n• Aufmerksamkeit gestört, Verlauf schwankt, oft nachts schlechter\n• Ursachen: Infekt, Flüssigkeitsmangel, Schmerzen, Medikamente, Harnverhalt, Operation\n• Screening: z. B. 4AT\n• Demenz dagegen: schleichend über Monate" },
+      { type: "frage", q: "Welche Ursachen solltest du bei Frau Lorenz prüfen?", multi: true, opts: [o("Trinkmenge und Ausscheidung", true), o("Schmerzen", true), o("Neue Medikamente", true), o("Fieber und Infektzeichen", true), o("Ihr Lieblingsessen")], exp: "Pflegende tragen viel zur Ursachensuche bei: Trinkprotokoll, Blasenkontrolle, Schmerzeinschätzung, Vitalzeichen, Medikamentenliste." },
+      { type: "tf", items: [tf("Brille und Hörgerät helfen, einem Delir vorzubeugen.", true, "Orientierung braucht Sinneswahrnehmung."), tf("Bei einem Delir sind Fixierungen das Mittel der Wahl.", false, "Fixierungen verschlimmern das Delir. Begleiten, Orientierung geben, Ursachen behandeln."), tf("Ein Delir kann auch ruhig und zurückgezogen sein.", true, "Das hypoaktive Delir wird oft übersehen.")] },
+      { type: "wort", q: "Was hilft Menschen mit Delir, sich zu orientieren?", demo: ["Uhr", "Kalender", "Licht", "Angehörige", "Brille", "Ruhe", "Gespräch", "Tagesstruktur"] },
+      { type: "ampel" }
+    ] },
+    { t: "Ethik: Fürsorge oder Selbstbestimmung?", kurz: "Meinungslinien zu Dilemmata, Begründen nach ethischen Prinzipien.", lvl: "Jahr 3", ber: "Ethik", blocks: [
+      { type: "folie", titel: "Vier Prinzipien der Medizinethik", text: "• Autonomie: Selbstbestimmung achten\n• Nicht schaden\n• Fürsorge: Gutes tun\n• Gerechtigkeit\nIn Dilemmata stehen Prinzipien gegeneinander. Professionell ist, abzuwägen und zu begründen." },
+      { type: "skala", q: "Herr Meier, 91, möchte nicht mehr essen. Er ist orientiert. Man sollte ihn trotzdem zum Essen motivieren.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "fall", titel: "Herr Meier, Tag 3", person: "Herr Meier, 91 Jahre", info: "Pflegeheim, Herzinsuffizienz, orientiert", sit: "Herr Meier lehnt seit drei Tagen fast alle Mahlzeiten ab. Er sagt: „Ich habe mein Leben gelebt. Ich will nicht mehr.“ Die Tochter fordert eine Magensonde.", q: "Was ist der nächste professionelle Schritt?", opts: [o("Sonde vorbereiten, die Tochter ist Angehörige"), o("Mit ihm sprechen, Gründe verstehen, Ärztin informieren, Patientenverfügung prüfen und eine ethische Fallbesprechung anregen", true), o("Essen heimlich in Getränke mischen"), o("Nichts tun, es ist seine Entscheidung")], exp: "Der Wille einer einwilligungsfähigen Person gilt. Gleichzeitig sind behandelbare Ursachen wie Depression, Schmerzen oder Mundprobleme auszuschließen. Eine Fallbesprechung bindet alle ein." },
+      { type: "skala", q: "Ein Bettgitter nachts bei einer sturzgefährdeten Person ist Schutz, keine Freiheitsentziehung.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "frage", q: "Was gilt rechtlich für ein Bettgitter gegen den Willen einer Person, die sich nicht äußern kann?", opts: [o("Die Pflegefachperson darf entscheiden"), o("Es ist eine freiheitsentziehende Maßnahme und braucht eine richterliche Genehmigung, außer im akuten Notfall", true), o("Angehörige können es einfach erlauben"), o("Nachts ist es immer erlaubt")], exp: "Regelmäßige oder länger dauernde Freiheitsentziehung braucht die Einwilligung oder eine richterliche Genehmigung (§ 1831 BGB). Vorrang haben Alternativen wie Niederflurbett und Sensormatte." },
+      { type: "wort", q: "Was braucht eine gute ethische Entscheidung im Team?", demo: ["Zeit", "Respekt", "Wille", "Information", "Team", "Begründung", "Dokumentation", "Angehörige"] },
+      { type: "ampel", q: "Wie sicher fühlst du dich, ethische Konflikte im Team anzusprechen?" }
+    ] },
+    { t: "Notfall: Reanimation im Team", kurz: "BLS-Ablauf, Rollen und klare Kommunikation.", lvl: "Jahr 3", ber: "Notfall", blocks: [
+      { type: "reihe", q: "Bringt die Basismaßnahmen der Reanimation in die richtige Reihenfolge.", items: ["Eigenschutz und Umgebung prüfen", "Ansprechen und anfassen", "Atmung prüfen: sehen, hören, fühlen (max. 10 Sekunden)", "Notruf und Reanimationsteam alarmieren, Defibrillator holen lassen", "30 Thoraxkompressionen", "2 Beatmungen, dann 30:2 fortsetzen"], exp: "Ohne normale Atmung sofort Hilfe rufen und mit Herzdruckmassage beginnen. Unterbrechungen so kurz wie möglich halten." },
+      { type: "schaetz", q: "Mit welcher Frequenz pro Minute drückst du bei der Herzdruckmassage?", ans: 110, unit: "/min", min: 60, max: 160, exp: "100 bis 120 Kompressionen pro Minute, 5 bis 6 cm tief, vollständige Entlastung." },
+      { type: "fall", titel: "Station 6, Flur, 14:20 Uhr", person: "Herr Roth, 68 Jahre", info: "Tag 2 nach Herzkatheter", sit: "Herr Roth bricht auf dem Flur zusammen. Er reagiert nicht und atmet nur noch schnappend.", q: "Wie deutest du die Schnappatmung?", opts: [o("Er atmet noch, stabile Seitenlage"), o("Keine normale Atmung: Kreislaufstillstand, sofort Hilfe rufen und mit der Herzdruckmassage beginnen", true), o("Erst den Puls zwei Minuten tasten"), o("Sauerstoff holen")], exp: "Schnappatmung ist ein Zeichen des Kreislaufstillstands und keine normale Atmung." },
+      { type: "fehler", titel: "Kommunikation im Reanimationsteam", lines: [L("„Ich übernehme die Herzdruckmassage!“"), L("„Kann mal jemand irgendwas holen?“", true, "Unklar. Besser: Person direkt ansprechen und konkret sagen, was gebraucht wird."), L("„Tom, bitte den Defibrillator holen.“ – „Ich hole den Defibrillator.“"), L("Alle wechseln sich ab, wann es passt.", true, "Wechsel der Herzdruckmassage etwa alle 2 Minuten bei der Rhythmusanalyse, angekündigt."), L("„Analyse läuft, alle weg vom Patienten!“")] },
+      { type: "tf", items: [tf("Ein AED darf auch von Laien benutzt werden.", true, "Der Automatische Externe Defibrillator führt mit Sprachanweisungen durch die Anwendung."), tf("Bei Unsicherheit über den Puls lieber erst einmal abwarten.", false, "Zeit ist Hirn. Ohne normale Atmung wird reanimiert.")] },
+      { type: "ampel", q: "Wie sicher fühlst du dich bei einem Notfall auf Station?" }
+    ] }
+  ];
+  var F = function (t, person, info, sit, befunde, q, opts, exp) { return { type: "fall", titel: t, person: person, info: info, sit: sit, befunde: befunde, q: q, opts: opts, exp: exp }; };
+  var faelle = [
+    { t: "Frau Weber: nach dem Sturz im Pflegeheim", kurz: "Vom Sturz in der Nacht bis zur Prophylaxe am nächsten Tag.", lvl: "Jahr 1", ber: "Langzeitpflege", blocks: [
+      F("Nachtdienst, 2:30 Uhr", "Frau Weber, 81 Jahre", "Wohnbereich 1, Arthrose, Bluthochdruck", "Ein Poltern aus Zimmer 12. Frau Weber sitzt neben dem Bett auf dem Boden und hält sich die rechte Hüfte.", null, "Was tust du als Erstes?", [o("Sie hochheben und ins Bett bringen"), o("Hilfe rufen, bei ihr bleiben, Bewusstsein, Schmerzen und Beinstellung prüfen", true), o("Schmerztablette holen")], "Erst einschätzen. Ein verkürztes und nach außen gedrehtes Bein spricht für einen Oberschenkelhalsbruch, dann nicht aufrichten."),
+      F("2:35 Uhr", "Frau Weber, 81 Jahre", "Wohnbereich 1", "Das rechte Bein ist verkürzt und nach außen gedreht. Sie hat starke Schmerzen bei jeder Bewegung.", [["Bewusstsein", "wach, orientiert"], ["Schmerz", "NRS 8"]], "Was ist jetzt richtig?", [o("Bein vorsichtig gerade ziehen"), o("Nicht bewegen, polstern, zudecken, Notruf über die Leitstelle und Bericht vorbereiten", true), o("Bis zur Frühschicht warten")], "Verdacht auf Schenkelhalsfraktur: Rettungsdienst, Wärmeerhalt, Lagerung so wie sie liegt, Medikamentenplan und Überleitungsbogen bereitlegen."),
+      F("Drei Wochen später", "Frau Weber, 81 Jahre", "zurück nach Hüft-Operation", "Frau Weber ist wieder im Heim. Sie hat Angst zu stürzen und möchte nur noch im Bett bleiben.", null, "Was unterstützt sie am besten?", [o("Bettruhe respektieren, damit nichts passiert"), o("Angst ernst nehmen, mit Physiotherapie kleine Gehziele vereinbaren und Hilfsmittel wie den Rollator nutzen", true), o("Sie zum Gehen drängen")], "Sturzangst führt zu Immobilität und erhöht das Sturzrisiko weiter. Kleine Erfolge und Sicherheit helfen."),
+      { type: "ampel", q: "Wie sicher fühlst du dich jetzt im Umgang mit Stürzen?" }
+    ] },
+    { t: "Herr Petersen: Atemnot in der Nacht", kurz: "Pneumonie, Sauerstoff und Krankenbeobachtung.", lvl: "Jahr 2", ber: "Innere Medizin", blocks: [
+      F("22:00 Uhr", "Herr Petersen, 78 Jahre", "Pneumonie rechts, Herzinsuffizienz", "Herr Petersen hustet viel und hat gelblichen Auswurf. Er liegt flach und sagt, er bekomme schlecht Luft.", [["Atemfrequenz", "26/min"], ["Sauerstoffsättigung", "89 % unter 2 l/min"]], "Was tust du zuerst?", [o("Oberkörper hochlagern, Atmung beobachten und die Pflegefachperson informieren", true), o("Ihm ein Glas Wasser geben und gehen"), o("Den Sauerstoff eigenständig auf 10 l/min erhöhen")], "Hochlagerung erleichtert die Atmung. Die Sauerstoffmenge wird ärztlich angeordnet."),
+      F("22:20 Uhr", "Herr Petersen, 78 Jahre", "Pneumonie rechts", "Die Ärztin erhöht den Sauerstoff auf 4 l/min über die Nasenbrille. Herr Petersen atmet durch den Mund.", null, "Worauf achtest du bei der Sauerstoffgabe?", [o("Nasenbrille richtig sitzend, Schleimhaut feucht halten, Mundpflege, Sättigung kontrollieren", true), o("Nasenbrille ist bei Mundatmung wirkungslos, also abnehmen"), o("Sauerstoff macht trockene Haut, deshalb eincremen")], "Auch bei Mundatmung gelangt Sauerstoff in die Atemwege. Trockene Schleimhäute brauchen Mund- und Nasenpflege."),
+      F("Nächster Morgen", "Herr Petersen, 78 Jahre", "Pneumonie, Tag 2", "Es geht ihm besser. Er möchte im Bett bleiben, weil er sich schwach fühlt.", null, "Welche Maßnahme hilft am meisten, die Lunge zu entlasten?", [o("Strikte Bettruhe"), o("Frühe Mobilisation, Atemübungen und Sekret abhusten lassen", true), o("Viel Milch trinken")], "Bewegung ist die wirksamste Pneumonieprophylaxe und hilft bei der Genesung."),
+      { type: "wort", q: "Welche Maßnahmen der Pneumonieprophylaxe kennt ihr?", demo: ["Mobilisation", "Atemtrainer", "Mundpflege", "Oberkörperhochlage", "Abhusten", "Lagerung", "Trinken", "Inhalation"] }
+    ] },
+    { t: "Jonas, 9: Asthmaanfall in der Schule", kurz: "Kindgerecht handeln, Notfallspray, Eltern einbinden.", lvl: "Jahr 3", ber: "Pädiatrie", blocks: [
+      F("Kinderklinik, Aufnahme", "Jonas, 9 Jahre", "Asthma bronchiale, kommt mit der Mutter", "Jonas sitzt nach vorn gebeugt, stützt die Arme auf und atmet pfeifend aus. Er sagt nur einzelne Worte.", [["Atemfrequenz", "34/min"], ["Sauerstoffsättigung", "91 %"]], "Wie lagerst du Jonas?", [o("Flach mit erhöhten Beinen"), o("Sitzend mit Armstütze, Kutschersitz, Mutter bleibt bei ihm", true), o("In Seitenlage")], "Der Kutschersitz erleichtert den Einsatz der Atemhilfsmuskulatur. Die Mutter beruhigt."),
+      F("5 Minuten später", "Jonas, 9 Jahre", "Asthmaanfall", "Die Ärztin ordnet ein Notfallspray mit Spacer an. Jonas ist aufgeregt und weint.", null, "Wie unterstützt du ihn?", [o("Ruhig erklären, Lippenbremse vormachen und das Spray mit Spacer korrekt anwenden", true), o("Ihn bitten, sich zusammenzureißen"), o("Das Spray ohne Spacer geben, das geht schneller")], "Der Spacer verbessert die Wirkstoffaufnahme. Ruhe senkt den Sauerstoffbedarf."),
+      F("Vor der Entlassung", "Jonas, 9 Jahre", "mit Mutter", "Jonas soll lernen, sein Spray selbst richtig anzuwenden.", null, "Was gehört in die Schulung?", [o("Spacer-Technik, Notfallplan, Auslöser meiden, Peakflow-Tagebuch", true), o("Nur der Mutter einen Zettel geben"), o("Sport für immer verbieten")], "Kinder werden altersgerecht eingebunden. Sport ist mit guter Asthmakontrolle erwünscht."),
+      { type: "ampel" }
+    ] },
+    { t: "Herr Yılmaz: Schmerzen nach der Hüft-OP", kurz: "Schmerzmanagement und kultursensible Pflege.", lvl: "Jahr 2", ber: "Chirurgie", blocks: [
+      F("Tag 1 nach der OP", "Herr Yılmaz, 67 Jahre", "Hüft-TEP links, spricht wenig Deutsch", "Herr Yılmaz stöhnt bei jeder Bewegung, lehnt aber Schmerzmittel ab. Sein Sohn übersetzt: „Er will stark sein.“", null, "Wie gehst du vor?", [o("Seine Ablehnung akzeptieren und nicht mehr fragen"), o("Mit Sohn oder Dolmetschdienst nachfragen, Bedenken erfragen und erklären, dass Schmerzfreiheit die Mobilisation ermöglicht", true), o("Die Tablette ins Essen mischen")], "Ablehnung kann Ängste vor Abhängigkeit oder kulturelle Werte haben. Information und Respekt ermöglichen eine Entscheidung."),
+      F("Später am Tag", "Herr Yılmaz, 67 Jahre", "Hüft-TEP links", "Er nimmt das Schmerzmittel. Vor der Mobilisation zeigt er auf einer Gesichter-Skala das zweite Gesicht.", null, "Wann mobilisierst du ihn?", [o("Sofort"), o("Wenn das Schmerzmittel wirkt, etwa 30 bis 60 Minuten nach der Einnahme", true), o("Erst morgen")], "Die Mobilisation wird an den Wirkungseintritt des Schmerzmittels angepasst."),
+      { type: "wort", q: "Was hilft bei Sprachbarrieren auf Station?", demo: ["Dolmetscher", "Bilder", "Gesten", "Geduld", "Übersetzungs-App", "Angehörige", "Einfache Sprache", "Skala"] }
+    ] },
+    { t: "Frau Krüger: Atemnot am Lebensende", kurz: "Palliative Symptomkontrolle und Begleitung der Angehörigen.", lvl: "Jahr 3", ber: "Palliative Care", blocks: [
+      F("Hospiz, Nachmittag", "Frau Krüger, 74 Jahre", "Lungenkrebs, palliative Situation", "Frau Krüger ist unruhig und sagt: „Ich habe Angst zu ersticken.“ Ihr Mann sitzt am Bett und weint.", null, "Was hilft Frau Krüger jetzt am meisten?", [o("Sie allein lassen, damit sie zur Ruhe kommt"), o("Bei ihr bleiben, Oberkörper hoch, Fenster öffnen oder Handventilator, Bedarfsmedikation nach Plan", true), o("Den Notarzt rufen")], "Atemnot ist ein häufiges Symptom am Lebensende. Ein Luftzug im Gesicht, Lagerung, Ruhe und Opioide nach Plan lindern sie."),
+      F("Abends", "Herr Krüger, Ehemann", "Angehöriger", "Herr Krüger fragt: „Muss sie verhungern, weil sie nichts mehr isst?“", null, "Wie antwortest du?", [o("„Das ist leider so.“"), o("Erklären, dass Sterbende oft kein Hungergefühl haben, und Mundpflege mit Lieblingsgetränken anbieten, die er übernehmen kann", true), o("„Fragen Sie die Ärztin.“")], "Angehörige wollen etwas tun. Mundpflege mit Geschmack ist liebevoll und lindert Durstgefühl."),
+      { type: "skala", q: "Angehörige sollten bei der Pflege Sterbender mithelfen dürfen.", links: "Stimme voll zu", rechts: "Stimme gar nicht zu" },
+      { type: "wort", q: "Was bedeutet für euch ein würdevolles Sterben?", demo: ["Schmerzfreiheit", "Nähe", "Ruhe", "Familie", "Selbstbestimmung", "Zeit", "Musik", "Würde"] }
+    ] },
+    { t: "Herr Novak: Alkoholentzug an Tag 2", kurz: "Entzugszeichen erkennen, sichern, wertschätzend begleiten.", lvl: "Jahr 3", ber: "Psychiatrie", blocks: [
+      F("Unfallchirurgie, Tag 2", "Herr Novak, 52 Jahre", "Unterarmfraktur, trinkt täglich Alkohol", "Herr Novak zittert, schwitzt stark und ist unruhig. Er sieht „Ameisen auf der Decke“.", [["Puls", "118/min"], ["Blutdruck", "165/100 mmHg"]], "Wie schätzt du die Lage ein?", [o("Er ist einfach nervös"), o("Verdacht auf Alkoholentzug mit beginnendem Delir: sofort ärztlich informieren und ihn nicht allein lassen", true), o("Ihm etwas Bier anbieten")], "Ein Entzugsdelir ist lebensbedrohlich. Krampfanfälle sind möglich. Engmaschige Beobachtung, z. B. mit einem Entzugsscore."),
+      F("Eine Stunde später", "Herr Novak, 52 Jahre", "Entzugssyndrom", "Die Ärztin ordnet Medikamente nach Score an. Herr Novak schämt sich und sagt: „Ich bin ein Versager.“", null, "Was antwortest du?", [o("„Das haben Sie sich selbst eingebrockt.“"), o("Wertschätzend reagieren, Sucht als Erkrankung benennen und Unterstützung durch den Sozialdienst anbieten", true), o("Das Thema wechseln")], "Eine wertfreie Haltung öffnet die Tür für Hilfe, zum Beispiel eine qualifizierte Entzugsbehandlung."),
+      { type: "tf", items: [tf("Ein Alkoholentzug kann tödlich verlaufen.", true, "Ein unbehandeltes Delirium tremens hat eine hohe Sterblichkeit."), tf("Wer trinkt, ist willensschwach.", false, "Abhängigkeit ist eine anerkannte Erkrankung.")] }
+    ] },
+    { t: "Frau Schulz: Blutung im Wochenbett", kurz: "Fundusstand, Wochenfluss und Notfallzeichen nach der Geburt.", lvl: "Jahr 3", ber: "Wochenbett", blocks: [
+      F("Wochenstation, 4 Stunden nach der Geburt", "Frau Schulz, 31 Jahre", "Spontangeburt, erstes Kind", "Frau Schulz klingelt. Die Vorlage ist nach 20 Minuten durchgeblutet, ihr ist schwindelig.", null, "Was prüfst du zuerst?", [o("Fundusstand und Festigkeit der Gebärmutter, Blutung und Kreislauf", true), o("Ob das Baby getrunken hat"), o("Die Wunddokumentation")], "Häufigste Ursache einer Nachblutung ist eine schlaff gebliebene Gebärmutter (Atonie)."),
+      F("Kurz danach", "Frau Schulz, 31 Jahre", "Wochenbett", "Die Gebärmutter ist weich und steht oberhalb des Nabels. Die Blutung hält an.", [["Puls", "112/min"], ["Blutdruck", "95/55 mmHg"]], "Was tust du?", [o("Hebamme und Ärztin sofort rufen, Gebärmutter massieren lassen, Blase entleeren lassen, bei ihr bleiben", true), o("Neue Vorlage geben und später nachsehen"), o("Ihr einen Kaffee bringen")], "Eine volle Blase behindert die Kontraktion. Atonie ist ein Notfall, schnelle Hilfe ist entscheidend."),
+      { type: "schaetz", q: "Ab wie viel Milliliter Blutverlust spricht man nach einer vaginalen Geburt von einer verstärkten Blutung?", ans: 500, unit: "ml", min: 0, max: 2000, exp: "Mehr als 500 ml nach vaginaler Geburt gelten als postpartale Blutung." }
+    ] },
+    { t: "Herr Brandt: plötzlich hängt der Mundwinkel", kurz: "Schlaganfall erkennen mit BE-FAST und schnell handeln.", lvl: "Jahr 2", ber: "Neurologie", blocks: [
+      F("Pflegeheim, Frühstück", "Herr Brandt, 76 Jahre", "Vorhofflimmern, lebt im Heim", "Beim Frühstück fällt Herrn Brandt die Tasse aus der rechten Hand. Er spricht verwaschen, der rechte Mundwinkel hängt.", null, "Was hast du gerade erkannt?", [o("Typische Zeichen eines Schlaganfalls", true), o("Er ist noch müde"), o("Eine Unterzuckerung, sicher")], "BE-FAST: Balance, Eyes, Face, Arms, Speech, Time. Auch an eine Unterzuckerung denken und den Blutzucker messen."),
+      F("Eine Minute später", "Herr Brandt, 76 Jahre", "Verdacht auf Schlaganfall", "Der Blutzucker ist normal. Die Symptome bestehen weiter.", null, "Was ist jetzt am wichtigsten?", [o("Notruf 112, Uhrzeit des Symptombeginns notieren, nichts essen oder trinken lassen", true), o("Hausarzt um einen Termin bitten"), o("Hinlegen und abwarten, ob es besser wird")], "Time is brain. Der genaue Zeitpunkt entscheidet über die Behandlung. Wegen Schluckstörung nüchtern lassen."),
+      { type: "reihe", q: "Ordnet die BE-FAST-Prüfung.", items: ["Balance: Gleichgewicht prüfen", "Eyes: Sehstörungen erfragen", "Face: lächeln lassen", "Arms: beide Arme heben lassen", "Speech: einen Satz nachsprechen lassen", "Time: Uhrzeit notieren und 112 rufen"] }
+    ] }
+  ];
+  window.FP_LIVE_LIB = { stunden: stunden, faelle: faelle };
+})();
+
+/* Lehrer-Portal: Live-Unterricht. Live-Stunden aus Bausteinen bauen, Module live an der Tafel zeigen,
+   Präsentationsmodus mit QR-Code. Die Lernenden sehen immer nur den Schritt, den die Lehrkraft freigibt. */
+(function () {
+  function pl(n, a, b) { return n + " " + (n === 1 ? a : b); }
+  var R = window.React, RD = window.ReactDOM;
+  if (!R || !RD) return;
+  var h = R.createElement, useState = R.useState, useEffect = R.useEffect, useMemo = R.useMemo, useRef = R.useRef;
+  var DEMO = function () { return !window.FP_SB; };
+  var esc = function (t) { return String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); };
+  var rid = function () { return Math.random().toString(36).slice(2, 9); };
+  var I = {
+    folie: "M4 5h16v11H4zM9 20h6M12 16v4", fall: "M12 4a4 4 0 1 1 0 8 4 4 0 0 1 0-8zM5 20c.8-3.5 3.6-5.5 7-5.5s6.2 2 7 5.5", frage: "M5 6h14M5 12h10M5 18h6",
+    peer: "M8 8a3 3 0 1 1 0 .1M16 8a3 3 0 1 1 0 .1M3 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5M11 19c.6-3 2.6-4.5 5-4.5s4.4 1.5 5 4.5", tf: "M5 12.5 10 17l9-10",
+    schaetz: "M4 18h16M7 18V9M12 18V5M17 18v-6", wort: "M4 7h9M4 12h16M4 17h11", ampel: "M9 3h6v18H9zM12 7h.01M12 12h.01M12 17h.01", skala: "M3 12h18M6 9v6M12 9v6M18 9v6",
+    reihe: "M9 6h11M9 12h11M9 18h11M4 5.5l1-.5v3M4 11h2l-2 2h2M4 17h2v2H4", fehler: "M11 4a7 7 0 1 1 0 14 7 7 0 0 1 0-14zM16 16l5 5", play: "M8 5.5v13l10.5-6.5z", plus: "M12 5v14M5 12h14",
+    up: "M12 19V5M6 11l6-6 6 6", down: "M12 5v14M6 13l6 6 6-6", x: "M6 6l12 12M18 6 6 18", trash: "M5 7h14M9 7V5h6v2M7 7l1 13h8l1-13", edit: "M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4",
+    left: "M15 6l-6 6 6 6", right: "M9 6l6 6-6 6", eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z", book: "M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3zM5 16.5a3 3 0 0 1 3-3h11", stop: "M7 7h10v10H7z", spark: "M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9z", copy: "M8 8h11v11H8zM5 16V5h11"
+  };
+  function Ic(p) { return h("svg", { viewBox: "0 0 24 24", width: p.s || 20, height: p.s || 20, fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true }, h("path", { d: I[p.n] || I.spark })); }
+  var TYPES = {
+    folie: { t: "Folie", d: "Inhalt an der Tafel zeigen und erklären. Lernende sehen ihn mit.", c: "#64748B" },
+    fall: { t: "Fallsituation", d: "Eine Situation mit Person und Befunden, die Klasse entscheidet. Ohne Vitalzeichen-Monitor.", c: "#E11D48" },
+    frage: { t: "Abstimmung", d: "Frage mit Antworten, die Verteilung erscheint vorne. Eine oder mehrere richtig.", c: "#0062FF" },
+    peer: { t: "Peer Instruction", d: "Erst allein abstimmen, dann zu zweit diskutieren, dann nochmal. Vorher und nachher im Vergleich.", c: "#7C3AED" },
+    tf: { t: "Richtig-oder-Falsch-Blitz", d: "Schnelle Aussagen nacheinander. Ideal zum Aufwärmen und für Mythen.", c: "#0D9488" },
+    schaetz: { t: "Schätzfrage", d: "Zahl schätzen, vorne erscheint die Verteilung mit dem richtigen Wert.", c: "#D97706" },
+    wort: { t: "Wortwolke", d: "Stichworte sammeln. Häufige Begriffe werden größer. Gut zum Einstieg.", c: "#DB2777" },
+    ampel: { t: "Ampel-Check", d: "Wie sicher fühlt ihr euch? Grün, gelb, rot. Zeigt, ob du wiederholen solltest.", c: "#059669" },
+    skala: { t: "Meinungslinie", d: "Zustimmung von „voll“ bis „gar nicht“. Startet Diskussionen zu ethischen Fragen.", c: "#4F46E5" },
+    reihe: { t: "Reihenfolge", d: "Schritte in die richtige Reihenfolge bringen, z. B. Handlungsabläufe.", c: "#0891B2" },
+    fehler: { t: "Fehlerjagd", d: "Eine Übergabe oder Dokumentation mit versteckten Fehlern. Die Klasse markiert sie.", c: "#EA580C" }
+  };
+  var ORDER = ["folie", "fall", "frage", "peer", "tf", "schaetz", "wort", "ampel", "skala", "reihe", "fehler"];
+
+  /* ---------- Lektion -> Schritte ---------- */
+  function seeded(n, seed) {
+    var a = []; for (var i = 0; i < n; i++) a.push(i);
+    var s = seed || 7;
+    for (var j = a.length - 1; j > 0; j--) { s = (s * 9301 + 49297) % 233280; var k = Math.floor(s / 233280 * (j + 1)); var t = a[j]; a[j] = a[k]; a[k] = t; }
+    if (n > 1 && a.every(function (x, i) { return x === i; })) a.push(a.shift());
+    return a;
+  }
+  function optsOf(b) { return (b.opts || []).map(function (o) { return typeof o === "string" ? { t: o.replace(/^\*\s*/, ""), ok: /^\*/.test(o) } : o; }).filter(function (o) { return o.t; }); }
+  function stepsOf(L) {
+    var out = [];
+    (L.blocks || []).forEach(function (b, bi) {
+      var o = optsOf(b);
+      var ok = o.map(function (x, i) { return x.ok ? i : -1; }).filter(function (i) { return i >= 0; });
+      switch (b.type) {
+        case "folie": out.push({ kind: "info", type: b.type, titel: b.titel, html: b.text, img: b.bild }); break;
+        case "fall": out.push({ kind: "choice", type: b.type, titel: b.titel || "Fallsituation", person: b.person ? { name: b.person, info: b.info } : null, sit: b.sit, rows: b.befunde, q: b.q, opts: o.map(function (x) { return x.t; }), ok: ok, multi: !!b.multi || ok.length > 1, exp: b.exp, demo: b.demo }); break;
+        case "frage": out.push({ kind: "choice", type: b.type, titel: b.titel, q: b.q, opts: o.map(function (x) { return x.t; }), ok: ok, multi: !!b.multi || ok.length > 1, exp: b.exp }); break;
+        case "peer":
+          out.push({ kind: "choice", type: b.type, peer: 1, titel: "Peer Instruction · Runde 1: allein", q: b.q, opts: o.map(function (x) { return x.t; }), ok: ok, multi: false, survey: true });
+          out.push({ kind: "choice", type: b.type, peer: 2, titel: "Peer Instruction · Runde 2: nach der Diskussion", q: b.q, opts: o.map(function (x) { return x.t; }), ok: ok, multi: false, exp: b.exp, ref: out.length - 1 });
+          break;
+        case "tf": (b.items || []).forEach(function (it) { out.push({ kind: "choice", type: b.type, titel: b.titel || "Richtig oder falsch?", q: it.t, opts: ["Richtig", "Falsch"], ok: [it.ok ? 0 : 1], exp: it.e, colors: ["#10B981", "#EF4444"] }); }); break;
+        case "schaetz": out.push({ kind: "estimate", type: b.type, titel: b.titel || "Schätzfrage", q: b.q, ans: Number(b.ans), unit: b.unit, min: b.min === "" ? undefined : Number(b.min), max: b.max === "" ? undefined : Number(b.max), exp: b.exp }); break;
+        case "wort": out.push({ kind: "word", type: b.type, titel: b.titel || "Wortwolke", q: b.q, hint: b.hint, demo: b.demo }); break;
+        case "ampel": out.push({ kind: "scale", type: b.type, titel: "Ampel-Check", q: b.q || "Wie sicher fühlst du dich jetzt?", opts: ["Sicher", "Teilweise", "Unsicher"], colors: ["#10B981", "#F59E0B", "#EF4444"], survey: true }); break;
+        case "skala": out.push({ kind: "scale", type: b.type, titel: "Meinungslinie", q: b.q, opts: [b.links || "Stimme voll zu", "Eher ja", "Unentschieden", "Eher nein", b.rechts || "Stimme gar nicht zu"], colors: ["#0D9488", "#5EB5A9", "#94A3B8", "#E8A87C", "#EA580C"], survey: true }); break;
+        case "reihe":
+          var items = (b.items || []).filter(Boolean).slice(0, 8), mix = seeded(items.length, bi + 3);
+          out.push({ kind: "order", type: b.type, titel: b.titel || "Reihenfolge", q: b.q, items: mix.map(function (i) { return items[i]; }), order: items.map(function (_, i) { return mix.indexOf(i); }), exp: b.exp });
+          break;
+        case "fehler":
+          var ls = (b.lines || []).slice(0, 10);
+          out.push({ kind: "lines", type: b.type, titel: b.titel || "Fehlerjagd", q: b.q || "Wo stecken die Fehler?", opts: ls.map(function (l) { return l.t; }), ok: ls.map(function (l, i) { return l.err ? i : -1; }).filter(function (i) { return i >= 0; }), lineExp: ls.map(function (l) { return l.err ? l.e || "" : null; }), multi: true, exp: b.exp });
+          break;
+      }
+    });
+    return out;
+  }
+  /* ---------- Modul -> Schritte ---------- */
+  var strip = function (x) { return String(x || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(); };
+  function stepsOfModule(m, chs) {
+    var out = [], chars = window.FP_CHARS || {};
+    out.push({ kind: "info", type: "folie", titel: m.title, html: (m.subtitle ? "<p><b>" + esc(m.subtitle) + "</b></p>" : "") + (m.intro || "") });
+    (m.chapters || []).forEach(function (c, ci) {
+      if (chs && chs.indexOf(ci) < 0) return;
+      out.push({ kind: "info", type: "folie", titel: "Station " + (ci + 1) + ": " + c.title, html: (c.time || c.place ? "<p>" + esc([c.time, c.place].filter(Boolean).join(" · ")) + "</p>" : "") + (c.goal ? "<p><b>Ziel:</b> " + esc(c.goal) + "</p>" : "") });
+      (c.blocks || []).forEach(function (b) {
+        var who = b.who && chars[b.who] ? chars[b.who].name : b.name || "";
+        switch (b.type) {
+          case "scene": out.push({ kind: "info", type: "folie", titel: who || "Szene", html: b.html, speaker: b.who }); break;
+          case "knowledge": case "challenge": out.push({ kind: "info", type: "folie", titel: b.title || (b.type === "challenge" ? "Herausforderung" : "Wissen"), html: b.html }); break;
+          case "merke": out.push({ kind: "info", type: "folie", titel: "Merke", html: b.html }); break;
+          case "case": out.push({ kind: "info", type: "folie", titel: b.title || "Fallvignette", html: b.html, rows: b.rows }); break;
+          case "bild": if (b.src) out.push({ kind: "info", type: "folie", titel: strip(b.caption) || "Bild", img: b.src }); break;
+          case "quiz": (b.questions || []).forEach(function (q) { out.push({ kind: "choice", type: "frage", titel: b.title || "Quiz", q: q.q, opts: q.o, ok: [q.a], exp: q.e }); }); break;
+          case "task": if ((b.kind === "choice" || b.kind === "multi") && b.options) { var okk = b.options.map(function (o, i) { return o.correct ? i : -1; }).filter(function (i) { return i >= 0; }); out.push({ kind: "choice", type: "frage", titel: "Aufgabe", q: strip(b.question), opts: b.options.map(function (o) { return strip(o.text); }), ok: okk, multi: b.kind === "multi" || okk.length > 1, exp: strip((b.options.find(function (o) { return o.correct; }) || {}).feedback) }); } break;
+          case "mythos": (b.items || []).forEach(function (it) { out.push({ kind: "choice", type: "tf", titel: "Mythos oder Fakt?", q: it.t, opts: ["Richtig", "Falsch"], ok: [it.ok ? 0 : 1], exp: it.e, colors: ["#10B981", "#EF4444"] }); }); break;
+          case "schaetz": out.push({ kind: "estimate", type: "schaetz", titel: "Schätzfrage", q: b.q, ans: b.ans, unit: b.unit, min: b.min, max: b.max, exp: b.fb }); break;
+          case "verlauf": (b.steps || []).forEach(function (s) { out.push({ kind: "choice", type: "fall", titel: "Fallverlauf", sit: s.sit, q: "Was tust du?", opts: s.opts.map(function (o) { return o.t; }), ok: s.opts.map(function (o, i) { return o.ok ? i : -1; }).filter(function (i) { return i >= 0; }), exp: s.opts.filter(function (o) { return o.ok; }).map(function (o) { return o.c; }).join(" ") }); }); break;
+          case "fehler": var ls = (b.lines || []).slice(0, 10); out.push({ kind: "lines", type: "fehler", titel: b.who || "Fehlersuche", q: "Wo stecken die Fehler?", opts: ls.map(function (l) { return l.t; }), ok: ls.map(function (l, i) { return l.e ? i : -1; }).filter(function (i) { return i >= 0; }), lineExp: ls.map(function (l) { return l.e || null; }), multi: true }); break;
+          case "reflect": out.push({ kind: "word", type: "wort", titel: "Reflexion", q: strip(b.question), hint: "Deine wichtigsten Stichworte" }); break;
+          case "cards": out.push({ kind: "info", type: "folie", titel: b.title || "Lernkarten", rows: (b.cards || []).slice(0, 8) }); break;
+        }
+      });
+    });
+    return out;
+  }
+  function pubOf(title, steps, i, phase) {
+    var s = steps[i];
+    if (!s) return { mode: "unterricht", title: title, total: steps.length };
+    var p = { mode: "unterricht", title: title, total: steps.length, kind: s.kind, titel: s.titel, html: s.html, img: s.img, rows: s.rows, person: s.person, sit: s.sit, q: s.q, opts: s.opts, multi: !!s.multi, colors: s.colors, items: s.items, unit: s.unit, min: s.min, max: s.max, hint: s.hint };
+    if (phase === "reveal" && !s.survey) p.rev = { ok: s.ok, exp: s.exp, ans: s.ans, order: s.order, lines: s.lineExp };
+    if (phase === "reveal" && s.survey && s.peer !== 1) p.rev = { exp: s.exp };
+    return JSON.parse(JSON.stringify(p));
+  }
+
+  /* ---------- Sitzung: Cloud oder Demo ---------- */
+  function Session(title, total) {
+    var self = { id: null, code: null, demo: DEMO(), votes: {} };
+    self.start = async function () {
+      if (self.demo) { self.id = "demo"; self.code = Math.random().toString(36).slice(2, 8).toUpperCase().replace(/[^A-Z0-9]/g, "X"); return self; }
+      var r = await window.FP_API.liveCreate({ title: title, step: -1, phase: "lobby", pub: { mode: "unterricht", title: title, total: total } });
+      self.id = r.id; self.code = r.code; return self;
+    };
+    self.update = async function (patch) { if (!self.demo) await window.FP_API.liveUpdate(self.id, patch); };
+    self.read = async function (step) {
+      if (self.demo) return self.votes[step] || [];
+      var c = await window.FP_SB();
+      var r = await c.from("live_votes").select("voter, choice, txt").eq("session_id", self.id).eq("step", step);
+      if (r.error) throw new Error(r.error.message);
+      return r.data || [];
+    };
+    self.end = async function () { if (!self.demo) await window.FP_API.liveUpdate(self.id, { phase: "end", ended_at: new Date().toISOString() }); };
+    self.simulate = function (step, s) {
+      var arr = self.votes[step] = self.votes[step] || [], n = arr.length, want = 18 + (step * 7) % 9;
+      if (n >= want) return;
+      var add = Math.min(want - n, 2 + Math.floor(Math.random() * 4));
+      for (var k = 0; k < add; k++) {
+        var v = { voter: "d" + step + "_" + (n + k), choice: [0], txt: null }, r = Math.random();
+        if (s.kind === "choice" || s.kind === "scale") {
+          var no = s.opts.length, good = s.ok && s.ok.length ? s.ok : null;
+          if (s.peer === 2 && good) v.choice = [r < 0.78 ? good[0] : Math.floor(Math.random() * no)];
+          else if (good && !s.survey) v.choice = s.multi ? good.filter(function () { return Math.random() < 0.8; }).concat(Math.random() < 0.3 ? [Math.floor(Math.random() * no)] : []).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort() : [r < (s.peer === 1 ? 0.45 : 0.62) ? good[0] : Math.floor(Math.random() * no)];
+          else v.choice = [Math.min(no - 1, Math.floor(Math.pow(Math.random(), 1.4) * no))];
+          if (!v.choice.length) v.choice = [0];
+        } else if (s.kind === "lines") {
+          v.choice = s.ok.filter(function () { return Math.random() < 0.7; }).concat(Math.random() < 0.35 ? [Math.floor(Math.random() * s.opts.length)] : []).filter(function (x, i, a) { return a.indexOf(x) === i; }).sort();
+          if (!v.choice.length) v.choice = [s.ok[0] || 0];
+        } else if (s.kind === "order") {
+          v.choice = r < 0.45 ? s.order.slice() : seeded(s.items.length, Math.floor(Math.random() * 999));
+        } else if (s.kind === "estimate") {
+          var a = Number(s.ans) || 10; v.txt = String(Math.round((a + (Math.random() + Math.random() + Math.random() - 1.5) * a * 0.45) * 10) / 10);
+        } else if (s.kind === "word") {
+          var pool = s.demo && s.demo.length ? s.demo : ["Zuwendung", "Sicherheit", "Beobachtung", "Kommunikation", "Hygiene", "Empathie", "Teamarbeit", "Verantwortung"];
+          v.txt = [pool[Math.floor(Math.pow(Math.random(), 1.7) * pool.length)], Math.random() < 0.5 ? pool[Math.floor(Math.random() * pool.length)] : null].filter(Boolean).join(", ");
+        }
+        arr.push(v);
+      }
+    };
+    return self;
+  }
+
+  /* ---------- Auswertung ---------- */
+  function tally(s, votes) {
+    var n = votes.length, res = { n: n };
+    if (s.kind === "choice" || s.kind === "scale" || s.kind === "lines") {
+      res.c = (s.opts || []).map(function (_, i) { return votes.filter(function (v) { return (v.choice || []).indexOf(i) >= 0; }).length; });
+      if (s.ok && s.ok.length && !s.survey && s.kind !== "lines") res.right = votes.filter(function (v) { var c = (v.choice || []).slice().sort().join(","); return c === s.ok.slice().sort().join(","); }).length;
+    } else if (s.kind === "order") {
+      res.full = votes.filter(function (v) { return (v.choice || []).join(",") === s.order.join(","); }).length;
+      res.pos = s.order.map(function (want, p) { return votes.filter(function (v) { return (v.choice || [])[p] === want; }).length; });
+    } else if (s.kind === "estimate") {
+      var nums = votes.map(function (v) { return Number(String(v.txt || "").replace(",", ".")); }).filter(function (x) { return isFinite(x); }).sort(function (a, b) { return a - b; });
+      res.nums = nums;
+      res.median = nums.length ? nums[Math.floor(nums.length / 2)] : null;
+      var lo = s.min != null && isFinite(s.min) ? s.min : Math.min.apply(null, nums.concat([Number(s.ans) * 0.5])), hi = s.max != null && isFinite(s.max) ? s.max : Math.max.apply(null, nums.concat([Number(s.ans) * 1.5]));
+      if (!(hi > lo)) hi = lo + 1;
+      var bins = [0, 0, 0, 0, 0, 0, 0, 0];
+      nums.forEach(function (x) { var k = Math.max(0, Math.min(7, Math.floor((x - lo) / (hi - lo) * 8))); bins[k]++; });
+      res.bins = bins; res.lo = lo; res.hi = hi;
+    } else if (s.kind === "word") {
+      var f = {};
+      votes.forEach(function (v) { String(v.txt || "").split(/[,;\n]+/).map(function (w) { return w.trim().replace(/\s+/g, " "); }).filter(function (w) { return w.length > 1 && w.length < 40; }).forEach(function (w) { var k = w.toLowerCase(); f[k] = f[k] || { w: w.charAt(0).toUpperCase() + w.slice(1), n: 0 }; f[k].n++; }); });
+      res.words = Object.keys(f).map(function (k) { return f[k]; }).sort(function (a, b) { return b.n - a.n; }).slice(0, 40);
+    }
+    return res;
+  }
+  function Bars(p) {
+    var s = p.s, t = p.t, max = Math.max(1, t.n), showOk = p.rev && s.ok && !s.survey;
+    return h("div", { className: "fxp-bars" + (s.kind === "lines" ? " lines" : "") }, (s.opts || []).map(function (o, i) {
+      var c = t.c ? t.c[i] : 0, pct = Math.round(c / max * 100), good = showOk && s.ok.indexOf(i) >= 0;
+      var cmp = p.cmp && p.cmp.c ? Math.round(p.cmp.c[i] / Math.max(1, p.cmp.n) * 100) : null;
+      return h("div", { key: i, className: "fxp-bar" + (good ? " ok" : showOk ? " no" : ""), style: { "--bc": s.colors ? s.colors[i] : null } },
+        h("div", { className: "fxp-bl" }, s.kind !== "scale" && s.kind !== "lines" ? h("i", null, "ABCDEFGHIJ"[i]) : null, h("span", null, o), good ? h("em", null, "richtig") : null),
+        h("div", { className: "fxp-bt" }, cmp != null && h("u", { style: { width: cmp + "%" } }), h("b", { style: { width: pct + "%" } })),
+        h("div", { className: "fxp-bn" }, pct + " %", cmp != null ? h("small", null, "vorher " + cmp + " %") : null));
+    }));
+  }
+
+  /* ---------- Präsentation (Beamer) ---------- */
+  function Presenter(p) {
+    var steps = p.steps, title = p.title;
+    var sx = useState(null), ses = sx[0], setSes = sx[1];
+    var si = useState(-1), idx = si[0], setIdx = si[1];
+    var sp = useState("lobby"), phase = sp[0], setPhase = sp[1];
+    var sv = useState([]), votes = sv[0], setVotes = sv[1];
+    var spk = useState(true), peek = spk[0], setPeek = spk[1];
+    var se = useState(null), err = se[0], setErr = se[1];
+    var sh = useState({}), hist = sh[0], setHist = sh[1];
+    var sq = useState(true), bigQr = sq[0], setBigQr = sq[1];
+    useEffect(function () { var S = Session(title, steps.length); S.start().then(setSes).catch(function (e) { setErr(e.message); }); }, []);
+    var s = idx >= 0 ? steps[idx] : null;
+    useEffect(function () {
+      if (!ses || idx < 0 || !s || s.kind === "info") { setVotes([]); return; }
+      var alive = true;
+      var f = async function () {
+        try { if (ses.demo && phase === "question") ses.simulate(idx, s); var v = await ses.read(idx); if (alive) setVotes(v.slice()); } catch (e) { if (alive) setErr(e.message); }
+      };
+      f(); var t = setInterval(f, 1300);
+      return function () { alive = false; clearInterval(t); };
+    }, [ses, idx, phase]);
+    async function go(i, ph) {
+      if (!ses) return;
+      if (s && idx >= 0) setHist(function (x) { var y = Object.assign({}, x); y[idx] = tally(s, votes); return y; });
+      setIdx(i); setPhase(ph); setVotes([]);
+      try { await ses.update({ step: i, phase: ph, pub: pubOf(title, steps, i, ph) }); } catch (e) { setErr(e.message); }
+    }
+    async function reveal() {
+      setPhase("reveal");
+      setHist(function (x) { var y = Object.assign({}, x); y[idx] = tally(s, votes); return y; });
+      try { await ses.update({ phase: "reveal", pub: pubOf(title, steps, idx, "reveal") }); } catch (e) { setErr(e.message); }
+    }
+    async function end() {
+      try { if (ses) await ses.end(); } catch (e) {}
+      p.close();
+    }
+    function next() { if (idx < steps.length - 1) go(idx + 1, "question"); else if (phase !== "end") { setPhase("end"); ses && ses.update({ phase: "end", pub: { mode: "unterricht", title: title, total: steps.length, summary: "Danke fürs Mitmachen! Die Stunde ist beendet." } }); } }
+    function back() { if (idx > 0) go(idx - 1, "question"); }
+    var canReveal = s && s.kind !== "info" && phase === "question";
+    useEffect(function () {
+      var k = function (e) {
+        if (/input|textarea|select/i.test((e.target || {}).tagName || "")) return;
+        if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); if (idx < 0) go(0, "question"); else if (canReveal) reveal(); else next(); }
+        else if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); back(); }
+        else if (e.key === " ") { e.preventDefault(); if (canReveal) reveal(); else if (idx < 0) go(0, "question"); else next(); }
+        else if (e.key === "Escape") { e.preventDefault(); end(); }
+      };
+      document.addEventListener("keydown", k);
+      return function () { document.removeEventListener("keydown", k); };
+    });
+    var url = (window.FP_APPURL || "") + "?live=" + (ses ? ses.code : "");
+    var qr = ses && window.FP_QRSVG ? window.FP_QRSVG(url) : "";
+    var t = s && s.kind !== "info" ? tally(s, votes) : null, showRes = s && s.kind !== "info" && (phase === "reveal" || peek);
+    var main;
+    if (!ses) main = h("div", { className: "fxp-center" }, h("div", { className: "fxp-spin" }), h("p", null, err || "Live-Sitzung wird gestartet …"));
+    else if (idx < 0) main = h("div", { className: "fxp-lobby" }, h("div", { className: "fxp-qrbig", dangerouslySetInnerHTML: { __html: qr } }), h("div", null, h("span", { className: "fxp-eyebrow" }, "Jetzt mitmachen"), h("h1", null, title), h("p", null, "QR-Code mit dem Handy scannen oder in der Fallpfad-App den Code eingeben."), h("div", { className: "fxp-code" }, ses.code), h("p", { className: "fxp-small" }, steps.length + " Schritte · Ohne Anmeldung · Anonym"), h("button", { type: "button", className: "fxp-btn primary", onClick: function () { go(0, "question"); } }, h(Ic, { n: "play" }), "Start")));
+    else if (phase === "end") main = h("div", { className: "fxp-center" }, h("h1", null, "Geschafft!"), h("p", null, "Die Stunde ist beendet. Danke fürs Mitmachen."), h("button", { type: "button", className: "fxp-btn primary", onClick: end }, "Schließen"));
+    else {
+      var col = TYPES[s.type] ? TYPES[s.type].c : "#0062FF";
+      var left = h("div", { className: "fxp-content" },
+        h("span", { className: "fxp-eyebrow", style: { color: col } }, s.titel || (TYPES[s.type] || {}).t || ""),
+        s.person && h("div", { className: "fxp-person" }, h("b", null, s.person.name), s.person.info && h("span", null, s.person.info)),
+        s.kind === "info" && s.speaker && window.FP_CHARS && window.FP_CHARS[s.speaker] ? h("div", { className: "fxp-av", dangerouslySetInnerHTML: { __html: window.FP_CHARS[s.speaker].svg } }) : null,
+        s.html && h("div", { className: "fxp-rich", dangerouslySetInnerHTML: { __html: /<(p|ul|ol|b|em|br|table)\b/i.test(s.html) ? s.html : s.html.split(/\n/).map(function (l) { var m = /^\s*[•\-\*]\s+(.*)$/.exec(l); return m ? "<li>" + esc(m[1]) + "</li>" : l.trim() ? "<p>" + esc(l) + "</p>" : ""; }).join("").replace(/(<li>.*?<\/li>)+/g, function (x) { return "<ul>" + x + "</ul>"; }) } }),
+        s.img && h("img", { className: "fxp-img", src: s.img, alt: "" }),
+        s.sit && h("div", { className: "fxp-sit" }, s.sit),
+        s.rows && s.rows.length > 0 && h("table", { className: "fxp-rows" }, h("tbody", null, s.rows.map(function (r, i) { return h("tr", { key: i }, h("td", null, r[0]), h("td", null, h("b", null, r[1]))); }))),
+        s.q && h("h2", { className: "fxp-q" }, s.q),
+        s.kind === "choice" || s.kind === "scale" || s.kind === "lines" ? (showRes ? h(Bars, { s: s, t: t, rev: phase === "reveal", cmp: s.peer === 2 && hist[s.ref] ? hist[s.ref] : null }) : h("div", { className: "fxp-opts" + (s.kind === "lines" ? " lines" : "") }, s.opts.map(function (o, i) { return h("div", { key: i, className: "fxp-opt", style: { "--bc": s.colors ? s.colors[i] : null } }, s.kind === "choice" ? h("i", null, "ABCDEFGHIJ"[i]) : null, h("span", null, o)); }))) : null,
+        s.kind === "order" && (showRes ? h("div", { className: "fxp-order" }, h("p", { className: "fxp-big" }, h("b", null, Math.round(t.full / Math.max(1, t.n) * 100) + " %"), " haben alles richtig"), h("ol", null, s.order.map(function (k, pIdx) { return h("li", { key: k }, h("span", null, phase === "reveal" ? s.items[k] : "Position " + (pIdx + 1)), h("em", null, Math.round(t.pos[pIdx] / Math.max(1, t.n) * 100) + " % richtig")); }))) : h("div", { className: "fxp-opts" }, s.items.map(function (o, i) { return h("div", { key: i, className: "fxp-opt" }, h("span", null, o)); }))),
+        s.kind === "estimate" && showRes && h("div", { className: "fxp-est" }, h("div", { className: "fxp-hist" }, t.bins.map(function (b, i) { return h("div", { key: i, style: { height: Math.round(b / Math.max(1, Math.max.apply(null, t.bins)) * 100) + "%" } }, b ? h("span", null, b) : null); })), h("div", { className: "fxp-axis" }, h("span", null, Math.round(t.lo * 10) / 10), h("span", null, Math.round(t.hi * 10) / 10)), h("p", { className: "fxp-big" }, "Median der Klasse: ", h("b", null, t.median == null ? "–" : String(t.median).replace(".", ",")), phase === "reveal" ? h(R.Fragment, null, " · richtig: ", h("b", { className: "ok" }, String(s.ans).replace(".", ",") + (s.unit ? " " + s.unit : ""))) : null)),
+        s.kind === "word" && showRes && h("div", { className: "fxp-cloud" }, t.words.length ? t.words.map(function (w, i) { var mx = t.words[0].n; return h("span", { key: w.w, style: { fontSize: (16 + Math.round(w.n / mx * 46)) + "px", color: ["#0062FF", "#7C3AED", "#0D9488", "#DB2777", "#EA580C", "#4F46E5", "#059669"][i % 7] } }, w.w); }) : h("p", { className: "fxp-small" }, "Noch keine Stichworte.")),
+        phase === "reveal" && s.exp && h("div", { className: "fxp-exp" }, h("b", null, "Erklärung"), h("p", null, s.exp)),
+        phase === "reveal" && s.kind === "lines" && s.lineExp && h("div", { className: "fxp-exp" }, s.lineExp.map(function (e, i) { return e ? h("p", { key: i }, h("b", null, "„" + s.opts[i].slice(0, 70) + "“ "), e) : null; })),
+        s.peer === 1 && phase === "reveal" && h("div", { className: "fxp-exp peer" }, h("b", null, "Jetzt diskutieren"), h("p", null, "Sucht euch jemanden mit einer anderen Antwort und überzeugt euch gegenseitig. Zwei Minuten. Danach stimmen alle noch einmal ab.")));
+      main = left;
+    }
+    var counter = s && s.kind !== "info" ? h("div", { className: "fxp-count" }, h("b", null, votes.length), h("span", null, votes.length === 1 ? "Antwort" : "Antworten")) : null;
+    return RD.createPortal(h("div", { className: "fxp", role: "dialog", "aria-label": "Live-Präsentation" },
+      h("header", { className: "fxp-top" },
+        h("div", { className: "fxp-brand" }, h("span", { className: "fxp-dot" }), h("b", null, "Fallpfad Live"), h("span", null, title)),
+        idx >= 0 && phase !== "end" && h("div", { className: "fxp-prog" }, h("span", null, "Schritt " + (idx + 1) + " von " + steps.length), h("div", null, h("i", { style: { width: Math.round((idx + 1) / steps.length * 100) + "%" } }))),
+        ses && idx >= 0 && h("button", { type: "button", className: "fxp-join", onClick: function () { setBigQr(!bigQr); }, title: "QR-Code ein- oder ausblenden" }, bigQr ? h("span", { className: "fxp-qrs", dangerouslySetInnerHTML: { __html: qr } }) : null, h("span", null, h("small", null, "Code"), h("b", null, ses.code))),
+        counter,
+        h("button", { type: "button", className: "fxp-x", onClick: end, "aria-label": "Beenden" }, h(Ic, { n: "x" }))),
+      err && h("div", { className: "fxp-err" }, err),
+      h("main", { className: "fxp-main" }, main),
+      ses && idx >= 0 && phase !== "end" && h("footer", { className: "fxp-bot" },
+        h("button", { type: "button", className: "fxp-btn", onClick: back, disabled: idx <= 0 }, h(Ic, { n: "left" }), "Zurück"),
+        s && s.kind !== "info" && phase === "question" && h("label", { className: "fxp-tog" }, h("input", { type: "checkbox", checked: peek, onChange: function (e) { setPeek(e.target.checked); } }), "Ergebnis live mitzeigen"),
+        h("div", { className: "fxp-sp" }),
+        ses && ses.demo && s && s.kind !== "info" && h("span", { className: "fxp-small" }, "Demo: Stimmen werden simuliert"),
+        canReveal && h("button", { type: "button", className: "fxp-btn accent", onClick: reveal }, s.survey ? "Ergebnis zeigen" : "Auflösen"),
+        h("button", { type: "button", className: "fxp-btn primary", onClick: next }, idx < steps.length - 1 ? "Weiter" : "Beenden", h(Ic, { n: "right" })))
+    ), document.body);
+  }
+
+  /* ---------- Baukasten (Editor) ---------- */
+  function linesOf(x) { return String(x || "").split("\n").map(function (l) { return l.trim(); }).filter(Boolean); }
+  function toForm(b) {
+    var f = Object.assign({}, b);
+    if (b.opts) f.opts = optsOf(b).map(function (o) { return (o.ok ? "* " : "") + o.t; }).join("\n");
+    if (b.befunde) f.befunde = b.befunde.map(function (r) { return r[0] + ": " + r[1]; }).join("\n");
+    if (b.items && b.type === "tf") f.items = b.items.map(function (i) { return (i.ok ? "R: " : "F: ") + i.t + (i.e ? " | " + i.e : ""); }).join("\n");
+    if (b.items && b.type === "reihe") f.items = b.items.join("\n");
+    if (b.lines) f.lines = b.lines.map(function (l) { return (l.err ? "! " : "") + l.t + (l.e ? " | " + l.e : ""); }).join("\n");
+    return f;
+  }
+  function fromForm(f) {
+    var b = Object.assign({}, f);
+    if (typeof f.opts === "string") b.opts = linesOf(f.opts).map(function (l) { return { t: l.replace(/^\*\s*/, ""), ok: /^\*/.test(l) }; });
+    if (typeof f.befunde === "string") b.befunde = linesOf(f.befunde).map(function (l) { var i = l.indexOf(":"); return i > 0 ? [l.slice(0, i).trim(), l.slice(i + 1).trim()] : [l, ""]; });
+    if (f.type === "tf" && typeof f.items === "string") b.items = linesOf(f.items).map(function (l) { var ok = !/^F\s*:/i.test(l), t = l.replace(/^[RF]\s*:\s*/i, ""), parts = t.split("|"); return { t: parts[0].trim(), ok: ok, e: (parts[1] || "").trim() }; });
+    if (f.type === "reihe" && typeof f.items === "string") b.items = linesOf(f.items).slice(0, 8);
+    if (typeof f.lines === "string") b.lines = linesOf(f.lines).slice(0, 10).map(function (l) { var err = /^!/.test(l), t = l.replace(/^!\s*/, ""), parts = t.split("|"); return { t: parts[0].trim(), err: err, e: (parts[1] || "").trim() }; });
+    return b;
+  }
+  var FIELDS = {
+    folie: [["titel", "Überschrift"], ["text", "Text (Zeilen mit • werden zur Liste)", "area"], ["bild", "Bild (optional)", "img"]],
+    fall: [["titel", "Überschrift, z. B. Frühdienst 7:30 Uhr"], ["person", "Person (erfunden), z. B. Frau Weber, 81 Jahre"], ["info", "Kurzinfo, z. B. Station 4B, nach Sturz"], ["sit", "Situation", "area"], ["befunde", "Befunde, je Zeile „Merkmal: Wert“ (optional)", "area"], ["q", "Frage an die Klasse"], ["opts", "Antworten, je Zeile eine. Richtige mit * davor", "area"], ["multi", "Mehrere Antworten möglich", "check"], ["exp", "Erklärung nach dem Auflösen", "area"]],
+    frage: [["q", "Frage"], ["opts", "Antworten, je Zeile eine. Richtige mit * davor", "area"], ["multi", "Mehrere Antworten möglich", "check"], ["exp", "Erklärung nach dem Auflösen", "area"]],
+    peer: [["q", "Kniffelige Frage (gut, wenn etwa die Hälfte falsch liegt)"], ["opts", "Antworten, je Zeile eine. Die richtige mit * davor", "area"], ["exp", "Erklärung nach Runde 2", "area"]],
+    tf: [["titel", "Überschrift (optional)"], ["items", "Aussagen, je Zeile „R: …“ (richtig) oder „F: …“ (falsch), Erklärung nach |", "area"]],
+    schaetz: [["q", "Frage"], ["ans", "Richtige Zahl", "num"], ["unit", "Einheit, z. B. ml oder %"], ["min", "Kleinster sinnvoller Wert (optional)", "num"], ["max", "Größter sinnvoller Wert (optional)", "num"], ["exp", "Erklärung", "area"]],
+    wort: [["q", "Frage, z. B. Was fällt euch zu Schmerz ein?"], ["hint", "Hinweis im Eingabefeld (optional)"]],
+    ampel: [["q", "Frage (optional), z. B. Wie sicher fühlst du dich beim Blutdruckmessen?"]],
+    skala: [["q", "These, z. B. Eine Lüge aus Fürsorge ist in Ordnung."], ["links", "Linkes Ende (optional)"], ["rechts", "Rechtes Ende (optional)"]],
+    reihe: [["q", "Aufgabe, z. B. Bringt die Schritte der Händedesinfektion in die richtige Reihenfolge."], ["items", "Schritte in der RICHTIGEN Reihenfolge, je Zeile einer (höchstens 8)", "area"], ["exp", "Erklärung", "area"]],
+    fehler: [["titel", "Überschrift, z. B. Übergabe der Frühschicht"], ["lines", "Sätze, je Zeile einer. Fehlerhafte mit ! davor, Erklärung nach |", "area"], ["exp", "Gesamterklärung (optional)", "area"]]
+  };
+  function shrinkImg(file, cb) {
+    var u = URL.createObjectURL(file), im = new Image();
+    im.onload = function () { var f = Math.min(1, 1200 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * f); c.height = Math.round(im.height * f); var x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); URL.revokeObjectURL(u); cb(c.toDataURL("image/jpeg", 0.82)); };
+    im.src = u;
+  }
+  function BlockForm(p) {
+    var b = p.b, T = TYPES[b.type];
+    return h("div", { className: "fxb-blk", style: { "--c": T.c } },
+      h("div", { className: "fxb-bh" }, h("span", { className: "fxb-ic" }, h(Ic, { n: b.type, s: 17 })), h("b", null, (p.i + 1) + ". " + T.t), h("small", null, T.d),
+        h("span", { className: "fxb-tools" }, h("button", { type: "button", className: "iconbtn", "aria-label": "Nach oben", disabled: p.i === 0, onClick: function () { p.move(-1); } }, h(Ic, { n: "up", s: 16 })), h("button", { type: "button", className: "iconbtn", "aria-label": "Nach unten", disabled: p.last, onClick: function () { p.move(1); } }, h(Ic, { n: "down", s: 16 })), h("button", { type: "button", className: "iconbtn", "aria-label": "Löschen", onClick: p.del }, h(Ic, { n: "trash", s: 16 })))),
+      h("div", { className: "fxb-fields" }, FIELDS[b.type].map(function (f) {
+        var k = f[0], v = b[k] == null ? "" : b[k], id = "fxb-" + b._id + "-" + k;
+        if (f[2] === "check") return h("label", { key: k, className: "fxb-chk" }, h("input", { type: "checkbox", checked: !!v, onChange: function (e) { p.set(k, e.target.checked); } }), f[1]);
+        if (f[2] === "img") return h("div", { key: k, className: "field" }, h("label", null, f[1]), v ? h("div", { className: "fxb-img" }, h("img", { src: v, alt: "" }), h("button", { type: "button", className: "btn ghost sm", onClick: function () { p.set(k, ""); } }, "Entfernen")) : h("input", { type: "file", accept: "image/*", onChange: function (e) { var fl = e.target.files[0]; if (fl) shrinkImg(fl, function (d) { p.set(k, d); }); } }));
+        return h("div", { key: k, className: "field" + (f[2] === "area" ? " wide" : "") }, h("label", { htmlFor: id }, f[1]), f[2] === "area" ? h("textarea", { id: id, className: "input", rows: k === "sit" || k === "text" ? 4 : 3, value: v, onChange: function (e) { p.set(k, e.target.value); } }) : h("input", { id: id, className: "input", type: f[2] === "num" ? "number" : "text", step: "any", value: v, onChange: function (e) { p.set(k, e.target.value); } }));
+      })));
+  }
+  function Builder(p) {
+    var s0 = p.lesson ? JSON.parse(JSON.stringify(p.lesson)) : { t: "", kurz: "", lvl: "Jahr 1", ber: "", blocks: [] };
+    var sl = useState(function () { return Object.assign({}, s0, { blocks: (s0.blocks || []).map(function (b) { return Object.assign(toForm(b), { _id: rid() }); }) }); }), L = sl[0], setL = sl[1];
+    var sb = useState(false), busy = sb[0], setBusy = sb[1];
+    var se = useState(null), err = se[0], setErr = se[1];
+    var setB = function (i, k, v) { setL(function (x) { var y = Object.assign({}, x, { blocks: x.blocks.slice() }); y.blocks[i] = Object.assign({}, y.blocks[i]); y.blocks[i][k] = v; return y; }); };
+    var add = function (t) { setL(function (x) { return Object.assign({}, x, { blocks: x.blocks.concat([{ type: t, _id: rid() }]) }); }); setTimeout(function () { var el = document.querySelector(".fxb-list > :last-child"); if (el) el.scrollIntoView({ behavior: "smooth", block: "center" }); }, 60); };
+    var mv = function (i, d) { setL(function (x) { var a = x.blocks.slice(), j = i + d; if (j < 0 || j >= a.length) return x; var t = a[i]; a[i] = a[j]; a[j] = t; return Object.assign({}, x, { blocks: a }); }); };
+    var del = function (i) { setL(function (x) { return Object.assign({}, x, { blocks: x.blocks.filter(function (_, j) { return j !== i; }) }); }); };
+    function out() { return { kind: "stunde", t: L.t.trim(), kurz: L.kurz, lvl: L.lvl, ber: L.ber, blocks: L.blocks.map(function (b) { var c = fromForm(b); delete c._id; return c; }) }; }
+    function check(d) {
+      if (!d.t) return "Gib der Live-Stunde einen Titel.";
+      if (!d.blocks.length) return "Füge mindestens einen Baustein hinzu.";
+      for (var i = 0; i < d.blocks.length; i++) {
+        var b = d.blocks[i], n = (i + 1) + ". " + TYPES[b.type].t + ": ";
+        if ((b.type === "frage" || b.type === "fall" || b.type === "peer") && (!b.q || (b.opts || []).length < 2)) return n + "Frage und mindestens zwei Antworten fehlen.";
+        if ((b.type === "frage" || b.type === "fall" || b.type === "peer") && !(b.opts || []).some(function (o) { return o.ok; })) return n + "Markiere die richtige Antwort mit * am Zeilenanfang.";
+        if (b.type === "schaetz" && (!b.q || !isFinite(Number(b.ans)) || b.ans === "")) return n + "Frage und richtige Zahl fehlen.";
+        if (b.type === "reihe" && (b.items || []).length < 3) return n + "Mindestens drei Schritte.";
+        if (b.type === "tf" && !(b.items || []).length) return n + "Mindestens eine Aussage.";
+        if (b.type === "fehler" && !(b.lines || []).some(function (l) { return l.err; })) return n + "Markiere fehlerhafte Sätze mit ! am Zeilenanfang.";
+        if ((b.type === "wort" || b.type === "skala") && !b.q) return n + "Die Frage fehlt.";
+      }
+      return null;
+    }
+    async function save(andStart) {
+      var d = out(), e = check(d);
+      if (e) { setErr(e); return; }
+      setBusy(true); setErr(null);
+      try {
+        var row = await window.FP_API.liveCaseSave(Object.assign(p.row && p.row.id ? { id: p.row.id } : {}, { title: d.t.slice(0, 120), data: d }));
+        p.saved(row);
+        if (andStart) p.start(d);
+      } catch (x) { setErr(x.message); }
+      setBusy(false);
+    }
+    return RD.createPortal(h("div", { className: "fxb-bg" }, h("div", { className: "fxb", role: "dialog", "aria-label": "Live-Stunde bauen" },
+      h("header", { className: "fxb-head" }, h("div", null, h("span", { className: "fxp-eyebrow" }, "Baukasten"), h("h2", null, p.row ? "Live-Stunde bearbeiten" : "Neue Live-Stunde")), h("button", { type: "button", className: "iconbtn", "aria-label": "Schließen", onClick: p.close }, h(Ic, { n: "x" }))),
+      h("div", { className: "fxb-body" },
+        h("div", { className: "fxb-meta" },
+          h("div", { className: "field" }, h("label", { htmlFor: "fxb-t" }, "Titel"), h("input", { id: "fxb-t", className: "input", value: L.t, onChange: function (e) { setL(Object.assign({}, L, { t: e.target.value })); }, placeholder: "z. B. Dekubitus: erkennen und vorbeugen" })),
+          h("div", { className: "field" }, h("label", { htmlFor: "fxb-k" }, "Kurzbeschreibung"), h("input", { id: "fxb-k", className: "input", value: L.kurz, onChange: function (e) { setL(Object.assign({}, L, { kurz: e.target.value })); } })),
+          h("div", { className: "field" }, h("label", { htmlFor: "fxb-l" }, "Ausbildungsjahr"), h("select", { id: "fxb-l", className: "input", value: L.lvl, onChange: function (e) { setL(Object.assign({}, L, { lvl: e.target.value })); } }, ["Jahr 1", "Jahr 2", "Jahr 3"].map(function (x) { return h("option", { key: x }, x); })))),
+        L.blocks.length === 0 && h("div", { className: "fxb-empty" }, h("b", null, "Noch keine Bausteine"), h("p", null, "Wähle unten einen Baustein. Ein guter Ablauf: Wortwolke zum Einstieg, eine Fallsituation, eine Peer-Instruction-Frage, ein Richtig-oder-Falsch-Blitz und zum Schluss der Ampel-Check.")),
+        h("div", { className: "fxb-list" }, L.blocks.map(function (b, i) { return h(BlockForm, { key: b._id, b: b, i: i, last: i === L.blocks.length - 1, set: function (k, v) { setB(i, k, v); }, move: function (d) { mv(i, d); }, del: function () { del(i); } }); })),
+        h("div", { className: "fxb-add" }, h("b", null, "Baustein hinzufügen"), h("div", { className: "fxb-types" }, ORDER.map(function (t) { return h("button", { key: t, type: "button", style: { "--c": TYPES[t].c }, onClick: function () { add(t); }, title: TYPES[t].d }, h("span", { className: "fxb-ic" }, h(Ic, { n: t, s: 17 })), h("span", null, TYPES[t].t)); })))),
+      err && h("div", { className: "notice bad", style: { margin: "0 22px" } }, err),
+      h("footer", { className: "fxb-foot" }, h("span", { className: "muted" }, pl(L.blocks.length, "Baustein", "Bausteine") + " · " + pl(stepsOf(out()).length, "Schritt", "Schritte")), h("div", { className: "fxp-sp" }), h("button", { type: "button", className: "btn ghost", onClick: p.close }, "Abbrechen"), h("button", { type: "button", className: "btn ghost", disabled: busy, onClick: function () { var d = out(), e = check(d); if (e) setErr(e); else p.start(d, true); } }, h(Ic, { n: "eye", s: 18 }), "Vorschau"), h("button", { type: "button", className: "btn", disabled: busy, onClick: function () { save(false); } }, "Speichern"), h("button", { type: "button", className: "btn fx-aibtn", disabled: busy, onClick: function () { save(true); } }, h(Ic, { n: "play", s: 18 }), "Speichern und starten"))
+    )), document.body);
+  }
+
+  /* ---------- Modul live ---------- */
+  function ModulePicker(p) {
+    var mods = (window.FP_MODS || []).slice().sort(function (a, b) { return (a.year - b.year) || (a.order - b.order); });
+    var sm = useState(null), mid = sm[0], setMid = sm[1];
+    var sc = useState(null), chs = sc[0], setChs = sc[1];
+    var sq = useState(""), q = sq[0], setQ = sq[1];
+    var m = mods.find(function (x) { return x.id === mid; });
+    var list = mods.filter(function (x) { return !q || (x.title + " " + (x.subtitle || "")).toLowerCase().indexOf(q.toLowerCase()) >= 0; });
+    var steps = m ? stepsOfModule(m, chs) : [];
+    return RD.createPortal(h("div", { className: "fxb-bg" }, h("div", { className: "fxb", role: "dialog", "aria-label": "Modul live zeigen" },
+      h("header", { className: "fxb-head" }, h("div", null, h("span", { className: "fxp-eyebrow" }, "Modul live an der Tafel"), h("h2", null, m ? m.title.replace(/^Fallmodul \d+ · /, "") : "Welches Modul möchtest du zeigen?")), h("button", { type: "button", className: "iconbtn", "aria-label": "Schließen", onClick: p.close }, h(Ic, { n: "x" }))),
+      h("div", { className: "fxb-body" }, !m ? h(R.Fragment, null,
+        h("p", { className: "muted", style: { marginTop: 0 } }, "Du zeigst das Modul Schritt für Schritt vorne. Die Lernenden scannen den QR-Code und sehen auf dem Handy denselben Schritt. Fragen, Quiz und Übungen beantworten sie dort, weiter schaltest nur du."),
+        h("input", { className: "input", placeholder: "Modul suchen …", value: q, onChange: function (e) { setQ(e.target.value); }, style: { maxWidth: "none", marginBottom: 12 } }),
+        h("div", { className: "fxm-grid" }, list.map(function (x) { return h("button", { key: x.id, type: "button", className: "fxm-card", style: { "--c": ["", "#0062FF", "#7C3AED", "#0D9488"][x.year] || "#0062FF" }, onClick: function () { setMid(x.id); setChs(x.chapters.map(function (_, i) { return i; })); } }, h("small", null, "Jahr " + x.year), h("b", null, x.title.replace(/^Fallmodul \d+ · /, "")), h("span", null, x.chapters.length + " Stationen")); })))
+        : h(R.Fragment, null,
+          h("button", { type: "button", className: "skip", onClick: function () { setMid(null); } }, h(Ic, { n: "left", s: 16 }), " Anderes Modul"),
+          h("h3", null, "Stationen auswählen"),
+          h("div", { className: "fxm-chs" }, m.chapters.map(function (c, i) { var on = chs.indexOf(i) >= 0; return h("label", { key: i, className: "fxm-ch" + (on ? " on" : "") }, h("input", { type: "checkbox", checked: on, onChange: function () { setChs(on ? chs.filter(function (x) { return x !== i; }) : chs.concat([i]).sort(function (a, b) { return a - b; })); } }), h("span", null, h("b", null, (i + 1) + ". " + c.title), h("small", null, ((c.blocks || []).length === 1 ? "1 Baustein" : (c.blocks || []).length + " Bausteine")))); })),
+          h("p", { className: "muted" }, steps.length + " Schritte, davon " + steps.filter(function (s) { return s.kind !== "info"; }).length + " zum Mitmachen."))),
+      h("footer", { className: "fxb-foot" }, h("div", { className: "fxp-sp" }), h("button", { type: "button", className: "btn ghost", onClick: p.close }, "Abbrechen"), m && h("button", { type: "button", className: "btn fx-aibtn", disabled: !chs.length, onClick: function () { p.start(m.title.replace(/^Fallmodul \d+ · /, ""), steps); } }, h(Ic, { n: "play", s: 18 }), "Live starten"))
+    )), document.body);
+  }
+
+  /* ---------- Übersicht im Reiter Live ---------- */
+  function chips(L) {
+    var seen = {}, out = [];
+    (L.blocks || []).forEach(function (b) { if (!seen[b.type]) { seen[b.type] = 1; out.push(b.type); } });
+    return out;
+  }
+  function LessonCard(p) {
+    var L = p.L, col = p.col;
+    return h("div", { className: "card fxl-card", style: { "--c": col } },
+      h("div", { className: "row", style: { justifyContent: "space-between", gap: 8, flexWrap: "nowrap" } }, h("span", { className: "eyebrow" }, p.tag + " · " + (L.lvl || "")), p.badge && h("span", { className: "pill" }, p.badge)),
+      h("b", { className: "fxl-t" }, L.t), L.kurz && h("p", { className: "muted fxl-k" }, L.kurz),
+      h("div", { className: "fxl-chips" }, chips(L).map(function (t) { return h("span", { key: t, title: TYPES[t].t, style: { "--c": TYPES[t].c } }, h(Ic, { n: t, s: 14 }), TYPES[t].t); })),
+      h("div", { className: "fxl-meta" }, pl(stepsOf(L).length, "Schritt", "Schritte")),
+      h("div", { className: "row", style: { gap: 6, marginTop: "auto" } }, h("button", { type: "button", className: "btn sm", onClick: p.start }, h(Ic, { n: "play", s: 16 }), "Live starten"), h("button", { type: "button", className: "btn ghost sm", onClick: p.edit }, h(Ic, { n: p.own ? "edit" : "copy", s: 16 }), p.own ? "Bearbeiten" : "Als Kopie bearbeiten"), p.own && h("button", { type: "button", className: "iconbtn", "aria-label": "Löschen", onClick: p.del }, h(Ic, { n: "trash", s: 16 }))));
+  }
+  function Hub() {
+    var lib = window.FP_LIVE_LIB || { stunden: [], faelle: [] };
+    var so = useState([]), own = so[0], setOwn = so[1];
+    var sb = useState(null), build = sb[0], setBuild = sb[1];
+    var sm = useState(false), pick = sm[0], setPick = sm[1];
+    var sr = useState(null), run = sr[0], setRun = sr[1];
+    var se = useState(null), err = se[0], setErr = se[1];
+    var sf = useState("alle"), flt = sf[0], setFlt = sf[1];
+    var load = function () { window.FP_API && window.FP_API.liveCases().then(function (r) { setOwn((r || []).filter(function (x) { return x.data && x.data.kind === "stunde"; })); }).catch(function (e) { if (!/does not exist|Could not find|Tabelle/i.test(e.message)) setErr(e.message); }); };
+    useEffect(load, []);
+    var start = function (L) { setRun({ title: L.t, steps: stepsOf(L) }); };
+    var Y = function (L) { return flt === "alle" || L.lvl === flt; };
+    return h("div", { className: "fxl-hub" },
+      err && h("div", { className: "notice bad" }, err),
+      h("div", { className: "fxl-start" },
+        h("button", { type: "button", className: "fxl-big", style: { "--c": "#7C3AED" }, onClick: function () { setBuild({}); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "plus", s: 24 })), h("b", null, "Live-Stunde bauen"), h("small", null, "Aus 11 Bausteinen: Fallsituation, Peer Instruction, Wortwolke, Schätzfrage, Fehlerjagd und mehr")),
+        h("button", { type: "button", className: "fxl-big", style: { "--c": "#0062FF" }, onClick: function () { setPick(true); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "book", s: 24 })), h("b", null, "Modul live an der Tafel"), h("small", null, "Ein Fallmodul Schritt für Schritt zeigen. Die Klasse antwortet mit, weiter schaltest nur du.")),
+        h("button", { type: "button", className: "fxl-big", style: { "--c": "#E11D48" }, onClick: function () { if (window.FP_IMPORT) window.FP_IMPORT.open("live"); } }, h("span", { className: "fxl-bic" }, h(Ic, { n: "spark", s: 24 })), h("b", null, "Aus Folien erstellen"), h("small", null, "PowerPoint oder PDF hochladen, daraus wird ein Live-Fall."))),
+      h("div", { className: "sec" }, h("h2", null, "Live-Stunden"), h("div", { className: "fxl-flt" }, ["alle", "Jahr 1", "Jahr 2", "Jahr 3"].map(function (x) { return h("button", { key: x, type: "button", className: "chip" + (flt === x ? " on blue" : ""), onClick: function () { setFlt(x); } }, x === "alle" ? "Alle" : x); }))),
+      h("p", { className: "muted", style: { marginTop: -6 } }, "Fertige Unterrichtsstunden mit wechselnden Methoden, sofort startklar. Ohne Vitalzeichen-Monitor."),
+      h("div", { className: "agrid fxl-grid" },
+        own.filter(function (r) { return Y(r.data); }).map(function (r) { return h(LessonCard, { key: r.id, L: r.data, tag: "Eigene", col: "#7C3AED", own: true, start: function () { start(r.data); }, edit: function () { setBuild({ row: r, lesson: r.data }); }, del: function () { if (confirm("„" + r.data.t + "“ löschen?")) window.FP_API.liveCaseDelete(r.id).then(load).catch(function (e) { setErr(e.message); }); } }); }),
+        (lib.stunden || []).filter(Y).map(function (L, i) { return h(LessonCard, { key: "s" + i, L: L, tag: "Fallpfad", col: ["#0062FF", "#7C3AED", "#0D9488", "#DB2777", "#EA580C", "#4F46E5", "#059669", "#D97706", "#0891B2", "#E11D48"][i % 10], start: function () { start(L); }, edit: function () { setBuild({ lesson: Object.assign({}, L, { t: L.t + " (eigene Fassung)" }) }); } }); })),
+      h("div", { className: "sec" }, h("h2", null, "Fallbeispiele für die Klasse")),
+      h("p", { className: "muted", style: { marginTop: -6 } }, "Ein Fall entwickelt sich Schritt für Schritt, die Klasse entscheidet gemeinsam. Ohne Vitalzeichen-Monitor, ideal zum Besprechen an der Tafel."),
+      h("div", { className: "agrid fxl-grid" }, (lib.faelle || []).filter(Y).map(function (L, i) { return h(LessonCard, { key: "f" + i, L: L, tag: "Fallbeispiel", col: "#E11D48", start: function () { start(L); }, edit: function () { setBuild({ lesson: Object.assign({}, L, { t: L.t + " (eigene Fassung)" }) }); } }); })),
+      h("details", { className: "card fxl-kit" }, h("summary", null, h("b", null, "Der Bausteinkasten: 11 Live-Methoden"), h("span", { className: "muted" }, " und wofür sie sich eignen")), h("div", { className: "fxl-kitgrid" }, ORDER.map(function (t) { return h("div", { key: t, style: { "--c": TYPES[t].c } }, h("span", { className: "fxb-ic" }, h(Ic, { n: t, s: 18 })), h("b", null, TYPES[t].t), h("p", null, TYPES[t].d)); }))),
+      h("div", { className: "sec" }, h("h2", null, "Live-Klassenfälle mit Vitalzeichen")),
+      build && h(Builder, { row: build.row, lesson: build.lesson, close: function () { setBuild(null); }, saved: function () { load(); setBuild(null); }, start: function (L, preview) { if (!preview) setBuild(null); setRun({ title: L.t, steps: stepsOf(L) }); } }),
+      pick && h(ModulePicker, { close: function () { setPick(false); }, start: function (t, steps) { setPick(false); setRun({ title: t, steps: steps }); } }),
+      run && h(Presenter, { title: run.title, steps: run.steps, close: function () { setRun(null); } }));
+  }
+  window.FP_LiveHub = Hub;
+  window.FP_LIVE = { stepsOf: stepsOf, stepsOfModule: stepsOfModule, tally: tally, pubOf: pubOf };
+})();
+
+/* Lehrer-Portal: Module je Kurs freischalten, sperren oder ausblenden. */
+(function () {
+  var R = window.React, RD = window.ReactDOM;
+  if (!R || !RD) return;
+  var h = R.createElement, useState = R.useState, useEffect = R.useEffect;
+  var YC = { 1: "#0062FF", 2: "#7C3AED", 3: "#0D9488" };
+  var clean = function (t) { return String(t || "").replace(/^Fallmodul \d+ · /, ""); };
+  function Freischalten(p) {
+    var sc = useState([]), courses = sc[0], setCourses = sc[1];
+    var si = useState(""), cid = si[0], setCid = si[1];
+    var ss = useState({ locked: [], hidden: [] }), st = ss[0], setSt = ss[1];
+    var sb = useState(false), busy = sb[0], setBusy = sb[1];
+    var sm = useState(null), msg = sm[0], setMsg = sm[1];
+    var se = useState(null), err = se[0], setErr = se[1];
+    useEffect(function () { window.FP_API.courses().then(function (c) { setCourses(c || []); if (c && c.length) pick(c[0]); }).catch(function (e) { setErr(e.message); }); }, []);
+    function pick(c) { setCid(c.id); var s = c.settings || {}; setSt({ locked: (s.locked || []).slice(), hidden: (s.hidden || []).slice(), years: s.years || [] }); setMsg(null); }
+    var course = courses.find(function (c) { return c.id === cid; });
+    var mods = (window.FP_MODS || []).slice().sort(function (a, b) { return (a.year - b.year) || (a.order - b.order); });
+    var state = function (id) { return st.hidden.indexOf(id) >= 0 ? "aus" : st.locked.indexOf(id) >= 0 ? "zu" : "frei"; };
+    function setState(id, v) {
+      setSt(function (x) { return Object.assign({}, x, { locked: x.locked.filter(function (i) { return i !== id; }).concat(v === "zu" ? [id] : []), hidden: x.hidden.filter(function (i) { return i !== id; }).concat(v === "aus" ? [id] : []) }); });
+      setMsg(null);
+    }
+    function setYear(y, v) { mods.filter(function (m) { return Number(m.year) === y; }).forEach(function (m) { setState(m.id, v); }); }
+    async function save() {
+      setBusy(true); setErr(null);
+      try {
+        var s0 = course.settings || {};
+        var saved = await window.FP_API.saveCourse(Object.assign({}, course, { settings: Object.assign({}, s0, { locked: st.locked, hidden: st.hidden }) }));
+        setCourses(function (cs) { return cs.map(function (c) { return c.id === course.id ? Object.assign({}, course, saved || {}, { settings: Object.assign({}, s0, { locked: st.locked, hidden: st.hidden }) }) : c; }); });
+        setMsg("Gespeichert. Die Lernenden sehen die Änderung beim nächsten Öffnen der App.");
+        if (p.saved) p.saved();
+      } catch (e) { setErr(/settings|column/i.test(e.message) ? "Die Kurs-Einstellungen können gerade nicht gespeichert werden. Ist live_unterricht.sql ausgeführt?" : e.message); }
+      setBusy(false);
+    }
+    var count = function (v) { return mods.filter(function (m) { return state(m.id) === v; }).length; };
+    return RD.createPortal(h("div", { className: "fxb-bg" }, h("div", { className: "fxb", role: "dialog", "aria-label": "Module freischalten" },
+      h("header", { className: "fxb-head" }, h("div", null, h("span", { className: "fxp-eyebrow" }, "Kurssteuerung"), h("h2", null, "Module freischalten")), h("button", { type: "button", className: "iconbtn", "aria-label": "Schließen", onClick: p.close }, "×")),
+      h("div", { className: "fxb-body" },
+        h("p", { className: "muted", style: { marginTop: 0 } }, "Lege für jeden Kurs fest, welche Module die Lernenden schon bearbeiten können. Gesperrte Module sehen sie mit einem Schloss, damit klar ist, was noch kommt. Ausgeblendete sehen sie gar nicht. So schaltest du Module Schritt für Schritt passend zum Unterricht frei."),
+        h("div", { className: "fxf-top" },
+          h("div", { className: "field", style: { margin: 0, minWidth: 240 } }, h("label", { htmlFor: "fxf-c" }, "Kurs"), h("select", { id: "fxf-c", className: "input", value: cid, onChange: function (e) { var c = courses.find(function (x) { return x.id === e.target.value; }); if (c) pick(c); } }, courses.map(function (c) { return h("option", { key: c.id, value: c.id }, c.name); }))),
+          h("div", { className: "fxf-sum" }, h("span", { className: "s-frei" }, h("b", null, count("frei")), " frei"), h("span", { className: "s-zu" }, h("b", null, count("zu")), " gesperrt"), h("span", { className: "s-aus" }, h("b", null, count("aus")), " ausgeblendet"))),
+        st.years && st.years.length ? h("div", { className: "notice", style: { margin: "10px 0" } }, "Für diesen Kurs sind nur die Ausbildungsjahre " + st.years.join(", ") + " eingeschaltet (unter Kurse verwalten). Module anderer Jahre sieht der Kurs ohnehin nicht.") : null,
+        [1, 2, 3].map(function (y) {
+          var list = mods.filter(function (m) { return Number(m.year) === y; });
+          if (!list.length) return null;
+          return h("section", { key: y, className: "fxf-year", style: { "--c": YC[y] } },
+            h("div", { className: "fxf-yh" }, h("b", null, y + ". Ausbildungsjahr"), h("span", { className: "muted" }, list.length + " Module"), h("div", { className: "fxp-sp" }), h("button", { type: "button", className: "btn ghost sm", onClick: function () { setYear(y, "frei"); } }, "Alle freischalten"), h("button", { type: "button", className: "btn ghost sm", onClick: function () { setYear(y, "zu"); } }, "Alle sperren")),
+            h("div", { className: "fxf-list" }, list.map(function (m, i) {
+              var v = state(m.id);
+              return h("div", { key: m.id, className: "fxf-row s-" + v }, h("span", { className: "fxf-n" }, i + 1), h("div", { className: "fxf-t" }, h("b", null, clean(m.title)), m.subtitle && h("small", null, m.subtitle)),
+                h("div", { className: "fxf-seg", role: "radiogroup", "aria-label": "Status " + clean(m.title) }, [["frei", "Frei"], ["zu", "Gesperrt"], ["aus", "Aus"]].map(function (o) { return h("button", { key: o[0], type: "button", role: "radio", "aria-checked": v === o[0], className: v === o[0] ? "on " + o[0] : "", onClick: function () { setState(m.id, o[0]); } }, o[1]); })));
+            })));
+        })),
+      err && h("div", { className: "notice bad", style: { margin: "0 22px" } }, err),
+      h("footer", { className: "fxb-foot" }, msg ? h("span", { className: "fxf-ok" }, msg) : h("span", { className: "muted" }, course ? course.name : ""), h("div", { className: "fxp-sp" }), h("button", { type: "button", className: "btn ghost", onClick: p.close }, "Schließen"), h("button", { type: "button", className: "btn", disabled: busy || !course, onClick: save }, "Speichern"))
+    )), document.body);
+  }
+  var host = null, root = null;
+  window.FP_FREISCHALTEN = { open: function () { if (!host) { host = document.createElement("div"); document.body.appendChild(host); root = RD.createRoot(host); } root.render(h(Freischalten, { key: Date.now(), close: function () { root.render(null); } })); } };
+  function addBtn() {
+    document.querySelectorAll("main .btn").forEach(function (b) {
+      if (!/^Neues Modul$/.test((b.textContent || "").trim())) return;
+      var par = b.parentNode;
+      if (par.querySelector(".fx-frbtn")) return;
+      var x = document.createElement("button");
+      x.type = "button"; x.className = "btn ghost fx-frbtn";
+      x.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>Für Kurse freischalten';
+      x.addEventListener("click", function (e) { e.preventDefault(); window.FP_FREISCHALTEN.open(); });
+      par.appendChild(x);
+    });
+  }
+  var q = false;
+  new MutationObserver(function () { if (q) return; q = true; requestAnimationFrame(function () { q = false; addBtn(); }); }).observe(document.documentElement, { childList: true, subtree: true });
 })();
 
 </script>
