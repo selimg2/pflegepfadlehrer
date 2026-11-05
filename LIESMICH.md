@@ -20,7 +20,28 @@ Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 Ohne ausgefüllte `config.js` startet das Portal im Demo-Modus mit erfundenen Daten.
 Die Schritt-für-Schritt-Anleitung steht im Dokument „Fallpfad Lehrer-Portal: Technische Anleitung“.
 
-## Neu in dieser Version
+## Neu in dieser Version: Training „Kommunikation“
+
+- **Neuer Bereich unter Training > Kommunikation** mit fünf Kategorien: Patientengespräch, Angehörigengespräch, Konflikt- und Beschwerdegespräch, Aufnahmegespräch und Beratungsgespräch. Je Kategorie drei Gespräche (insgesamt 15), alle Personen erfunden.
+- **Sprachsimulation in Echtzeit:** Die lernende Person spricht über das Mikrofon mit einer KI, die die Gesprächsperson spielt und mit natürlicher Stimme antwortet. Die Person fragt nach, versteht manchmal etwas nicht, reagiert auf Fachwörter, Tempo und Ton und gibt Wichtiges erst preis, wenn gut nachgefragt wird. Die Stimmung verändert sich je nach Gesprächsführung. Live-Untertitel sind zuschaltbar, statt zu sprechen kann man auch schreiben. Höchstens 10 Minuten je Gespräch, bei Verbindungsabbruch geht das Gespräch nahtlos weiter.
+- **Auswertung nach jedem Gespräch:** Gesamtergebnis und je 0 bis 100 Punkte für Gesprächsführung, Verständlichkeit, Empathie und fachliche Kommunikation, mit Stärken, Verbesserungen, Status jedes Lernziels, Schlüsselmomenten mit wörtlichem Zitat und besserer Formulierung, Messwerten (Redeanteil, Sprechtempo, offene Fragen, Unterbrechungen) und einem Übungstipp.
+- **Datenschutz:** Vor dem ersten Gespräch willigt die Person ein (widerrufbar unter Training > Kommunikation). Ton und Mitschrift speichert Fallpfad nicht auf dem Server, im Konto landen nur die Punktzahlen. Die Rollenanweisungen liegen auf dem Server, Lernende können keine eigenen Anweisungen einschleusen. Tageslimit je Konto. Die Datenschutzerklärung (Abschnitt 2.7) ist angepasst.
+- **Demo-Konto:** Dort ist das Live-Gespräch nicht möglich (kein Server). Stattdessen gibt es eine Beispielauswertung.
+- **Abbildungen im Praktischen Examen** überarbeitet: Figuren mit sauber angesetztem Hals, neu gezeichnete Szenen, Patientenbilder pulsieren nicht mehr beim Antippen.
+
+### Einrichtung für die Kommunikation
+
+| Schritt | Was |
+|---|---|
+| 1 | `supabase/gespraech_nutzung.sql` im SQL Editor ausführen (Tageszähler, nur Zahlen) |
+| 2 | Die Edge Functions `gespraech-sitzung` und `gespraech-auswertung` bereitstellen, mit dem Ordner `supabase/functions/_shared` (Lehrer-Portal-Paket). Am einfachsten mit der Supabase-CLI: `supabase functions deploy gespraech-sitzung` und `supabase functions deploy gespraech-auswertung`. Beide nutzen den vorhandenen Secret `OPENAI_API_KEY` |
+| 3 | Optional als Secrets: `OPENAI_MODEL_GESPRAECH` (Standard `gpt-realtime-2.1`, günstiger: `gpt-realtime-2.1-mini`), `OPENAI_MODEL_AUSWERTUNG`, `OPENAI_MODEL_TRANSKRIPTION` (Standard `gpt-4o-mini-transcribe`), `FALLPFAD_GESPRAECHE_TAG` (Standard 8 Gespräche je Person und Tag), `FALLPFAD_GESPRAECH_MAX_SEKUNDEN` (Standard 600) |
+| 4 | Empfohlen: Bei OpenAI die europäische Datenresidenz beantragen (über den OpenAI-Vertrieb, neues Projekt mit Region Europa, Zero Data Retention) und dann `OPENAI_BASE_URL=https://eu.api.openai.com/v1` setzen. Ohne das läuft die Verarbeitung in den USA; so steht es auch in der Datenschutzerklärung |
+| 5 | Im OpenAI-Projekt ein monatliches Ausgabenlimit setzen. Sprachgespräche sind deutlich teurer als Text; die Kosten hängen vom Modell und der Gesprächslänge ab (aktuelle Preise auf der Preisseite von OpenAI). Mit `gpt-realtime-2.1-mini` wird es erheblich günstiger, das Tageslimit begrenzt die Kosten je Person |
+
+Wer die Funktion nicht anbieten möchte, stellt die beiden Funktionen einfach nicht bereit. Die App meldet dann „noch nicht eingerichtet“.
+
+## Aus der letzten Version
 
 **Beim Hochladen unbedingt mitnehmen:** den neuen Ordner `vendor/` (alle Bibliotheken liegen jetzt auf deinem eigenen Server, die App lädt nichts mehr von fremden Servern) und die Seiten `datenschutz.html`, `nutzungsbedingungen.html`, `impressum.html`, `konto-loeschen.html`. In diesen vier Seiten vorher die Platzhalter in eckigen Klammern ausfüllen.
 
@@ -45,7 +66,7 @@ Die Schritt-für-Schritt-Anleitung steht im Dokument „Fallpfad Lehrer-Portal: 
 | 3 | Edge Functions `uebersetzen` und `konto-loeschen` bereitstellen (Ordner `supabase/functions` im Lehrer-Portal-Paket). `uebersetzen` nutzt denselben Secret `OPENAI_API_KEY` wie der Folien-Import. Optional: `OPENAI_MODEL_UEBERSETZEN`, `FALLPFAD_LS_ZEICHEN_TAG` (Standard 60000 Zeichen je Person und Tag) |
 | 4 | Optional in `config.js` ergänzen: `webUrl` (Adresse der Web-App), `datenschutzUrl`, `nutzungUrl`, `impressumUrl`, falls die Rechtstexte woanders liegen (siehe `config.BEISPIEL.js`) |
 
-## Aus der letzten Version (großer Ausbau)
+## Aus früheren Versionen (großer Ausbau)
 
 - **Profilmenü mit 5 Farbprofilen:** Ein Klick auf dein Profil (oben rechts oder unten links) öffnet ein Menü mit Profilbild, fünf Farben (jeweils hell und dunkel), Hell/Dunkel/Automatisch, Einstellungen und Abmelden. Die Schrift bleibt immer gleich.
 - **Einführung nur nach der Registrierung:** Neue Konten sehen die Tour automatisch beim ersten Anmelden. Eine Stunde lang gibt es danach unten links den kleinen Knopf „Tutorial“ zum erneuten Ansehen. Lehrer- und Schüler-Tour erklären jetzt Schritt für Schritt, wie man etwas erledigt.

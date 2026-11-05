@@ -15409,6 +15409,7 @@ html.fp-native input,html.fp-native textarea,html.fp-native [contenteditable]{-w
   document.addEventListener("pointerdown", function (e) {
     var el = e.target && e.target.closest && e.target.closest(SEL);
     if (!el || el.disabled) return;
+    if (e.target.closest(".pxavw, .av, .pxpatav, .pxheadav, .pxpavimg")) return;
     var c = getComputedStyle(el).getPropertyValue("--c").trim();
     if (c) el.style.setProperty("--rc", c);
     el.classList.remove("fxm-ring"); void el.offsetWidth; el.classList.add("fxm-ring");
@@ -15623,6 +15624,11 @@ html body .ksbh::before,html body .ksbh::after{display:none!important}
 html body .ksbh b{color:var(--c,var(--accent))!important;font-size:19px!important;letter-spacing:-.02em}
 html body .ksbh small,html body .ksbh span{color:var(--muted)!important}
 html body .ksbh .chip,html body .ksbh [class*=badge]{background:var(--fill)!important;color:var(--fg)!important}
+
+/* Patientenbilder: Buchstabe unten rechts statt über dem Gesicht, kein Pulsieren beim Antippen */
+html body .pxpatav .pxbadge{left:auto!important;top:auto!important;right:-7px!important;bottom:-5px!important;width:19px!important;height:19px!important;font-size:10.5px!important}
+html body .pxavw,html body .pxavw svg,html body .av svg{transition:none!important}
+html body .pxavw.fxm-ring,html body .av.fxm-ring{animation:none!important}
 </style>
 <style id="fp-pro-css">
 /* ===== Fallpfad Pro: einheitliche Gestaltung für alle Bereiche (Schüler-App und Lehrer-Portal) =====
