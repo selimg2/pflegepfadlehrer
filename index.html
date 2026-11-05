@@ -15618,17 +15618,16 @@ html body .mod .ring,html body .mod .ring *{filter:none}
   html body .tabbar .tab span[data-short]::after{content:attr(data-short);font-size:10px!important}
 }
 /* Lehrer-Portal: Kurskarten ruhiger, Titel in der Kursfarbe wie Listen in Erinnerungen */
-html body .ksblock{background:var(--surface)!important;border:0!important;border-radius:14px!important;box-shadow:none!important;overflow:hidden}
-html body .ksbh{background:var(--surface)!important;background-image:none!important;color:var(--fg)!important;border-bottom:1px solid var(--line)}
-html body .ksbh::before,html body .ksbh::after{display:none!important}
-html body .ksbh b{color:var(--c,var(--accent))!important;font-size:19px!important;letter-spacing:-.02em}
-html body .ksbh small,html body .ksbh span{color:var(--muted)!important}
-html body .ksbh .chip,html body .ksbh [class*=badge]{background:var(--fill)!important;color:var(--fg)!important}
 
 /* Patientenbilder: Buchstabe unten rechts statt über dem Gesicht, kein Pulsieren beim Antippen */
 html body .pxpatav .pxbadge{left:auto!important;top:auto!important;right:-7px!important;bottom:-5px!important;width:19px!important;height:19px!important;font-size:10.5px!important}
 html body .pxavw,html body .pxavw svg,html body .av svg{transition:none!important}
 html body .pxavw.fxm-ring,html body .av.fxm-ring{animation:none!important}
+
+/* Kurskarten: Lernenden-Kreise zentriert (die Klassen p1 bis p5 kollidieren sonst mit einem allgemeinen Raster) */
+html body .ksbfaces i,html body .ksav,html body .klegend i{display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;gap:0!important;margin-top:0!important}
+html body .ksbfaces i.pn{color:var(--muted)!important}
+html body .ksbh .eyebrow{color:rgba(255,255,255,.82)!important}
 </style>
 <style id="fp-pro-css">
 /* ===== Fallpfad Pro: einheitliche Gestaltung für alle Bereiche (Schüler-App und Lehrer-Portal) =====
