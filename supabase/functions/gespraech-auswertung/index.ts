@@ -8,7 +8,7 @@
 // - store=false: OpenAI legt die Anfrage nicht als Konversation ab, nutzt sie nicht zum Training und
 //   bewahrt sie höchstens 30 Tage zur Missbrauchsüberwachung auf.
 // - Fallpfad speichert die Mitschrift nicht auf dem Server. Gezählt wird nur die Anzahl der Auswertungen je Konto und Tag.
-import { BASE, CORS, TAGESLIMIT, anmeldung, clean, json, szenario, zaehlen } from "../_shared/komm.ts";
+import { BASE, CORS, TAGESLIMIT, akteText, anmeldung, clean, json, szenario, zaehlen } from "../_shared/komm.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_AUSWERTUNG") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const EFFORT = Deno.env.get("OPENAI_REASONING_AUSWERTUNG") ?? "low"; // "none" = Parameter weglassen
@@ -51,6 +51,23 @@ const SCHEMA = {
     naechsterSchritt: { type: "string" },
   },
 };
+const SB = {
+  type: "object", additionalProperties: false, required: ["status", "hinweis"],
+  properties: { status: { type: "string", enum: ["erfuellt", "teilweise", "fehlt"] }, hinweis: { type: "string" } },
+};
+// Übergaben: zusätzlich eine SBAR-Prüfung
+const SCHEMA_UEB = {
+  ...SCHEMA,
+  required: [...SCHEMA.required, "sbar"],
+  properties: {
+    ...SCHEMA.properties,
+    sbar: {
+      type: "object", additionalProperties: false,
+      required: ["situation", "background", "assessment", "recommendation", "reihenfolge", "fazit"],
+      properties: { situation: SB, background: SB, assessment: SB, recommendation: SB, reihenfolge: { type: "boolean" }, fazit: { type: "string" } },
+    },
+  },
+};
 
 function anweisung(s: any) {
   return `Du bist erfahrene Praxisanleiterin und Pflegepädagogin. Du wertest ein geübtes Gespräch einer bzw. eines Auszubildenden in der Pflege aus.
@@ -63,7 +80,25 @@ Worauf es fachlich ankommt:
 ${s.kriterien.map((z: string) => "- " + z).join("\n")}
 Was die Gesprächsperson verborgen hielt und nur bei guter Gesprächsführung preisgab:
 ${s.rolle.verborgen.map((z: string) => "- " + z).join("\n")}
+${s.kat === "uebergabe" ? `
+Dies ist eine Übergabe. Die lernende Person hat übergeben, die Gesprächsperson hat die Übergabe angenommen und nachgefragt. Die lernende Person hatte dabei diese Patientenakte vor sich:
+${akteText(s)}
 
+Für Übergaben gilt bei den vier Bereichen:
+  1. gespraechsfuehrung: klare Struktur nach SBAR, Wichtiges zuerst, Priorisierung, sauberer Abschluss mit offenen Aufgaben.
+  2. verstaendlichkeit: knapp und präzise, Zahlen mit Einheit und Uhrzeit, keine unklaren Abkürzungen.
+  3. empathie: kollegialer, respektvoller Ton, Rückfragen ruhig angenommen, die Würde der übergebenen Person gewahrt (keine abwertenden Bemerkungen).
+  4. fachlich: Vollständigkeit und Richtigkeit gegenüber der Akte, Dringlichkeit richtig eingeschätzt, Rückfragen richtig beantwortet. Falsche Werte oder vergessene kritische Punkte wiegen schwer.
+
+Die lernende Person sollte das SBAR-Übergabemodell nutzen. Prüfe im Feld sbar jeden Baustein einzeln mit erfuellt, teilweise oder fehlt und einem kurzen hinweis (ein Satz, was gut war oder was gefehlt hat, möglichst mit Beispiel aus der Akte):
+  - situation (S): Wer ist die Person (Name, Alter, Zimmer), warum ist sie da, was ist aktuell das Wichtigste bzw. das Problem.
+  - background (B): relevante Vorgeschichte, Diagnosen, bisheriger Verlauf, Allergien, Therapieziel, laufende Therapie und Medikamente.
+  - assessment (A): eigene Einschätzung des aktuellen Zustands mit Messwerten (Vitalzeichen, Schmerz, Bewusstsein, Ausscheidung, Wunde), Veränderungen und Risiken.
+  - recommendation (R): was als Nächstes zu tun ist, offene Aufgaben mit Uhrzeit, worauf zu achten ist, wann jemand informiert werden muss.
+  - reihenfolge: true, wenn die Übergabe erkennbar in der Reihenfolge S, B, A, R aufgebaut war (kleine Abweichungen sind in Ordnung), sonst false.
+  - fazit: ein bis zwei Sätze zur Nutzung von SBAR insgesamt. Bei mehreren Patientinnen oder Patienten gilt SBAR für jede Person einzeln.
+Wenn SBAR erkennbar nicht genutzt wurde, wirkt sich das deutlich auf gespraechsfuehrung aus.
+` : ""}
 So bewertest du:
 - Bewerte nur die Beiträge der Pflegekraft („du“). Die Beiträge der Gesprächsperson sind Kontext.
 - Die Mitschrift stammt aus einer Spracherkennung. Einzelne falsch erkannte Wörter, fehlende Satzzeichen oder Füllwörter gehen nicht in die Bewertung ein.
@@ -93,8 +128,8 @@ Deno.serve(async (req) => {
 
   let b: any;
   try { b = await req.json(); } catch { return json({ error: "Ungültige Anfrage." }, 400); }
-  const s = szenario(b.szenario);
-  if (!s) return json({ error: "Dieses Gespräch gibt es nicht." }, 400);
+  const s = await szenario(b.szenario, b.def);
+  if (!s) return json({ error: "Dieses Gespräch gibt es nicht oder die App ist nicht aktuell. Bitte lade die Seite neu." }, 400);
   const verlauf = (Array.isArray(b.verlauf) ? b.verlauf : []).slice(0, 160)
     .map((x: any) => ({ r: x?.r === "du" ? "du" : "ki", t: clean(x?.t, 800) })).filter((x: any) => x.t);
   if (verlauf.filter((x: any) => x.r === "du").length < 2) return json({ error: "Das Gespräch war zu kurz für eine Auswertung." }, 400);
@@ -117,7 +152,7 @@ Deno.serve(async (req) => {
     model: MODEL,
     instructions: anweisung(s),
     input: "Messwerte aus der App (Orientierung, nicht überbewerten):\n" + JSON.stringify(mess) + "\n\nMitschrift:\n" + mitschrift,
-    text: { format: { type: "json_schema", name: "auswertung", strict: true, schema: SCHEMA } },
+    text: { format: { type: "json_schema", name: "auswertung", strict: true, schema: s.kat === "uebergabe" ? SCHEMA_UEB : SCHEMA } },
     store: false,
     max_output_tokens: 6000,
   };

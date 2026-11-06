@@ -28,8 +28,8 @@ Deno.serve(async (req) => {
 
   let b: any;
   try { b = await req.json(); } catch { return json({ error: "Ungültige Anfrage." }, 400); }
-  const s = szenario(b.szenario);
-  if (!s) return json({ error: "Dieses Gespräch gibt es nicht." }, 400);
+  const s = await szenario(b.szenario, b.def);
+  if (!s) return json({ error: "Dieses Gespräch gibt es nicht oder die App ist nicht aktuell. Bitte lade die Seite neu." }, 400);
   if (b.einwilligung !== true) return json({ error: "Bitte bestätige zuerst den Hinweis zur Sprachverarbeitung." }, 400);
 
   // Fortsetzen nach Verbindungsabbruch zählt nicht als neues Gespräch
