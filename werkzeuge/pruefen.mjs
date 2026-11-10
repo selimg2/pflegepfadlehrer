@@ -9,7 +9,7 @@ import os from "node:os";
 import { spawn } from "node:child_process";
 
 const args = process.argv.slice(2);
-const root = path.resolve(args[0] || ".");
+const root = path.resolve(/^https?:/.test(args[0] || "") ? "." : args[0] || ".");
 const opt = { shots: [], js: [], warte: 2500 };
 for (let i = 1; i < args.length; i++) {
   if (args[i] === "--shot") opt.js.push({ shot: args[++i] });
@@ -64,7 +64,7 @@ for (const d of ["Runtime", "Log", "Network", "Page"]) await send(d + ".enable")
 await send("Emulation.setDeviceMetricsOverride", opt.mobil ? { width: 390, height: 844, deviceScaleFactor: 2, mobile: true } : { width: 1280, height: 860, deviceScaleFactor: 1, mobile: false });
 if (opt.dunkel) await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-await send("Page.navigate", { url: `http://127.0.0.1:${port}/index.html` });
+await send("Page.navigate", { url: /^https?:/.test(args[0] || "") ? args[0] : `http://127.0.0.1:${port}/index.html` });
 await sleep(opt.warte + 2500);
 for (const s of opt.js) {
   if (s.warte) await sleep(s.warte);
