@@ -15,8 +15,10 @@ import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_UEBERSETZEN") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
-const EFFORT = Deno.env.get("OPENAI_REASONING_UEBERSETZEN") ?? "none"; // "none" = Parameter weglassen
-const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_LS_ZEICHEN_TAG") ?? "60000"); // Zeichen je Konto und Tag
+const EFFORT = Deno.env.get("OPENAI_REASONING_UEBERSETZEN") ?? "low"; // wie die anderen KI-Funktionen; "none" = Parameter weglassen
+const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_LS_ZEICHEN_TAG") ?? "250000"); // Zeichen je Konto und Tag (Cache-Treffer zählen nicht)
+const MAX_TEXTE = 30; // je Anfrage
+const SCHEMA = { type: "object", additionalProperties: false, required: ["t"], properties: { t: { type: "array", items: { type: "string" } } } };
 
 const SPRACHEN: Record<string, string> = {
   einfach: "Einfaches Deutsch", en: "Englisch", tr: "Türkisch", ar: "Arabisch", uk: "Ukrainisch", ru: "Russisch",
@@ -70,7 +72,7 @@ Deno.serve(async (req) => {
   try { b = await req.json(); } catch { return json({ error: "Ungültige Anfrage." }, 400); }
   const lang = String(b.lang || "");
   if (!SPRACHEN[lang]) return json({ error: "Diese Sprache wird nicht unterstützt." }, 400);
-  const texts: string[] = (Array.isArray(b.texts) ? b.texts : []).slice(0, 8).map((t: string) => clean(t).slice(0, 3000)).filter(Boolean);
+  const texts: string[] = (Array.isArray(b.texts) ? b.texts : []).slice(0, MAX_TEXTE).map((t: string) => clean(t).slice(0, 3000)).filter(Boolean);
   if (!texts.length) return json({ out: [] });
 
   // 1. Gemeinsamer Cache ohne Personenbezug
@@ -89,35 +91,67 @@ Deno.serve(async (req) => {
     await admin.from("fp_ls_nutzung").upsert({ user_id: u.user.id, tag, zeichen: bisher + zeichen });
     if (Math.random() < 0.05) await admin.from("fp_ls_nutzung").delete().lt("tag", new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10));
 
-    // 3. OpenAI (nur Text und Zielsprache)
-    const body: Record<string, unknown> = {
-      model: MODEL,
-      instructions: anweisung(lang) + `\nAntworte nur mit einem JSON-Objekt {"t":["…"]} mit genau ${offen.length} Einträgen in derselben Reihenfolge.`,
-      input: JSON.stringify({ texte: offen.map((x) => x.t) }),
-      text: { format: { type: "json_object" } },
-      store: false,
-      max_output_tokens: 8000,
-    };
-    if (EFFORT !== "none") body.reasoning = { effort: EFFORT };
-    let r: Response;
-    try {
-      r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    } catch {
-      return json({ error: "Der Übersetzungsdienst ist gerade nicht erreichbar." }, 502);
+    // 3. OpenAI (nur Text und Zielsprache). Strukturierte Ausgabe (JSON-Schema), damit Anzahl und Reihenfolge stimmen.
+    //    Bei unvollständiger Antwort wird einzeln nachübersetzt, damit eine Seite nie ganz scheitert.
+    // Varianten: erst die Standardeinstellung, bei 400 (Parameter vom Modell nicht unterstützt) eine einfachere Fassung
+    const VARIANTEN = [
+      { format: "schema", effort: EFFORT },
+      { format: "schema", effort: EFFORT === "none" ? "low" : "none" },
+      { format: "objekt", effort: "low" },
+      // zuletzt das allgemeine Modell, das auch Folien-Import und Assistent nutzen
+      { format: "schema", effort: "low", model: Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra" },
+    ];
+    let variante = 0;
+    async function frage(liste: string[]): Promise<string[] | { fehler: number }> {
+      const v: { format: string; effort: string; model?: string } = VARIANTEN[variante];
+      const body: Record<string, unknown> = {
+        model: v.model || MODEL,
+        instructions: anweisung(lang) + `\nDu bekommst ein JSON-Objekt mit dem Feld "texte" (${liste.length} Einträge). Antworte als JSON mit dem Feld "t": genau ${liste.length} Übersetzungen in derselben Reihenfolge. Platzhalter wie ⟦N⟧ unverändert übernehmen. Sehr kurze Texte (Knöpfe, Überschriften) knapp übersetzen.`,
+        input: "JSON: " + JSON.stringify({ texte: liste }),
+        text: { format: v.format === "schema" ? { type: "json_schema", name: "uebersetzung", strict: true, schema: SCHEMA } : { type: "json_object" } },
+        store: false,
+        max_output_tokens: 12000,
+      };
+      if (v.effort !== "none") body.reasoning = { effort: v.effort };
+      let r: Response;
+      try {
+        r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      } catch {
+        return { fehler: 503 };
+      }
+      if (!r.ok) {
+        // Nur Statuscode und Fehlertyp ins Log, keine Inhalte
+        let typ = ""; try { const e = await r.json(); typ = String(e?.error?.code || e?.error?.type || "").slice(0, 60) + " " + String(e?.error?.param || "").slice(0, 40); } catch { /* leer */ }
+        console.error("OpenAI", r.status, typ, "variante", variante);
+        if (r.status === 400 && variante < VARIANTEN.length - 1) { variante++; return frage(liste); }
+        return { fehler: r.status };
+      }
+      const o = await r.json();
+      let text = "";
+      for (const item of o.output || []) if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
+      let arr: unknown = [];
+      try { arr = JSON.parse(text).t; } catch { /* leer */ }
+      return Array.isArray(arr) ? arr.map((x) => String(x ?? "")) : [];
     }
-    if (!r.ok) {
-      console.error("OpenAI", r.status);
-      return json({ error: r.status === 429 ? "Der Übersetzungsdienst ist gerade ausgelastet. Bitte gleich noch einmal versuchen." : "Die Übersetzung hat nicht geklappt (" + r.status + ")." }, 502);
+    let arr = await frage(offen.map((x) => x.t));
+    if (!Array.isArray(arr)) {
+      const st = arr.fehler;
+      return json({ error: st === 429 ? "Der Übersetzungsdienst ist gerade ausgelastet. Bitte gleich noch einmal versuchen." : st === 503 ? "Der Übersetzungsdienst ist gerade nicht erreichbar." : "Die Übersetzung hat gerade nicht geklappt. Bitte später noch einmal versuchen." }, 502);
     }
-    const o = await r.json();
-    let text = "";
-    for (const item of o.output || []) if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
-    let arr: string[] = [];
-    try { arr = JSON.parse(text).t || []; } catch { /* leer */ }
-    if (arr.length !== offen.length) return json({ error: "Die Übersetzung war unvollständig. Bitte noch einmal versuchen." }, 502);
-    const rows = offen.map((x, k) => ({ h: x.h, lang, out: String(arr[k] || "").slice(0, 8000) }));
+    if (arr.length !== offen.length) {
+      // Einzeln nachfragen (höchstens 10, sonst Rest leer lassen; die App versucht es später erneut)
+      const einzeln: string[] = [];
+      for (let k = 0; k < offen.length; k++) {
+        if (k >= 10) { einzeln.push(""); continue; }
+        const e = await frage([offen[k].t]);
+        einzeln.push(Array.isArray(e) && e.length === 1 ? e[0] : "");
+      }
+      arr = einzeln;
+    }
+    const fertig = arr as string[];
+    const rows = offen.map((x, k) => ({ h: x.h, lang, out: String(fertig[k] || "").slice(0, 8000) })).filter((x) => x.out);
     rows.forEach((x) => map.set(x.h, x.out));
-    await admin.from("fp_uebersetzungen").upsert(rows);
+    if (rows.length) await admin.from("fp_uebersetzungen").upsert(rows);
   }
   return json({ out: hashes.map((h) => map.get(h) || ""), meta: { anbieter: "OpenAI", region: BASE.includes("eu.api") ? "EU" : "USA" } });
 });

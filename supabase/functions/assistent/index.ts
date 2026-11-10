@@ -17,8 +17,10 @@ import { antworten, koerper, vorpruefung } from "../_shared/sicherheit.ts";
 const MODEL = Deno.env.get("OPENAI_MODEL_ASSISTENT") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
 const EFFORT = Deno.env.get("OPENAI_REASONING_ASSISTENT") ?? "low"; // "none" = Parameter weglassen
-const LIMIT_SCHUELER = Number(Deno.env.get("FALLPFAD_ASSISTENT_TAG") ?? "3");
-const LIMIT_LEHRER = Number(Deno.env.get("FALLPFAD_ASSISTENT_TAG_LEHRER") ?? "3");
+// Großzügiges Tageslimit als Kostenschutz. Wird in der App nicht angezeigt.
+// Neue Secret-Namen, damit alte Werte (früher 3) nicht mehr greifen.
+const LIMIT_SCHUELER = Number(Deno.env.get("FALLPFAD_ASSISTENT_LIMIT") ?? "40");
+const LIMIT_LEHRER = Number(Deno.env.get("FALLPFAD_ASSISTENT_LIMIT_LEHRER") ?? "80");
 
 const SPRACHEN: Record<string, string> = {
   de: "Deutsch", einfach: "einfaches Deutsch (Sprachniveau B1, kurze Sätze, Fachwörter in Klammern kurz erklärt)",
@@ -68,16 +70,19 @@ Heute ist ${heute}.
 - Fachlich und didaktisch beraten, immer auf Grundlage der Quellen.
 - Unterrichtsplanung: art "plan" als Abfolge von Unterrichtseinheiten (Feld "datum" darf leer sein, "titel" = Thema der Einheit, Schritte mit "was" und "minuten", "modul" nur wenn ein Fallpfad-Modul passt).
 - Klausur oder Test: art "klausur" mit Fragen, Antworten, Lösung und Erklärung, jede Frage mit Quellen-Kennung.
-- Modul erstellen: Wenn die Lehrkraft ein neues Lernmodul möchte, antwortest du mit art "modul" und füllst "modul" (titel, jahr 1 bis 3, umfang "kurz"|"mittel"|"lang", schwerpunkte, hinweis). Das eigentliche Modul baut danach der Fallpfad-Folien-Import aus den Quellen der Lehrkraft. Ohne eigene Quellen der Lehrkraft schlägst du vor, Quellen hinzuzufügen.`;
+- Modul erstellen: Wenn die Lehrkraft ein neues Lernmodul möchte, antwortest du mit art "modul" und füllst "modul" (titel, jahr 1 bis 3, umfang "kurz"|"mittel"|"lang", schwerpunkte, hinweis). Das eigentliche Modul baut danach der Fallpfad-Folien-Import aus den Quellen der Lehrkraft. Ohne eigene Quellen der Lehrkraft schlägst du vor, Quellen hinzuzufügen.
+- Unterrichtsmaterial: Für Lernsituationen (Fallbeispiele), Arbeitsblätter, Erwartungshorizonte, Prüfungsbögen, Gruppenarbeiten oder vereinfachte Texte (DaZ, Sprachniveau B1) antwortest du mit art "dokument" und füllst "dokument" (titel, zielgruppe, abschnitte mit ueberschrift und text). Arbeitsblätter enthalten klare Arbeitsaufträge mit Operatoren (nennen, beschreiben, begründen, beurteilen) und Zeitangaben. Erwartungshorizonte nennen je Aufgabe die erwarteten Punkte und eine Punkteverteilung. Lernsituationen orientieren sich an den Kompetenzbereichen der PflAPrV (Anlage 1 bis 2), mit erfundenen Personen und realistischem Stationsalltag; Fakten nur aus den Quellen.
+- Ausbildungsjahr: Richte Niveau und Umfang nach dem angegebenen Ausbildungsjahr.
+- Datenschutz: Verwende niemals Namen echter Lernender. Nutze für Fallbeispiele immer erfundene Namen.`;
 
   const format = `
 # Antwortformat
 Antworte ausschließlich mit einem JSON-Objekt:
-{"art":"antwort"|"plan"|"klausur"${rolle === "lehrer" ? '|"modul"' : ""},
+{"art":"antwort"|"plan"|"klausur"${rolle === "lehrer" ? '|"modul"|"dokument"' : ""},
  "text":"Antwort an die Person",
  "quellen":["Kennung", ...],
  "plan":{"titel":"…","ziel":"YYYY-MM-DD oder leer","tage":[{"datum":"YYYY-MM-DD oder leer","titel":"…","schritte":[{"modul":"Modul-ID oder leer","was":"…","minuten":30}]}]},
- "klausur":{"titel":"…","minuten":30,"fragen":[{"frage":"…","optionen":["…","…","…"],"richtig":0,"erklaerung":"…","quelle":"Kennung"}]},${rolle === "lehrer" ? '\n "modul":{"titel":"…","jahr":2,"umfang":"mittel","schwerpunkte":["…"],"hinweis":"…"},' : ""}
+ "klausur":{"titel":"…","minuten":30,"fragen":[{"frage":"…","optionen":["…","…","…"],"richtig":0,"erklaerung":"…","quelle":"Kennung"}]},${rolle === "lehrer" ? '\n "modul":{"titel":"…","jahr":2,"umfang":"mittel","schwerpunkte":["…"],"hinweis":"…"},\n "dokument":{"titel":"…","zielgruppe":"…","abschnitte":[{"ueberschrift":"…","text":"…"}]},' : ""}
  "vorschlaege":["kurze Anschlussfrage", "…"]}
 Felder, die nicht zur art passen, lässt du weg. "vorschlaege": 2 bis 3 sinnvolle nächste Fragen in der Sprache der Antwort.`;
   return gemeinsam + (rolle === "lehrer" ? lehrer : schueler) + format;
@@ -100,7 +105,7 @@ function eingabe(b: any, rolle: "schueler" | "lehrer") {
 function bereinigen(o: any, e: ReturnType<typeof eingabe>, rolle: "schueler" | "lehrer") {
   const ids = new Set([...e.quellen, ...e.eigene].map((q: any) => q.id));
   const mods = new Set(e.module.map((m: any) => m.id));
-  const art = ["antwort", "plan", "klausur", ...(rolle === "lehrer" ? ["modul"] : [])].includes(o?.art) ? o.art : "antwort";
+  const art = ["antwort", "plan", "klausur", ...(rolle === "lehrer" ? ["modul", "dokument"] : [])].includes(o?.art) ? o.art : "antwort";
   const out: any = { art, text: String(o?.text ?? "").slice(0, 8000), quellen: (Array.isArray(o?.quellen) ? o.quellen : []).map(String).filter((x: string) => ids.has(x)).slice(0, 12) };
   out.vorschlaege = (Array.isArray(o?.vorschlaege) ? o.vorschlaege : []).map((x: unknown) => String(x).slice(0, 160)).filter(Boolean).slice(0, 3);
   if (art === "plan" && o.plan && Array.isArray(o.plan.tage)) {
@@ -133,6 +138,11 @@ function bereinigen(o: any, e: ReturnType<typeof eingabe>, rolle: "schueler" | "
       hinweis: String(o.modul.hinweis ?? "").slice(0, 800),
     };
   }
+  if (art === "dokument" && o.dokument && Array.isArray(o.dokument.abschnitte)) {
+    const ab = o.dokument.abschnitte.slice(0, 30).map((a: any) => ({ ueberschrift: String(a?.ueberschrift ?? "").slice(0, 200), text: String(a?.text ?? "").slice(0, 6000) })).filter((a: any) => a.text);
+    if (ab.length) out.dokument = { titel: String(o.dokument.titel ?? "Unterrichtsmaterial").slice(0, 200), zielgruppe: String(o.dokument.zielgruppe ?? "").slice(0, 200), abschnitte: ab };
+    else out.art = "antwort";
+  }
   if (!out.text) out.text = out.art === "plan" ? "Hier ist dein Plan." : out.art === "klausur" ? "Hier ist deine Testklausur." : "Dazu finde ich in Fallpfad nichts.";
   return out;
 }
@@ -164,7 +174,7 @@ Deno.serve(async (req) => {
   // Nur Stand abfragen (für die Anzeige „noch x Nachrichten heute“)
   if (b.status === true) {
     const { data: z } = await admin.from("fp_assistent_nutzung").select("nachrichten").eq("user_id", u.user.id).eq("tag", new Date().toISOString().slice(0, 10)).maybeSingle();
-    return json({ rest: Math.max(0, limit - (z?.nachrichten ?? 0)), limit });
+    return json({ rest: Math.max(0, limit - (z?.nachrichten ?? 0)) > 0 ? null : 0 });
   }
 
   const e = eingabe(b, rolle);
@@ -176,7 +186,7 @@ Deno.serve(async (req) => {
   // Tageslimit: zählt vor dem Aufruf, wird bei einem Fehler zurückgegeben
   const { data: n, error: ze } = await admin.rpc("fp_assistent_zaehlen", { p_user: u.user.id, p_limit: limit });
   if (ze) { console.error("zaehlen", ze.code); return json({ error: "Der Assistent ist gerade nicht verfügbar (Tabelle fehlt?)." }, 503); }
-  if (n === -1) return json({ error: `Für heute sind deine ${limit} Nachrichten verbraucht. Morgen geht es weiter.`, rest: 0, limit }, 429);
+  if (n === -1) return json({ error: "Du hast den Assistenten heute schon sehr oft genutzt. Morgen geht es weiter.", rest: 0 }, 429);
   const zurueck = async () => { try { await admin.rpc("fp_assistent_zurueck", { p_user: u.user.id }); } catch { /* leer */ } };
 
   const input = [
@@ -229,5 +239,5 @@ Deno.serve(async (req) => {
     return json({ error: "Die Antwort war unvollständig. Bitte noch einmal senden, die Nachricht wurde nicht gezählt." }, 502);
   }
   const antwort = bereinigen(roh, e, rolle);
-  return json({ antwort, rest: Math.max(0, limit - Number(n)), limit, meta: { anbieter: "OpenAI", region: BASE.includes("eu.api") ? "EU" : "USA" } });
+  return json({ antwort, rest: Number(n) >= limit ? 0 : null, meta: { anbieter: "OpenAI", region: BASE.includes("eu.api") ? "EU" : "USA" } });
 });

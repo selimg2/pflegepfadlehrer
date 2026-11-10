@@ -1,0 +1,14 @@
+/* Fallpfad: Politur (November 2026). Wird als letzte Ebene geladen. Gilt gleich in Schüler-App und Lehrer-Portal. */
+
+/* Logo: Symbol hell auf Akzentfarbe (das eingebettete SVG bringt eine eigene dunkle Farbe mit) */
+html body .brand .logo svg,html body .logo svg,html body .logo .logo-svg svg{color:var(--on-accent,#fff)!important}
+html body .brand .logo svg *,html body .logo svg *{stroke:currentColor!important}
+
+/* Symbole in der Seitenleiste: etwas feinere Linien, damit kleine Symbole (Zahnrad) nicht zulaufen */
+html body .side .tab svg{stroke-width:2!important}
+html body .side .tab svg path{stroke-width:2!important}
+html body .tabbar .tab svg path{stroke-width:1.9}
+
+/* Einstellungen: Farbkreise bleiben auf Touch-Geräten rund (44-px-Regel betrifft nur die Schaltfläche) */
+html body .fps-sw{min-height:44px}
+html body .fps-sw i{aspect-ratio:1;flex:0 0 auto}

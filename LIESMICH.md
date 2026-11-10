@@ -2,6 +2,23 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Neu in dieser Version (10.11.2026)
+
+- **Startseite:** Ganz oben stehen jetzt deine Kurse als Kursblöcke (wie unter „Kurse & Schüler“: im Einsatz, im Unterricht, Praxisanleitung, Unterrichtsfeedback). Ein Tipp öffnet den Kurs. Die Zahlen (Lernende, aktiv in 7 Tagen) stehen unten.
+- **Seitenleiste:** „Kurse & Schüler“ steht direkt unter „Übersicht“, der Assistent darunter.
+- **Assistent für Lehrkräfte:** neue Aufträge „Lernsituation schreiben“, „Arbeitsblatt erstellen“, „Erwartungshorizont“ und „Text vereinfachen“ (DaZ, B1). Ergebnisse als Dokumentkarte mit Download als Word-Datei; Klausuren ebenfalls als Word-Datei mit Lösungsteil. Niveau je Ausbildungsjahr wählbar. Keine Anzeige des Tageslimits mehr (großzügiges Limit als Kostenschutz, Secret `FALLPFAD_ASSISTENT_LIMIT_LEHRER`, Standard 80).
+- **Profilmenü und Symbole** wie in der Schüler-App überarbeitet (`css/06-politur.css`).
+- **Backend:** Edge Function `pflegeplanung` (neu), `uebersetzen` repariert, `assistent` mit neuen Limits und Dokumenttyp. SQL: `supabase/pflegeplanung_sicherheit.sql` einmal ausführen.
+
+### Einrichtung für diese Version
+
+| Schritt | Was |
+|---|---|
+| 1 | `supabase/pflegeplanung_sicherheit.sql` im SQL Editor ausführen (Zähler, Härtung, pg_cron-Löschfristen) |
+| 2 | Edge Functions bereitstellen: `supabase functions deploy pflegeplanung assistent uebersetzen` (mit Ordner `_shared`) |
+| 3 | Optional: `OPENAI_MODEL_PFLEGEPLANUNG`, `FALLPFAD_PFLEGEPLANUNG_TAG` (Standard 25 je Person und Tag), `FALLPFAD_ASSISTENT_LIMIT` (40), `FALLPFAD_ASSISTENT_LIMIT_LEHRER` (80) |
+| 4 | Supabase > Authentication > Passwortschutz: „Leaked password protection“ einschalten |
+
 ## Aufbau (modular)
 
 | Ordner / Datei | Inhalt |

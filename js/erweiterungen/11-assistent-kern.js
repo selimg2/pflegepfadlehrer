@@ -2,7 +2,7 @@
    - Suche auf dem Gerät: Die App zerlegt Lernmodule, Lernkarten und Kitteltasche in kurze Abschnitte und sucht die passenden
      Abschnitte zur Frage heraus (BM25). Nur diese Abschnitte gehen mit der Frage an die Edge Function "assistent".
    - Antwortarten: Erklärung mit Quellen, Lernplan bis zur Prüfung (speicherbar, mit Kalenderdatei), Testklausur zum Üben.
-   - 3 Nachrichten pro Tag (Server zählt), Chatverlauf nur auf dem Gerät, Antwortsprache = „Meine Sprache“.
+   - Großzügiges Tageslimit (Server zählt, wird nicht angezeigt), Chatverlauf nur auf dem Gerät, Antwortsprache = „Meine Sprache“.
    - Gemeinsamer Kern (Suche, Darstellung) wird auch vom Lehrer-Portal genutzt: window.FP_AST_CORE. */
 (function () {
   var R = window.React;
@@ -461,7 +461,7 @@
       tool[1](tool[0] === k ? null : k);
     }
     var leer = !msgs.length;
-    var restTxt = rest[0] == null ? "" : rest[0] === 0 ? "Heute keine Nachrichten mehr, morgen geht es weiter" : "Heute noch " + rest[0] + " von " + limit[0] + " Nachrichten";
+    var restTxt = "";
     var QW = function (pp) { return h(Quellen, Object.assign({ open: openQuelle }, pp)); };
 
     var miniForm = tool[0] === "plan" ? h("form", { className: "ast-mini", style: { "--c": "#0A84FF" }, onSubmit: function (e) { e.preventDefault(); if (!form[0].datum) return; var d = form[0].datum.split("-"); send("Ich habe am " + d[2] + "." + d[1] + "." + d[0] + " meine " + form[0].art + "e Prüfung. Bitte erstelle mir einen Prüfungsplan.", { wunsch: "plan", datum: form[0].datum, art: form[0].art }); } },
@@ -496,7 +496,7 @@
       !leer ? h("div", { className: "ast-tools" }, SUGS.slice(0, 2).map(function (s) { return h("button", { key: s.k, type: "button", style: { "--c": s.c }, "aria-pressed": tool[0] === s.k, onClick: function () { startTool(s.k); } }, h(Ic, { k: s.ic, s: 14 }), s.t); })) : null,
       miniForm,
       h("form", { className: "ast-form", onSubmit: function (e) { e.preventDefault(); send(txt[0]); } },
-        h("textarea", { ref: taRef, rows: 1, value: txt[0], maxLength: 2000, "aria-label": "Nachricht an den Assistenten", placeholder: rest[0] === 0 ? "Morgen kannst du wieder schreiben" : "Frag mich etwas zu Fallpfad …", disabled: rest[0] === 0,
+        h("textarea", { ref: taRef, rows: 1, value: txt[0], maxLength: 2000, "aria-label": "Nachricht an den Assistenten", placeholder: rest[0] === 0 ? "Morgen geht es weiter" : "Frag mich etwas zu Fallpfad …", disabled: rest[0] === 0,
           onChange: function (e) { txt[1](e.target.value); var t = e.target; t.style.height = "auto"; t.style.height = Math.min(160, t.scrollHeight) + "px"; },
           onKeyDown: function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(txt[0]); } } }),
         h("button", { type: "submit", className: "ast-send", "aria-label": "Senden", disabled: !txt[0].trim() || busy[0] || rest[0] === 0 }, h(Ic, { k: "send", s: 18, w: 2.4 }))),
@@ -512,7 +512,6 @@
         h("ul", { className: "ast-how" },
           h("li", null, h("span", { style: { "--c": "#34C759" } }, h(Ic, { k: "shield", s: 15 })), h("div", null, h("b", null, "Nur Fallpfad-Inhalte"), h("small", null, "Kein Internet. Was nicht in der App steht, sagt er offen."))),
           h("li", null, h("span", { style: { "--c": "#0A84FF" } }, h(Ic, { k: "book", s: 15 })), h("div", null, h("b", null, "Mit Quellen"), h("small", null, "Zu jeder Antwort siehst du die Stationen zum Nachlesen."))),
-          h("li", null, h("span", { style: { "--c": "#FF9500" } }, h(Ic, { k: "chat", s: 15 })), h("div", null, h("b", null, limit[0] + " Nachrichten pro Tag"), h("small", null, "Plane deine Fragen gut. Fehler zählen nicht."))),
           h("li", null, h("span", { style: { "--c": "#AF52DE" } }, h(Ic, { k: "globe", s: 15 })), h("div", null, h("b", null, "In deiner Sprache"), h("small", null, "Antwortet in der Sprache, die du unter Meine Sprache wählst."))))),
       msgs.length ? h("button", { type: "button", className: "btn ghost sm", style: { alignSelf: "flex-start" }, onClick: function () { set([]); } }, h(Ic, { k: "trash", s: 15 }), "Chat leeren") : null);
 

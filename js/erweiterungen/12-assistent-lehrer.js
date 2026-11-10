@@ -59,6 +59,9 @@
     ".astl-cons{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.4;color:var(--muted);margin-top:4px}.astl-cons input{margin-top:2px;accent-color:var(--accent)}",
     ".astl-tg{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13.5px;padding:4px 0}",
     ".astl-mod{border-radius:16px;box-shadow:inset 0 0 0 1px var(--line);padding:14px;display:flex;flex-direction:column;gap:10px}",
+    ".astl-dok-a h4{margin:6px 0 4px;font-size:14.5px;letter-spacing:-.01em}.astl-dok-a{font-size:14.5px;line-height:1.55}",
+    ".astl-jahr{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}.astl-jahr .seg3{display:inline-flex}",
+    ".astl-jahr button{all:unset;cursor:pointer;padding:4px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--fg)}.astl-jahr button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.12)}",
     ".astl-mod ul{margin:0;padding-left:18px;font-size:14px}.astl-bar{height:6px;border-radius:6px;background:var(--surface2);overflow:hidden}.astl-bar i{display:block;height:100%;background:var(--accent);transition:width .3s}"
   ].join("\n");
   var st = document.createElement("style"); st.textContent = CSS; document.head.appendChild(st);
@@ -92,18 +95,59 @@
     { k: "modul", ic: "book", c: "#0A84FF", t: "Modul aus Quellen erstellen", d: "Interaktives Lernmodul aus deinem Material", text: "Erstelle aus meinen Quellen ein Lernmodul für das 2. Ausbildungsjahr." },
     { k: "klausur", ic: "exam", c: "#AF52DE", t: "Klausur erstellen", d: "Fragen mit Lösung und Erklärung", text: "Erstelle eine Klausur mit 10 Fragen zum Thema " },
     { k: "plan", ic: "cal", c: "#FF9500", t: "Unterricht planen", d: "Einheiten mit Zeiten und passenden Modulen", text: "Plane eine Unterrichtssequenz mit 4 Doppelstunden zum Thema " },
+    { k: "lernsituation", ic: "book", c: "#FF2D55", t: "Lernsituation schreiben", d: "Fallbeispiel mit Arbeitsaufträgen nach PflAPrV", text: "Schreibe eine Lernsituation mit Arbeitsaufträgen zum Thema " },
+    { k: "arbeitsblatt", ic: "file", c: "#30B0C7", t: "Arbeitsblatt erstellen", d: "Aufgaben mit Operatoren und Zeitangaben", text: "Erstelle ein Arbeitsblatt für eine Doppelstunde zum Thema " },
+    { k: "ewh", ic: "exam", c: "#5856D6", t: "Erwartungshorizont", d: "Erwartete Punkte und Punkteverteilung", text: "Erstelle einen Erwartungshorizont mit Punkteverteilung für folgende Aufgabe: " },
+    { k: "daz", ic: "globe", c: "#FF9500", t: "Text vereinfachen", d: "Für Lernende mit Deutsch als Zweitsprache", text: "Vereinfache diesen Text auf Sprachniveau B1 und erkläre die Fachbegriffe: " },
     { k: "frage", ic: "bulb", c: "#34C759", t: "Fachfrage klären", d: "Antwort mit Quellen aus Fallpfad", text: "" }
   ];
+
+  /* Dokumente (Lernsituation, Arbeitsblatt, Erwartungshorizont …) als Word-Datei: HTML mit Word-Kopf, öffnet in Word, Pages und LibreOffice */
+  function escH(t) { return String(t == null ? "" : t).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function mdHtml(t) {
+    var out = [], list = null;
+    String(t || "").split("\n").forEach(function (l) {
+      var x = escH(l).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+      if (/^\s*[-•]\s+/.test(l)) { if (!list) { list = []; } list.push("<li>" + x.replace(/^\s*[-•]\s+/, "") + "</li>"); return; }
+      if (list) { out.push("<ul>" + list.join("") + "</ul>"); list = null; }
+      if (x.trim()) out.push("<p>" + x + "</p>");
+    });
+    if (list) out.push("<ul>" + list.join("") + "</ul>");
+    return out.join("");
+  }
+  function wordDatei(titel, html) {
+    var doc = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><title>" + escH(titel) + "</title>" +
+      "<style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.4}h1{font-size:18pt}h2{font-size:13pt;margin-top:16pt}p,li{margin:0 0 6pt}.k{color:#555;font-size:9pt}</style></head><body>" + html + "<p class='k'>Erstellt mit dem Fallpfad-Assistenten (KI). Bitte vor dem Einsatz fachlich prüfen.</p></body></html>";
+    var blob = new Blob(["\ufeff", doc], { type: "application/msword" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = String(titel || "Fallpfad").replace(/[^\wäöüÄÖÜß\- ]+/g, "").trim().replace(/\s+/g, "_").slice(0, 60) + ".doc";
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function dokText(d) { return d.titel + (d.zielgruppe ? "\n" + d.zielgruppe : "") + "\n\n" + d.abschnitte.map(function (a) { return (a.ueberschrift ? a.ueberschrift + "\n" : "") + a.text; }).join("\n\n"); }
+  function dokHtml(d) { return "<h1>" + escH(d.titel) + "</h1>" + (d.zielgruppe ? "<p><i>" + escH(d.zielgruppe) + "</i></p>" : "") + d.abschnitte.map(function (a) { return (a.ueberschrift ? "<h2>" + escH(a.ueberschrift) + "</h2>" : "") + mdHtml(a.text); }).join(""); }
+  function klausurHtml(k) {
+    return "<h1>" + escH(k.titel) + "</h1><p>Bearbeitungszeit: " + k.minuten + " Minuten</p><ol>" + k.fragen.map(function (f) { return "<li><p>" + escH(f.frage) + "</p><ol type='A'>" + f.optionen.map(function (o) { return "<li>" + escH(o) + "</li>"; }).join("") + "</ol></li>"; }).join("") + "</ol>" +
+      "<h2 style='page-break-before:always'>Lösung</h2><ol>" + k.fragen.map(function (f) { return "<li><b>" + "ABCDE"[f.richtig] + "</b> – " + escH(f.erklaerung) + "</li>"; }).join("") + "</ol>";
+  }
+  function DokKarte(p) {
+    var d = p.dok, cp = uS(false);
+    return h("div", { className: "astl-mod astl-dok" },
+      h("div", { className: "ast-plan-h" }, h("span", { className: "ast-pi", style: { "--c": "#30B0C7" } }, h(Ic, { k: "file", s: 18 })), h("div", null, h("b", null, d.titel), d.zielgruppe ? h("small", null, d.zielgruppe) : null)),
+      d.abschnitte.map(function (a, i) { return h("div", { key: i, className: "astl-dok-a" }, a.ueberschrift ? h("h4", null, a.ueberschrift) : null, h(Md, { text: a.text })); }),
+      h("div", { className: "ast-row" },
+        h("button", { type: "button", className: "btn sm", onClick: function () { wordDatei(d.titel, dokHtml(d)); } }, h(Ic, { k: "dl", s: 15 }), "Als Word-Datei"),
+        h("button", { type: "button", className: "btn ghost sm", onClick: function () { try { navigator.clipboard.writeText(dokText(d)).then(function () { cp[1](true); setTimeout(function () { cp[1](false); }, 1600); }); } catch (e) {} } }, cp[0] ? "Kopiert" : "Text kopieren")),
+      h("small", { style: { color: "var(--muted)" } }, "KI-Entwurf: vor dem Einsatz fachlich prüfen und an deine Lerngruppe anpassen."));
+  }
 
   function AssistentLehrer() {
     var uk = ukey();
     var chat = uS(function () { return lsGet("fp-astl-chat-" + uk, []); }), msgs = chat[0];
     var src = uS(function () { return lsGet("fp-astl-src-" + uk, []); }), mitApp = uS(function () { return lsGet("fp-astl-app", true); });
     var cons = uS(function () { return lsGet("fp-astl-cons-" + uk, false); });
-    var txt = uS(""), busy = uS(false), rest = uS(null), limit = uS(3), paste = uS(null), lesen = uS(null), ready = uS(false);
+    var txt = uS(""), busy = uS(false), rest = uS(null), limit = uS(3), paste = uS(null), lesen = uS(null), ready = uS(false), jahr = uS(function () { return lsGet("fp-astl-jahr", 2); });
     var logRef = uR(null), taRef = uR(null), fileRef = uR(null);
     var demo = !window.FP_SB;
-    uE(function () { loadContent().then(function () { ready[1](true); }); if (!demo) invoke({ status: true }).then(function (r) { rest[1](r.rest); limit[1](r.limit || 3); }, function () {}); }, []);
+    uE(function () { loadContent().then(function () { ready[1](true); }); if (!demo) invoke({ status: true }).then(function (r) { if (r && r.rest === 0) rest[1](0); }, function () {}); }, []);
     uE(function () { lsSet("fp-astl-chat-" + uk, msgs.slice(-30)); var el = logRef.current; if (el) setTimeout(function () { el.scrollTop = el.scrollHeight; }, 30); }, [msgs.length, busy[0]]);
     function saveSrc(v) { src[1](v); if (!lsSet("fp-astl-src-" + uk, v)) { /* zu groß für den Speicher: nur für diese Sitzung */ } }
     function addFile(f) {
@@ -134,18 +178,18 @@
       var mods = (window.FP_DATA && window.FP_DATA.mods || []).map(function (m) { return { id: m.id, titel: C.modTitle(m), jahr: m.year, pct: 0, stationen: (m.chapters || []).length }; });
       var body = {
         nachricht: text, verlauf: msgs.slice(-6).map(function (m) { return { r: m.r, t: m.r === "ki" ? (m.a && m.a.text) || "" : m.t }; }),
-        lang: "de", jahr: 2, heute: C.isoDay(new Date()), module: mods,
+        lang: "de", jahr: jahr[0], heute: C.isoDay(new Date()), module: mods,
         quellen: Q.app.map(function (d) { return { id: d.id, titel: d.titel, text: d.text.slice(0, 1700) }; }),
         eigene: Q.own.map(function (d) { return { id: d.id, titel: d.titel, text: d.text.slice(0, 2400) }; })
       };
       var pr = demo ? new Promise(function (ok) { setTimeout(function () {
         var modul = /modul/i.test(text) ? { titel: "Neues Lernmodul", jahr: 2, umfang: "mittel", schwerpunkte: Q.own.concat(Q.app).slice(0, 3).map(function (d) { return d.titel.replace(/^.*› /, ""); }), hinweis: "" } : null;
         ok({ antwort: { art: modul ? "modul" : "antwort", modul: modul, text: "**Demo ohne KI:** Im Demo-Modus ist der Assistent nicht mit dem Schulserver verbunden. Passende Stellen:" + Q.own.concat(Q.app).slice(0, 4).map(function (d) { return "\n- **" + d.titel + "**"; }).join(""), quellen: Q.own.concat(Q.app).slice(0, 4).map(function (d) { return d.id; }), vorschlaege: [] }, rest: 3 }); }, 800); }) : invoke(body);
-      pr.then(function (r) { chat[1](mine.concat([{ r: "ki", a: r.antwort, own: Q.own }])); if (r.rest != null) rest[1](r.rest); if (r.limit) limit[1](r.limit); },
+      pr.then(function (r) { chat[1](mine.concat([{ r: "ki", a: r.antwort, own: Q.own }])); if (r.rest === 0) rest[1](0); },
         function (e) { chat[1](mine.concat([{ r: "ki", err: e.message }])); if (e.rest === 0) rest[1](0); }).then(function () { busy[1](false); });
     }
     function sug(s) { if (s.k === "modul") return send(s.text); txt[1](s.text); setTimeout(function () { if (taRef.current) { taRef.current.focus(); var n = s.text.length; taRef.current.setSelectionRange(n, n); } }, 30); }
-    var restTxt = rest[0] == null ? (demo ? "Demo-Modus" : "") : rest[0] === 0 ? "Heute keine Nachrichten mehr" : "Heute noch " + rest[0] + " von " + limit[0] + " Nachrichten";
+    var restTxt = demo ? "Demo-Modus ohne KI" : rest[0] === 0 ? "Für heute ist Schluss, morgen geht es weiter" : "";
 
     var log = h("div", { className: "ast-log", ref: logRef, "aria-live": "polite" },
       !msgs.length ? h("div", { className: "ast-empty" },
@@ -162,7 +206,8 @@
             m.err ? h("div", { className: "ast-err" }, m.err) : h(Md, { text: a.text }),
             a.modul ? h(ModulKarte, { modul: a.modul, quellen: function () { return modulQuellen(a.modul); } }) : null,
             a.plan ? h(C.Plan, { plan: a.plan, lang: "de", actions: [h("button", { key: "c", type: "button", className: "btn ghost sm", onClick: function () { try { navigator.clipboard.writeText(a.plan.titel + "\n" + a.plan.tage.map(function (t, j) { return "\n" + (t.datum || "Einheit " + (j + 1)) + ": " + t.titel + "\n" + t.schritte.map(function (s) { return "- " + s.was + (s.minuten ? " (" + s.minuten + " Min.)" : ""); }).join("\n"); }).join("\n")); } catch (e) {} } }, "Kopieren")] }) : null,
-            a.klausur ? h(C.Klausur, { klausur: a.klausur, id: "kl" + i, quellen: Q, actions: [h("button", { key: "c", type: "button", className: "btn ghost sm", onClick: function () { try { navigator.clipboard.writeText(klausurText(a.klausur)); } catch (e) {} } }, "Mit Lösung kopieren")] }) : null,
+            a.klausur ? h(C.Klausur, { klausur: a.klausur, id: "kl" + i, quellen: Q, actions: [h("button", { key: "w", type: "button", className: "btn sm", onClick: function () { wordDatei(a.klausur.titel, klausurHtml(a.klausur)); } }, "Als Word-Datei"), h("button", { key: "c", type: "button", className: "btn ghost sm", onClick: function () { try { navigator.clipboard.writeText(klausurText(a.klausur)); } catch (e) {} } }, "Mit Lösung kopieren")] }) : null,
+            a.dokument ? h(DokKarte, { dok: a.dokument }) : null,
             a.quellen && a.quellen.length ? h(Q, { ids: a.quellen }) : null,
             a.vorschlaege && a.vorschlaege.length && i === msgs.length - 1 && !busy[0] ? h("div", { className: "ast-next" }, a.vorschlaege.map(function (v, j) { return h("button", { key: j, type: "button", onClick: function () { send(v); } }, v); })) : null));
       }),
@@ -174,7 +219,7 @@
           onChange: function (e) { txt[1](e.target.value); var t = e.target; t.style.height = "auto"; t.style.height = Math.min(160, t.scrollHeight) + "px"; },
           onKeyDown: function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(txt[0]); } } }),
         h("button", { type: "submit", className: "ast-send", "aria-label": "Senden", disabled: !txt[0].trim() || busy[0] || rest[0] === 0 }, h(Ic, { k: "send", s: 18, w: 2.4 }))),
-      h("div", { className: "ast-meta" }, h("span", null, restTxt), h("span", null, "Nur Fallpfad und deine Quellen")));
+      h("div", { className: "ast-meta" }, h("span", { className: "astl-jahr" }, "Niveau", h("span", { className: "seg3", role: "group", "aria-label": "Ausbildungsjahr" }, [1, 2, 3].map(function (j) { return h("button", { key: j, type: "button", "aria-pressed": jahr[0] === j, onClick: function () { jahr[1](j); lsSet("fp-astl-jahr", j); } }, j + ". Jahr"); }))), h("span", null, restTxt || "Nur Fallpfad und deine Quellen")));
 
     var side = h("aside", { className: "ast-side" },
       h("section", { className: "ast-card" }, h("h3", null, "Meine Quellen"),
@@ -196,7 +241,7 @@
         h("ul", { className: "ast-how" },
           h("li", null, h("span", { style: { "--c": "#34C759" } }, h(Ic, { k: "shield", s: 15 })), h("div", null, h("b", null, "Keine erfundenen Inhalte"), h("small", null, "Antwortet nur aus Fallpfad und deinen Quellen und sagt, wenn etwas fehlt."))),
           h("li", null, h("span", { style: { "--c": "#0A84FF" } }, h(Ic, { k: "book", s: 15 })), h("div", null, h("b", null, "Quellen zu jeder Antwort"), h("small", null, "Klausurfragen tragen ihre Quelle, nichts ohne Beleg."))),
-          h("li", null, h("span", { style: { "--c": "#FF9500" } }, h(Ic, { k: "chat", s: 15 })), h("div", null, h("b", null, (limit[0] || 3) + " Nachrichten pro Tag"), h("small", null, "Modulerstellung läuft über den Folien-Import."))))),
+          h("li", null, h("span", { style: { "--c": "#5856D6" } }, h(Ic, { k: "file", s: 15 })), h("div", null, h("b", null, "Material zum Mitnehmen"), h("small", null, "Lernsituationen, Arbeitsblätter und Klausuren als Word-Datei."))))),
       msgs.length ? h("button", { type: "button", className: "btn ghost sm", style: { alignSelf: "flex-start" }, onClick: function () { chat[1]([]); } }, h(Ic, { k: "trash", s: 15 }), "Chat leeren") : null);
 
     return h("div", { className: "wrap wide ast-wrap" },
