@@ -11,7 +11,7 @@
 // - Für das Tageslimit wird je Konto und Tag nur die Zeichenzahl gezählt (fp_ls_nutzung), Einträge älter als 7 Tage werden gelöscht.
 // - Keine Inhalte in Logs, nur Statuscodes.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
+import { antworten, vorpruefung, kiErlaubt, OHNE_KURS } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_UEBERSETZEN") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -67,6 +67,7 @@ Deno.serve(async (req) => {
   const { data: u } = await user.auth.getUser();
   if (!u?.user) return json({ error: "Bitte melde dich an." }, 401);
   const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  if (!(await kiErlaubt(admin, u.user.id))) return json({ error: OHNE_KURS, kurs: false }, 403);
 
   let b: any;
   try { b = await req.json(); } catch { return json({ error: "Ungültige Anfrage." }, 400); }

@@ -3269,6 +3269,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     return data;
   };
   var client = null;
+  var appHome = () => location.origin + location.pathname;
   async function sb() {
     if (client) return client;
     if (!window.supabase) await new Promise((res, rej) => {
@@ -3294,11 +3295,24 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
       if (error) throw new Error(de(error));
       return data.user;
     },
-    async signUp(email, password, name2) {
+    async signUp(email, password, name2, invite) {
       const c = await sb();
-      const { data, error } = await c.auth.signUp({ email, password, options: { data: { name: name2 } } });
+      const meta = { name: name2, app: "lehrer" };
+      if (invite) meta.einladungscode = String(invite).toUpperCase().replace(/[^A-Z0-9]/g, "");
+      const { data, error } = await c.auth.signUp({ email, password, options: { data: meta, emailRedirectTo: appHome() } });
       if (error) throw new Error(de(error));
+      if (data.user && Array.isArray(data.user.identities) && !data.user.identities.length) throw new Error("Zu dieser E-Mail-Adresse gibt es schon ein Konto. Bitte melde dich an oder setze dein Passwort zur\xFCck.");
       return data.session ? data.user : null;
+    },
+    async resend(email) {
+      const c = await sb();
+      const { error } = await c.auth.resend({ type: "signup", email, options: { emailRedirectTo: appHome() } });
+      if (error) throw new Error(de(error));
+    },
+    async zugang() {
+      const c = await sb();
+      const r = await c.rpc("fp_mein_zugang");
+      return r.error ? null : (r.data && r.data[0]) || null;
     },
     async signOut() {
       const c = await sb();
@@ -3306,7 +3320,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     },
     async reset(email) {
       const c = await sb();
-      const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: location.href });
+      const { error } = await c.auth.resetPasswordForEmail(email, { redirectTo: appHome() });
       if (error) throw new Error(de(error));
     },
     async me(uid4) {
@@ -4068,6 +4082,11 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     },
     async redeem() {
       return true;
+    },
+    async resend() {
+    },
+    async zugang() {
+      return null;
     },
     async courses() {
       await ensureNw(db());
@@ -9327,38 +9346,68 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     return r.json();
   }
   function Login({ onIn }) {
-    const [mode, setMode] = (0, import_react21.useState)("in"), [email, setEmail] = (0, import_react21.useState)(""), [pw, setPw] = (0, import_react21.useState)(""), [name2, setName] = (0, import_react21.useState)(""), [err, setErr] = (0, import_react21.useState)(null), [info, setInfo] = (0, import_react21.useState)(null), [busy, setBusy] = (0, import_react21.useState)(false);
+    const [mode, setMode] = (0, import_react21.useState)("in"), [email, setEmail] = (0, import_react21.useState)(""), [pw, setPw] = (0, import_react21.useState)(""), [name2, setName] = (0, import_react21.useState)(""), [err, setErr] = (0, import_react21.useState)(null), [info, setInfo] = (0, import_react21.useState)(null), [busy, setBusy] = (0, import_react21.useState)(false), [invite, setInvite] = (0, import_react21.useState)(() => {
+      try {
+        return (new URLSearchParams(location.search).get("einladung") || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+      } catch (e) {
+        return "";
+      }
+    }), [unconfirmed, setUnconfirmed] = (0, import_react21.useState)(false);
+    (0, import_react21.useEffect)(() => {
+      if (invite) setMode("up");
+    }, []);
+    const resend = async () => {
+      setErr(null);
+      setBusy(true);
+      try {
+        await API.resend(email.trim());
+        setInfo("Wir haben dir einen neuen Best\xE4tigungslink geschickt. Schau auch im Spam-Ordner nach.");
+        setUnconfirmed(false);
+      } catch (e) {
+        setErr(e.message);
+      }
+      setBusy(false);
+    };
     const go = async () => {
       setErr(null);
       setInfo(null);
+      setUnconfirmed(false);
       setBusy(true);
       try {
         if (mode === "in") onIn(await API.signIn(email.trim(), pw));
         else if (mode === "up") {
-          const u = await API.signUp(email.trim(), pw, name2.trim());
+          if (!name2.trim()) throw new Error("Bitte gib deinen Namen ein.");
+          const u = await API.signUp(email.trim(), pw, name2.trim(), invite.trim());
           if (u) onIn(u);
-          else setInfo("Fast geschafft: Best\xE4tige deine E-Mail-Adresse \xFCber den Link in der Mail und melde dich dann an.");
+          else {
+            setInfo("Fast geschafft: Wir haben dir eine E-Mail geschickt. Klicke auf den Link darin, dann geht es hier im Lehrer-Portal weiter." + (invite.trim() ? " Dein Einladungscode wird dabei automatisch eingel\xF6st." : " Danach gibst du deinen Einladungscode ein."));
+            setMode("in");
+          }
         } else {
           await API.reset(email.trim());
           setInfo("Wenn ein Konto existiert, kommt gleich eine E-Mail zum Zur\xFCcksetzen.");
         }
       } catch (e) {
         setErr(e.message);
+        if (/best\xE4tige zuerst/i.test(e.message)) setUnconfirmed(true);
       }
       setBusy(false);
     };
     return /* @__PURE__ */ import_react21.default.createElement("div", { className: "lwrap" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "card lcard" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "row", style: { gap: 12 } }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("div", null, /* @__PURE__ */ import_react21.default.createElement("b", { style: { fontSize: 18 } }, "Fallpfad Lehrer-Portal"), /* @__PURE__ */ import_react21.default.createElement("div", { className: "muted", style: { fontSize: 14 } }, "F\xFCr Lehrkr\xE4fte und Praxisanleitende"))), isDemo && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice warn" }, "Demo-Modus: Es ist keine Datenbank verbunden. Alle Daten sind erfunden und bleiben in diesem Browser. Du kannst dich mit beliebigen Angaben anmelden."), configError() && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad" }, configError()), /* @__PURE__ */ import_react21.default.createElement("form", { onSubmit: (e) => {
       e.preventDefault();
       go();
-    }, className: "lform" }, mode === "up" && /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "ln" }, "Name"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "ln", className: "input", value: name2, onChange: (e) => setName(e.target.value), autoComplete: "name" })), /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "le" }, "E-Mail"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "le", className: "input", type: "email", value: email, onChange: (e) => setEmail(e.target.value), autoComplete: "username", required: !isDemo })), mode !== "reset" && /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "lp" }, "Passwort"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "lp", className: "input", type: "password", value: pw, onChange: (e) => setPw(e.target.value), autoComplete: mode === "up" ? "new-password" : "current-password", required: !isDemo, minLength: isDemo ? 0 : 6 })), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", role: "alert" }, err), info && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice ok", role: "status" }, info), /* @__PURE__ */ import_react21.default.createElement("button", { type: "submit", className: "btn", disabled: busy }, mode === "in" ? "Anmelden" : mode === "up" ? "Konto anlegen" : "Link senden")), /* @__PURE__ */ import_react21.default.createElement("div", { className: "row", style: { justifyContent: "space-between" } }, mode !== "in" ? /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("in")) }, "Zur Anmeldung") : /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("up")) }, "Neues Konto mit Einladungscode"), mode === "in" && !isDemo && /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("reset")) }, "Passwort vergessen"))));
+    }, className: "lform" }, mode === "up" && /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "ln" }, "Name"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "ln", className: "input", value: name2, onChange: (e) => setName(e.target.value), autoComplete: "name" })), /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "le" }, "E-Mail"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "le", className: "input", type: "email", value: email, onChange: (e) => setEmail(e.target.value), autoComplete: "username", required: !isDemo })), mode !== "reset" && /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "lp" }, "Passwort"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "lp", className: "input", type: "password", value: pw, onChange: (e) => setPw(e.target.value), autoComplete: mode === "up" ? "new-password" : "current-password", required: !isDemo, minLength: isDemo ? 0 : 6 })), mode === "up" && /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "linv" }, "Einladungscode"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "linv", className: "input", value: invite, onChange: (e) => setInvite(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "")), autoComplete: "off", placeholder: "z. B. 7KQ2M9XA", maxLength: 16 }), /* @__PURE__ */ import_react21.default.createElement("small", { className: "muted" }, "Den Code bekommst du von deiner Schule oder der Fallpfad-Verwaltung. Ohne Code kannst du dich trotzdem registrieren; die Verwaltung schaltet dich dann frei.")), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", role: "alert" }, err, unconfirmed && /* @__PURE__ */ import_react21.default.createElement("div", { style: { marginTop: 8 } }, /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "btn sm ghost", disabled: busy || !email.trim(), onClick: (e) => { e.preventDefault(); e.stopPropagation(); resend(); } }, "Best\xE4tigungs-Mail erneut senden"))), info && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice ok", role: "status" }, info), /* @__PURE__ */ import_react21.default.createElement("button", { type: "submit", className: "btn", disabled: busy }, mode === "in" ? "Anmelden" : mode === "up" ? "Konto anlegen" : "Link senden")), /* @__PURE__ */ import_react21.default.createElement("div", { className: "row", style: { justifyContent: "space-between" } }, mode !== "in" ? /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("in")) }, "Zur Anmeldung") : /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("up")) }, "Neues Konto mit Einladungscode"), mode === "in" && !isDemo && /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(() => setMode("reset")) }, "Passwort vergessen"))));
   }
-  function NotTeacher({ me, onRedeem, signOut }) {
-    const [c, setC] = (0, import_react21.useState)(""), [err, setErr] = (0, import_react21.useState)(null), [busy, setBusy] = (0, import_react21.useState)(false);
-    const go = async () => {
+  function NotTeacher({ me, user, onRedeem, signOut }) {
+    const meta = user && user.user_metadata || {};
+    const [c, setC] = (0, import_react21.useState)(String(meta.einladungscode || "").toUpperCase()), [err, setErr] = (0, import_react21.useState)(null), [busy, setBusy] = (0, import_react21.useState)(false), [z, setZ] = (0, import_react21.useState)(null), [info, setInfo] = (0, import_react21.useState)(null);
+    const tried = (0, import_react21.useRef)(false);
+    const go = async (code) => {
       setBusy(true);
       setErr(null);
+      setInfo(null);
       try {
-        const ok = await API.redeem(c.trim());
+        const ok = await API.redeem(String(code || c).trim());
         if (ok) onRedeem();
         else setErr("Dieser Einladungscode ist ung\xFCltig oder wurde schon verwendet.");
       } catch (e) {
@@ -9366,10 +9415,27 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
       }
       setBusy(false);
     };
-    return /* @__PURE__ */ import_react21.default.createElement("div", { className: "lwrap" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "card lcard" }, /* @__PURE__ */ import_react21.default.createElement("h2", null, "Noch kein Lehrkraft-Zugang"), /* @__PURE__ */ import_react21.default.createElement("p", { className: "muted" }, "Du bist als ", me && me.email, " angemeldet. Dieses Konto ist f\xFCr die Sch\xFCler-App freigeschaltet, aber noch nicht f\xFCr das Lehrer-Portal. Gib den Einladungscode ein, den du von einer Kollegin oder der Schulleitung bekommen hast."), /* @__PURE__ */ import_react21.default.createElement("form", { className: "lform", onSubmit: (e) => {
+    const check = async () => {
+      setBusy(true);
+      setErr(null);
+      const d = await API.zugang().catch(() => null);
+      setZ(d);
+      if (d && (d.rolle === "teacher" || d.rolle === "admin")) onRedeem();
+      else setInfo("Noch nicht freigeschaltet. Sobald die Fallpfad-Verwaltung dein Konto freigibt, geht es hier weiter.");
+      setBusy(false);
+    };
+    (0, import_react21.useEffect)(() => {
+      API.zugang().then(setZ, () => {});
+      if (!tried.current && meta.einladungscode) {
+        tried.current = true;
+        go(meta.einladungscode);
+      }
+    }, []);
+    const fromStudentApp = meta.app !== "lehrer";
+    return /* @__PURE__ */ import_react21.default.createElement("div", { className: "lwrap" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "card lcard" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "eyebrow" }, "Letzter Schritt"), /* @__PURE__ */ import_react21.default.createElement("h2", null, "Zugang zu deiner Schule freischalten"), /* @__PURE__ */ import_react21.default.createElement("p", { className: "muted" }, "Du bist als ", /* @__PURE__ */ import_react21.default.createElement("b", null, me && me.email), " angemeldet. ", fromStudentApp ? "Dieses Konto ist bisher nur f\xFCr die Sch\xFCler-App freigeschaltet. " : "", "Gib den Einladungscode ein, den du von deiner Schule oder der Fallpfad-Verwaltung bekommen hast. Erst danach siehst du die Kurse und Daten deiner Schule."), z && z.abgelehnt && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad" }, "Deine Anfrage auf einen Lehrkraft-Zugang wurde nicht best\xE4tigt. Mit einem g\xFCltigen Einladungscode kannst du dich trotzdem freischalten."), /* @__PURE__ */ import_react21.default.createElement("form", { className: "lform", onSubmit: (e) => {
       e.preventDefault();
       go();
-    } }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "ic" }, "Einladungscode"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "ic", className: "input", value: c, onChange: (e) => setC(e.target.value.toUpperCase()), autoComplete: "off", placeholder: "z. B. 7KQ2M9XA" })), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad" }, err), /* @__PURE__ */ import_react21.default.createElement("button", { type: "submit", className: "btn", disabled: busy || c.length < 4 }, "Freischalten")), /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(signOut) }, "Abmelden")));
+    } }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "field" }, /* @__PURE__ */ import_react21.default.createElement("label", { htmlFor: "ic" }, "Einladungscode"), /* @__PURE__ */ import_react21.default.createElement("input", { id: "ic", className: "input", value: c, onChange: (e) => setC(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "")), autoComplete: "off", placeholder: "z. B. 7KQ2M9XA", maxLength: 16 })), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad", role: "alert" }, err), info && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice", role: "status" }, info), /* @__PURE__ */ import_react21.default.createElement("button", { type: "submit", className: "btn", disabled: busy || c.length < 4 }, "Freischalten")), /* @__PURE__ */ import_react21.default.createElement("p", { className: "muted", style: { fontSize: 14 } }, "Kein Code? ", fromStudentApp ? "Bitte deine Schule um einen Einladungscode." : "Deine Registrierung liegt der Fallpfad-Verwaltung vor. Sie kann dein Konto auch ohne Code direkt freischalten."), /* @__PURE__ */ import_react21.default.createElement("div", { className: "row", style: { justifyContent: "space-between" } }, /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", disabled: busy, onClick: stop(check) }, "Status erneut pr\xFCfen"), /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", className: "skip", onClick: stop(signOut) }, "Abmelden"))));
   }
   function useIndex(mods) {
     return (0, import_react21.useMemo)(() => {
@@ -10000,7 +10066,7 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     };
     if (user === void 0 || user && !me && !err) return /* @__PURE__ */ import_react21.default.createElement("div", { className: "splash2" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "logo" }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: "cap" })), /* @__PURE__ */ import_react21.default.createElement("p", { className: "muted" }, "Fallpfad Lehrer-Portal wird geladen \u2026"));
     if (!user) return /* @__PURE__ */ import_react21.default.createElement(import_react21.default.Fragment, null, /* @__PURE__ */ import_react21.default.createElement(Login, { onIn: setUser }), err && /* @__PURE__ */ import_react21.default.createElement("div", { className: "notice bad floating" }, err));
-    if (!teacher) return /* @__PURE__ */ import_react21.default.createElement(NotTeacher, { me: me || { email: user.email }, onRedeem: () => loadMe(user), signOut });
+    if (!teacher) return /* @__PURE__ */ import_react21.default.createElement(NotTeacher, { me: me || { email: user.email }, user, onRedeem: () => { loadMe(user); if (window.FP_SCHOOL_RELOAD) window.FP_SCHOOL_RELOAD(); }, signOut });
     const tabs = [["start", "\xDCbersicht", "home"], ["kurse", "Kurse & Sch\xFCler", "users"], ...window.FP_AssistentLehrer ? [["assistent", "Assistent", "spark"]] : [], ["module", "Module", "layers"], ["aufgaben", "Aufgaben", "clip"], ["nachweis", "Ausbildungsnachweis", "seal"], ["feedback", "Feedback", "chat"], ["pruefen", "Pr\xFCfen", "exam"], ["nachrichten", "Nachrichten", "mail"], ["stundenplan", "Stundenplan", "cal"], ["live", "Live", "play"], ["team", "Team-Krankenhaus", "hosp"], ["einstellungen", "Einstellungen", "gear"], ...me && me.role === "admin" ? [["schulen", "Schulen", "school"]] : []];
     const nav = tabs.map(([k, l, ic]) => /* @__PURE__ */ import_react21.default.createElement("button", { type: "button", key: k, className: "tab", "aria-current": tab === k && !edit ? "page" : void 0, onClick: stop(() => go(k)) }, /* @__PURE__ */ import_react21.default.createElement(Icon, { n: ic, w: tab === k ? 2.2 : 1.8 }), /* @__PURE__ */ import_react21.default.createElement("span", null, l)));
     window.FP_PROF = { signOut, setTheme: (x) => setTheme(x), name: me && (me.display_name || ""), email: (me && me.email) || (user && user.email), go: (t) => setTab(t) };

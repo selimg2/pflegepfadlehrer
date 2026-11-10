@@ -13,7 +13,7 @@
 //
 // KI-Verordnung: Die Rückmeldung ist eine Übungshilfe, keine Note und keine Prüfungsentscheidung.
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { antworten, koerper, vorpruefung } from "../_shared/sicherheit.ts";
+import { antworten, koerper, vorpruefung, kiErlaubt, OHNE_KURS } from "../_shared/sicherheit.ts";
 import { FAELLE } from "../_shared/pflegeplanung-faelle.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_PFLEGEPLANUNG") ?? Deno.env.get("OPENAI_MODEL_AUSWERTUNG") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
@@ -149,6 +149,7 @@ Deno.serve(async (req) => {
   const { data: u } = await sb.auth.getUser();
   if (!u?.user) return json({ error: "Bitte melde dich an." }, 401);
   const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  if (!(await kiErlaubt(admin, u.user.id))) return json({ error: OHNE_KURS, kurs: false }, 403);
 
   const b = await koerper(req, 120_000);
   if (!b) return json({ error: "Ungültige Anfrage." }, 400);

@@ -2,6 +2,7 @@
 // "gespraech-sitzung" und "gespraech-auswertung".
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { HASHES, VORHER } from "./komm-szenarien.ts";
+import { kiErlaubt, OHNE_KURS } from "./sicherheit.ts";
 
 export const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
 export const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_GESPRAECHE_TAG") ?? "8"); // neue Gespräche je Konto und Tag
@@ -27,7 +28,9 @@ export async function anmeldung(req: Request, json: (b: unknown, status?: number
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
   const { data: u } = await user.auth.getUser();
   if (!u?.user) return json({ error: "Bitte melde dich an, um Gespräche zu üben." }, 401);
-  return { uid: u.user.id, admin: createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!) };
+  const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  if (!(await kiErlaubt(admin, u.user.id))) return json({ error: OHNE_KURS, kurs: false }, 403);
+  return { uid: u.user.id, admin };
 }
 
 /** Zähler je Konto und Tag (nur Anzahl, keine Inhalte). feld: "gespraeche" oder "auswertungen". */

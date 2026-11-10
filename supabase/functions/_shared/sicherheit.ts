@@ -75,3 +75,17 @@ export async function koerper(req: Request, maxBytes = 400_000): Promise<any | n
     return null;
   }
 }
+
+/** Hinweis, wenn eine lernende Person noch in keinem Kurs ist. */
+export const OHNE_KURS = "Die KI-Funktionen sind freigeschaltet, sobald du in einem Kurs bist. Gib dazu im Profil unter „Kurs beitreten“ den Kurscode deiner Lehrkraft ein.";
+
+/**
+ * Darf dieses Konto KI-Funktionen nutzen? Lehrkräfte und Administration: ja. Lernende: nur in einem Kurs einer
+ * freigeschalteten Schule (Datenbankfunktion fp_ki_erlaubt, nur mit dem Service-Schlüssel aufrufbar).
+ * Bei einem Datenbankfehler wird abgelehnt.
+ */
+export async function kiErlaubt(admin: { rpc: (fn: string, args: Record<string, unknown>) => PromiseLike<{ data: unknown; error: { code?: string } | null }> }, uid: string): Promise<boolean> {
+  const { data, error } = await admin.rpc("fp_ki_erlaubt", { p_user: uid });
+  if (error) { console.error("ki_erlaubt", error.code); return false; }
+  return data === true;
+}

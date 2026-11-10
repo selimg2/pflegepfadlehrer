@@ -2,6 +2,18 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Anmeldung, Freischaltung und Kurs-Pflicht (10.11.2026, Abend)
+
+**Ablauf Lehrkraft:** Registrieren im Portal (optional mit Einladungscode, auch per Link `…/?einladung=CODE`) → Mail „Willkommen bei Fallpfad“ → Klick führt direkt zurück ins Lehrer-Portal und meldet an → ein Code aus der Registrierung wird beim Bestätigen automatisch eingelöst. Ohne gültigen Code sieht das Konto nur die Seite „Zugang zu deiner Schule freischalten“.
+
+**Ablauf Administration (Rolle `admin`):** Reiter *Schulen* → Karte *Lehrkräfte freischalten*. Dort stehen alle Konten, die sich im Lehrer-Portal registriert haben und noch keine Lehrkraft sind: Schule wählen, optional Schulleitung, *Freischalten* oder *Ablehnen*. Darunter: bestehendes Konto per E-Mail-Adresse freischalten. Einladungscodes je Schule wie bisher; die erzeugte Einladungs-Mail enthält jetzt fertige Links mit Code.
+
+**Ablauf Lernende:** Registrieren in der Schüler-App → Bestätigungslink führt zurück in die Schüler-App. Ohne Kurs sind Assistent, Sprachsimulation, Pflegeplanung-Rückmeldung und App-Übersetzung gesperrt (Prüfung serverseitig über `fp_ki_erlaubt`). Freigeschaltet, sobald der Kurscode eingegeben ist.
+
+**Technik:** `supabase/zugang_freischaltung.sql` (Funktionen `fp_einladung_einloesen`, `fp_auth_bestaetigt` + Trigger auf `auth.users`, `fp_admin_anfragen`, `fp_admin_freischalten`, `fp_admin_freischalten_email`, `fp_admin_ablehnen`, `fp_ki_erlaubt`, `fp_mein_zugang`, Versuchsbegrenzung `fp_code_versuch`). Links aus den E-Mails löst `js/kern/00-anmeldelink.js` in beiden Apps ein (auch „Passwort vergessen“: Dialog für das neue Passwort). E-Mail-Vorlagen in `supabase/email-vorlagen/`.
+
+**Supabase-Dashboard (Authentication):** *URL Configuration*: Site URL `https://pflegepfad.vercel.app`, Redirect URLs `https://pflegepfad.vercel.app/**` und `https://pflegepfadlehrer.vercel.app/**`. *Email Templates*: Inhalte aus `supabase/email-vorlagen/` (Bestätigung, Passwort, E-Mail ändern, Magic Link). *SMTP Settings*: eigener Absender „Fallpfad“, sonst steht „Supabase Auth“ als Absender in der Mail.
+
 ## Neu in dieser Version (10.11.2026)
 
 - **Startseite:** Ganz oben stehen jetzt deine Kurse als Kursblöcke (wie unter „Kurse & Schüler“: im Einsatz, im Unterricht, Praxisanleitung, Unterrichtsfeedback). Ein Tipp öffnet den Kurs. Die Zahlen (Lernende, aktiv in 7 Tagen) stehen unten.

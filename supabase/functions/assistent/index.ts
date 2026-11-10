@@ -12,7 +12,7 @@
 // - store=false, keine Inhalte in Logs. Fallpfad speichert den Chat nicht auf dem Server (nur auf dem Gerät).
 // - Für das Tageslimit wird je Konto und Tag nur die Anzahl der Nachrichten gezählt (fp_assistent_nutzung).
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { antworten, koerper, vorpruefung } from "../_shared/sicherheit.ts";
+import { antworten, kiErlaubt, koerper, OHNE_KURS, vorpruefung } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_ASSISTENT") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -160,6 +160,7 @@ Deno.serve(async (req) => {
   const { data: u } = await sb.auth.getUser();
   if (!u?.user) return json({ error: "Bitte melde dich an, um den Assistenten zu nutzen." }, 401);
   const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+  const darf = await kiErlaubt(admin, u.user.id);
 
   const b = await koerper(req, 300_000);
   if (!b) return json({ error: "Ungültige Anfrage." }, 400);
@@ -173,10 +174,12 @@ Deno.serve(async (req) => {
 
   // Nur Stand abfragen (für die Anzeige „noch x Nachrichten heute“)
   if (b.status === true) {
+    if (!darf) return json({ rest: null, kurs: false });
     const { data: z } = await admin.from("fp_assistent_nutzung").select("nachrichten").eq("user_id", u.user.id).eq("tag", new Date().toISOString().slice(0, 10)).maybeSingle();
     return json({ rest: Math.max(0, limit - (z?.nachrichten ?? 0)) > 0 ? null : 0 });
   }
 
+  if (!darf) return json({ error: OHNE_KURS, kurs: false }, 403);
   const e = eingabe(b, rolle);
   if (!e.nachricht) return json({ error: "Bitte schreibe eine Nachricht." }, 400);
   const lang = SPRACHEN[String(b.lang || "de")] ? String(b.lang || "de") : "de";

@@ -63,7 +63,7 @@
       rpc("fp_admin_people", { p_school: s.id }).then(setPeople).catch(function (x) { p.err(x.message); });
     };
     useEffect(load, [s.id]);
-    var mail = fresh ? "Hallo,\n\nhier sind eure Zugänge zum Fallpfad Lehrer-Portal (" + s.name + "):\n\n1. Portal öffnen: " + location.origin + location.pathname + "\n2. „Neues Konto mit Einladungscode“ wählen und mit der dienstlichen E-Mail registrieren\n3. E-Mail bestätigen, anmelden und einen dieser Codes eingeben (jeder Code gilt einmal):\n\n" + fresh.join("\n") + "\n\nViele Grüße" : "";
+    var mail = fresh ? "Hallo,\n\nhier sind eure Zugänge zum Fallpfad Lehrer-Portal (" + s.name + "):\n\nJede Person nutzt einen eigenen Link (jeder Code gilt einmal). Der Link öffnet die Registrierung mit eingetragenem Code, danach nur noch die E-Mail bestätigen:\n\n" + fresh.map(function (c) { return location.origin + location.pathname + "?einladung=" + c + "   (Code " + c + ")"; }).join("\n") + "\n\nViele Grüße" : "";
     return h("div", { className: "card adm-detail" },
       h("div", { className: "row", style: { justifyContent: "space-between", alignItems: "flex-start", gap: 12 } },
         h("div", null, h("div", { className: "eyebrow" }, s.aktiv ? "Freigeschaltet" : "Gesperrt"), h("h2", { style: { margin: "6px 0 2px" } }, s.name), h("p", { className: "muted", style: { margin: 0 } }, [s.ort, s.kontakt].filter(Boolean).join(" · ") || "Keine weiteren Angaben")),
@@ -90,6 +90,68 @@
         return h("div", { key: c.code, className: "adm-li" }, h("div", null, h("code", null, c.code), h("small", null, (c.schulleitung ? "Schulleitung · " : "") + "erstellt " + fmt(c.created_at))), h("span", { className: "pill " + (c.used_at ? "ok" : "") }, c.used_at ? "benutzt von " + (c.used_email || "?") : "offen"));
       })));
   }
+  /* Freischaltungs-Anfragen: Konten, die sich im Lehrer-Portal registriert haben, aber noch keine Lehrkraft sind */
+  function Anfragen(p) {
+    var a = useState(null), list = a[0], setList = a[1];
+    var w = useState({}), wahl = w[0], setWahl = w[1];
+    var m = useState({ email: "", school: "", leit: false }), man = m[0], setMan = m[1];
+    var o = useState(null), ok = o[0], setOk = o[1];
+    var b = useState(false), busy = b[0], setBusy = b[1];
+    var schools = p.schools || [];
+    var def = schools.length === 1 ? schools[0].id : "";
+    var load = function () { rpc("fp_admin_anfragen").then(function (d) { setList(d || []); }).catch(function (x) { setList([]); p.err(x.message); }); };
+    useEffect(load, []);
+    var pick = function (id, k, v) { setWahl(function (x) { var y = Object.assign({}, x); y[id] = Object.assign({ school: def, leit: false }, y[id]); y[id][k] = v; return y; }); };
+    var frei = function (u) {
+      var c = Object.assign({ school: def, leit: false }, wahl[u.id]);
+      if (!c.school) { p.err("Bitte zuerst eine Schule wählen."); return; }
+      setBusy(true);
+      rpc("fp_admin_freischalten", { p_user: u.id, p_school: c.school, p_schulleitung: !!c.leit })
+        .then(function () { setOk((u.name || u.email) + " ist jetzt Lehrkraft."); load(); p.reload(); })
+        .catch(function (x) { p.err(x.message); }).then(function () { setBusy(false); });
+    };
+    var ab = function (u) {
+      if (!confirm("Anfrage von " + (u.name || u.email) + " ablehnen? Das Konto bleibt bestehen, sieht das Lehrer-Portal aber nicht.")) return;
+      rpc("fp_admin_ablehnen", { p_user: u.id }).then(load).catch(function (x) { p.err(x.message); });
+    };
+    var perMail = function (e) {
+      e.preventDefault();
+      var sc = man.school || def;
+      if (!sc) { p.err("Bitte eine Schule wählen."); return; }
+      setBusy(true);
+      rpc("fp_admin_freischalten_email", { p_email: man.email, p_school: sc, p_schulleitung: man.leit })
+        .then(function () { setOk(man.email + " ist jetzt Lehrkraft."); setMan({ email: "", school: man.school, leit: false }); load(); p.reload(); })
+        .catch(function (x) { p.err(x.message); }).then(function () { setBusy(false); });
+    };
+    var sel = function (val, on, id) {
+      return h("select", { className: "input", id: id, value: val, onChange: function (ev) { on(ev.target.value); }, style: { minWidth: 180 } },
+        h("option", { value: "" }, "Schule wählen …"), schools.map(function (s) { return h("option", { key: s.id, value: s.id }, s.name + (s.aktiv ? "" : " (gesperrt)")); }));
+    };
+    var fmtd = function (d) { return d ? new Date(d).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" }) : ""; };
+    return h("div", { className: "card adm-anfragen" },
+      h("div", { className: "row", style: { justifyContent: "space-between", alignItems: "baseline", gap: 10 } },
+        h("h3", { style: { margin: 0 } }, "Lehrkräfte freischalten"),
+        list && list.length ? h("span", { className: "pill warn" }, list.length + (list.length === 1 ? " Anfrage" : " Anfragen")) : null),
+      h("p", { className: "muted" }, "Wer sich im Lehrer-Portal registriert, erscheint hier, bis du das Konto einer Schule zuordnest. Alternativ löst die Person einen Einladungscode ein (unten bei der jeweiligen Schule)."),
+      ok && h("div", { className: "notice ok", role: "status" }, ok, " ", h("button", { type: "button", className: "skip", onClick: function () { setOk(null); } }, "OK")),
+      !list ? h("p", { className: "muted" }, "Wird geladen …") : !list.length ? h("p", { className: "muted" }, "Keine offenen Anfragen.") :
+        h("div", { className: "adm-list" }, list.map(function (u) {
+          var c = Object.assign({ school: def, leit: false }, wahl[u.id]);
+          return h("div", { key: u.id, className: "adm-li", style: { flexWrap: "wrap", gap: 10 } },
+            h("div", { style: { minWidth: 200, flex: "1 1 220px" } }, h("b", null, u.name || u.email), h("small", null, u.email + " · registriert " + fmtd(u.registriert) + (u.bestaetigt ? "" : " · E-Mail noch nicht bestätigt") + (u.code ? " · eingegebener Code " + u.code + " war ungültig" : ""))),
+            h("div", { className: "row", style: { gap: 8, flexWrap: "wrap", alignItems: "center" } },
+              sel(c.school, function (v) { pick(u.id, "school", v); }),
+              h("label", { className: "adm-check sm" }, h("input", { type: "checkbox", checked: !!c.leit, onChange: function (e) { pick(u.id, "leit", e.target.checked); } }), h("span", null, h("b", null, "Schulleitung"))),
+              h("button", { type: "button", className: "btn sm", disabled: busy, onClick: function () { frei(u); } }, "Freischalten"),
+              h("button", { type: "button", className: "btn ghost sm", disabled: busy, onClick: function () { ab(u); } }, "Ablehnen")));
+        })),
+      h("details", { style: { marginTop: 14 } }, h("summary", { style: { cursor: "pointer", fontWeight: 600 } }, "Bestehendes Konto per E-Mail-Adresse freischalten"),
+        h("form", { className: "row", style: { gap: 8, flexWrap: "wrap", alignItems: "flex-end", marginTop: 10 }, onSubmit: perMail },
+          h("div", { className: "field", style: { margin: 0, flex: "1 1 220px" } }, h("label", { htmlFor: "af-m" }, "E-Mail-Adresse"), h("input", { id: "af-m", className: "input", type: "email", required: true, value: man.email, onChange: function (e) { setMan(Object.assign({}, man, { email: e.target.value })); } })),
+          h("div", { className: "field", style: { margin: 0 } }, h("label", { htmlFor: "af-s" }, "Schule"), sel(man.school || def, function (v) { setMan(Object.assign({}, man, { school: v })); }, "af-s")),
+          h("label", { className: "adm-check sm" }, h("input", { type: "checkbox", checked: man.leit, onChange: function (e) { setMan(Object.assign({}, man, { leit: e.target.checked })); } }), h("span", null, h("b", null, "Schulleitung"))),
+          h("button", { type: "submit", className: "btn", disabled: busy || !man.email }, "Freischalten"))));
+  }
   function AdminPage() {
     var l = useState(null), list = l[0], setList = l[1];
     var e = useState(null), err = e[0], setErr = e[1];
@@ -110,6 +172,7 @@
     return h("div", { className: "wrap wide" },
       h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", { style: { marginTop: 8 } }, "Schulen"), h("p", null, "Hier legst du Schulen an, schaltest sie frei, erzeugst Einladungscodes für Lehrkräfte und siehst, wie aktiv jede Schule ist. Jede Schule sieht nur ihre eigenen Daten.")),
       err && h("div", { className: "notice bad" }, err, " ", h("button", { type: "button", className: "skip", onClick: function () { setErr(null); } }, "Ausblenden")),
+      list && h(Anfragen, { schools: list, err: setErr, reload: load }),
       h("div", { className: "card adm-view" }, h("div", null, h("b", null, "Ansicht im Portal"), h("small", null, view ? "Du siehst gerade das Portal wie eine Lehrkraft dieser Schule." : "Du siehst gerade die Daten aller Schulen zusammen.")),
         h("select", { className: "input", value: view || "", onChange: function (ev) { doView(ev.target.value || null); } }, h("option", { value: "" }, "Alle Schulen"), (list || []).map(function (s) { return h("option", { key: s.id, value: s.id }, s.name); }))),
       h("div", { className: "row", style: { justifyContent: "space-between", margin: "22px 0 10px" } }, h("h2", { style: { margin: 0, fontSize: 20 } }, (list ? list.length : 0) + " Schulen · " + tot.t + " Lehrkräfte · " + tot.l + " Lernende"), h("button", { type: "button", className: "btn", onClick: function () { setNeu(true); setOpen(null); } }, "+ Neue Schule")),
