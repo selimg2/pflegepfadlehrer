@@ -11,17 +11,12 @@
 // - Für das Tageslimit wird je Konto und Tag nur die Zeichenzahl gezählt (fp_ls_nutzung), Einträge älter als 7 Tage werden gelöscht.
 // - Keine Inhalte in Logs, nur Statuscodes.
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_UEBERSETZEN") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
 const EFFORT = Deno.env.get("OPENAI_REASONING_UEBERSETZEN") ?? "none"; // "none" = Parameter weglassen
 const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_LS_ZEICHEN_TAG") ?? "60000"); // Zeichen je Konto und Tag
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
 const SPRACHEN: Record<string, string> = {
   einfach: "Einfaches Deutsch", en: "Englisch", tr: "Türkisch", ar: "Arabisch", uk: "Ukrainisch", ru: "Russisch",
@@ -58,8 +53,9 @@ Verständliche, freundliche Sprache für Auszubildende.`;
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  const vor = vorpruefung(req, 300_000);
+  if (vor) return vor;
+  const json = antworten(req);
   const KEY = Deno.env.get("OPENAI_API_KEY");
   if (!KEY) return json({ error: "Die Übersetzung ist an dieser Schule noch nicht eingerichtet." }, 503);
 

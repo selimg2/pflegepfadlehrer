@@ -8,7 +8,8 @@
 // - store=false: OpenAI legt die Anfrage nicht als Konversation ab, nutzt sie nicht zum Training und
 //   bewahrt sie höchstens 30 Tage zur Missbrauchsüberwachung auf.
 // - Fallpfad speichert die Mitschrift nicht auf dem Server. Gezählt wird nur die Anzahl der Auswertungen je Konto und Tag.
-import { BASE, CORS, TAGESLIMIT, akteText, anmeldung, clean, json, szenario, zaehlen } from "../_shared/komm.ts";
+import { BASE, TAGESLIMIT, akteText, anmeldung, clean, szenario, zaehlen } from "../_shared/komm.ts";
+import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_AUSWERTUNG") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const EFFORT = Deno.env.get("OPENAI_REASONING_AUSWERTUNG") ?? "low"; // "none" = Parameter weglassen
@@ -118,12 +119,13 @@ So bewertest du:
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  const vor = vorpruefung(req, 200_000);
+  if (vor) return vor;
+  const json = antworten(req);
   const KEY = Deno.env.get("OPENAI_API_KEY");
   if (!KEY) return json({ error: "Die Auswertung ist an dieser Schule noch nicht eingerichtet." }, 503);
 
-  const a = await anmeldung(req);
+  const a = await anmeldung(req, json);
   if (a instanceof Response) return a;
 
   let b: any;

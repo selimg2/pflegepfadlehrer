@@ -2,23 +2,28 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
-| Datei | Wofür |
-|---|---|
-| `index.html` | das komplette Lehrer-Portal |
-| `config.js` | Verbindung zur Datenbank. Hier trägst du dieselben zwei Werte ein wie in der Schüler-App, dazu die Adresse der Schüler-App |
-| `content.json` | alle 41 eingebauten Module als Daten, damit das Portal sie anzeigen und bearbeiten kann |
-| `favicon.svg` | Symbol im Browser-Tab |
-| `vercel.json` | sorgt dafür, dass Suchmaschinen das Portal nicht anzeigen |
-| `supabase/lehrer_schema.sql` | Tabellen und Zugriffsrechte für Kurse, Module, Profile und Einladungen (einmal in Supabase ausführen) |
-| `supabase/aufgaben.sql`, `live.sql`, `kurse_examen.sql`, `team.sql`, `kommunikation.sql` | weitere Funktionen, Reihenfolge siehe LIESMICH der Schüler-App |
-| `supabase/nachweis.sql` | digitaler Ausbildungsnachweis (Schritt 8, nach `kommunikation.sql` ausführen) |
-| `supabase/lehrer_erweiterung.sql` | Lehrer-Stundenplan und neue Aufgabenarten Training, Team-Krankenhaus, Live-Fall (Schritt 10) |
-| `supabase/schulen.sql` | Mehrere Schulen: Trennung der Daten je Schule, Bereich „Schulen“ für die Administration (Schritt 11) |
-| `supabase/live_unterricht.sql` | Live im Unterricht und Modul-Freischaltung (Schritt 12, nach `schulen.sql`) |
-| `supabase/functions/folien-import/index.ts` | KI-Dienst für den Folien-Import (Supabase Edge Function, siehe unten) |
+## Aufbau (modular)
 
-Ohne ausgefüllte `config.js` startet das Portal im Demo-Modus mit erfundenen Daten.
-Die Schritt-für-Schritt-Anleitung steht im Dokument „Fallpfad Lehrer-Portal: Technische Anleitung“.
+| Ordner / Datei | Inhalt |
+|---|---|
+| `index.html` | Grundgerüst: lädt Stylesheets und Skripte der Reihe nach |
+| `css/` | Gestaltung in Ebenen: `01-basis`, `02-erweiterungen`, `03-apple`, `04-pro`, `05-feinschliff` |
+| `js/kern/` | Start: Konfiguration, Demo-Konto, Farbprofile, zusätzliche Live-Fälle |
+| `js/app/01-portal.bundle.js` | der gebaute Kern des Portals |
+| `js/erweiterungen/` | je Bereich eine Datei: Live-Unterricht, Folien-Import, Schulverwaltung, Freischaltung, Profilmenü … |
+| `content.json` | die eingebauten Module als Daten |
+| `supabase/` | **das Backend**: Datenbank (SQL), Edge Functions, Sicherheit. Siehe `supabase/BACKEND.md` |
+| `vercel.json` | Sicherheits-Header (CSP, HSTS, kein Einbetten, keine Suchmaschinen) |
+
+Die Reihenfolge der `<script>`-Zeilen in `index.html` nicht ändern.
+
+## Sicherheit und Backend in dieser Version
+
+- Kein Inline-Code mehr, dadurch strenge Content-Security-Policy.
+- Alle Edge Functions nutzen `supabase/functions/_shared/sicherheit.ts`: Antworten nur für die eigenen Apps (CORS), Größenbegrenzung, Sicherheits-Header.
+- `supabase/sicherheit_haertung.sql` (Schritt 13): fester `search_path`, Trigger-Funktionen nicht mehr über die API aufrufbar, Einwilligungsprotokoll, Datenauskunft.
+- **KI-Gesprächsperson bleibt in ihrer Rolle:** Die Rollenanweisung in `_shared/komm.ts` ist neu aufgebaut. Ursache des Rollenwechsels war, dass Texte aus der Aufgabenkarte der Lernenden („Du bist Auszubildende …“) unverändert in der Anweisung der KI standen.
+- Nach dem Hochladen: Edge Functions neu bereitstellen (`supabase functions deploy`), `sicherheit_haertung.sql` ausführen.
 
 ## Neu in dieser Version: Training „Kommunikation“
 

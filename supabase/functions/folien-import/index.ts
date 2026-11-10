@@ -6,17 +6,12 @@
 // E-Mail-Adressen, Telefonnummern und Datumsangaben werden vor dem Versand entfernt, keine Inhalte in Logs.
 // Einrichtung: siehe Admin-Handbuch, Abschnitt "KI-Folien-Import mit OpenAI".
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
 const EFFORT = Deno.env.get("OPENAI_REASONING") ?? "low"; // "none" = Parameter weglassen
 const LIMIT = Number(Deno.env.get("FALLPFAD_LIMIT_TAG") ?? "150"); // Aufrufe je Schule und Tag
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-region",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
 // Datenminimierung (zweite Stufe, die erste läuft im Browser)
 function scrub(t: string) {
@@ -156,8 +151,9 @@ function schemaText(t: any): string {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  const vor = vorpruefung(req, 8_000_000);
+  if (vor) return vor;
+  const json = antworten(req);
   const KEY = Deno.env.get("OPENAI_API_KEY");
   if (!KEY) return json({ error: "Der KI-Dienst ist noch nicht eingerichtet (OPENAI_API_KEY fehlt)." }, 503);
   const auth = req.headers.get("Authorization") ?? "";

@@ -1,0 +1,157 @@
+/* Fallpfad Feinschliff nach Apples Human Interface Guidelines.
+   Diese Ebene lädt zuletzt und ändert nichts am Aufbau: Sie vereinheitlicht Bewegung, Fokus, Touch-Ziele und
+   Lesbarkeit und respektiert die Bedienungshilfen des Geräts. Gleiche Datei in Schüler-App und Lehrer-Portal.
+
+   Leitlinien (HIG):
+   - Motion › Best practices: Bewegung kurz, präzise, nie Selbstzweck, immer abschaltbar.
+   - Accessibility: Kontrast, 44-pt-Ziele auf Touch-Geräten, Bewegung/Transparenz reduzieren, mehr Kontrast.
+   - Focus and selection: klar sichtbarer Fokus bei Tastaturbedienung.
+   - Typography: Hierarchie über Größe und Gewicht, gut umbrochene Titel, Tabellenziffern für Zahlen. */
+
+:root {
+  /* Eine Bewegungssprache für die ganze App */
+  --fp-kurz: 120ms;   /* Rückmeldung auf Antippen */
+  --fp-normal: 220ms; /* Zustandswechsel */
+  --fp-ruhig: 360ms;  /* Erscheinen von Flächen */
+  --fp-feder: cubic-bezier(.2, .8, .2, 1);     /* weich abbremsend, ohne Nachschwingen */
+  --fp-standard: cubic-bezier(.4, 0, .2, 1);
+  --fp-fokus: color-mix(in srgb, var(--accent, #0062FF) 55%, transparent);
+}
+
+/* ---------- Schrift ---------- */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-optical-sizing: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+h1, h2, h3 { text-wrap: balance; }
+p, li { text-wrap: pretty; }
+/* Zahlen springen nicht, wenn sie sich ändern (Punkte, Timer, Fortschritt, Tabellen) */
+table, time, .kpi, .chip, .badge, .km-tag, [class*="timer"], [class*="count"], [class*="punkte"], [class*="score"], [class*="ring"] {
+  font-variant-numeric: tabular-nums;
+}
+::selection { background: color-mix(in srgb, var(--accent, #0062FF) 28%, transparent); }
+
+/* ---------- Fokus: nur bei Tastaturbedienung, dann eindeutig ---------- */
+:where(a, button, input, select, textarea, summary, [role="button"], [role="tab"], [tabindex]):focus-visible {
+  outline: 3px solid var(--fp-fokus);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+:where(input, select, textarea):focus-visible { outline-offset: 0; }
+:where(a, button, [role="button"]):focus:not(:focus-visible) { outline: none; }
+
+/* ---------- Rückmeldung auf Antippen: kurz und präzise ---------- */
+:where(button, [role="button"], a.btn, .btn, .chip):not(:disabled) {
+  transition-timing-function: var(--fp-feder);
+}
+:where(button, [role="button"], a.btn, .btn):not(:disabled):active {
+  transform: scale(.975);
+  transition: transform var(--fp-kurz) var(--fp-standard);
+}
+:where(button, .btn):disabled, :where(button, .btn)[aria-disabled="true"] { cursor: not-allowed; }
+
+/* Schweben gibt es nur mit Maus oder Trackpad. Auf Touch-Geräten bleibt sonst ein „klebender“ Hover-Zustand. */
+@media (hover: none) {
+  :where(button, a, [role="button"], .card, .tile, .km-cat, .km-sbar-b):hover { transform: none; }
+}
+
+/* ---------- Touch-Ziele: mindestens 44 × 44 pt auf Touch-Geräten ---------- */
+@media (pointer: coarse) {
+  :where(button, [role="button"], a.btn, .btn, select, summary, input[type="checkbox"], input[type="radio"]) {
+    min-height: 44px;
+  }
+  :where(input[type="checkbox"], input[type="radio"]) { min-width: 22px; min-height: 22px; }
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+    font-size: max(16px, 1em); /* verhindert das automatische Hineinzoomen von iOS beim Tippen */
+  }
+}
+
+/* ---------- Flächen erscheinen ruhig ---------- */
+@keyframes fp-auf {
+  from { opacity: 0; transform: translateY(6px) scale(.985); }
+  to { opacity: 1; transform: none; }
+}
+:where([role="dialog"], .km-sheet, .modal, .sheet) {
+  animation: fp-auf var(--fp-ruhig) var(--fp-feder) both;
+}
+:where(progress, [role="progressbar"]) { transition: width var(--fp-ruhig) var(--fp-feder); }
+
+/* ---------- Scrollen ---------- */
+:where([role="dialog"], .km-sheet, .modal, .sheet) { overscroll-behavior: contain; }
+:target { scroll-margin-top: 84px; }
+
+/* ---------- Untere Leiste auf dem Handy ----------
+   Fehlerbehebung: Aus dem alten, schwebenden Design war eine Breitenbegrenzung (100vw - 24px) übrig. Die Leiste
+   endete dadurch 24 px vor dem rechten Rand. Sie reicht jetzt über die volle Breite. */
+@media (max-width: 959px) {
+  html body .tabbar { max-width: none; width: 100%; }
+}
+
+/* ---------- Kurzer Hinweis (z. B. nach „Meine Daten herunterladen“) ---------- */
+.fp-hinweis {
+  position: fixed;
+  left: 50%;
+  bottom: calc(132px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 9999;
+  max-width: min(92vw, 440px);
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: var(--fg, #1d1d1f);
+  color: var(--bg, #fff);
+  font-size: 14.5px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  box-shadow: 0 12px 34px -12px rgba(0, 0, 0, .45);
+  animation: fp-hinweis-auf var(--fp-ruhig) var(--fp-feder) both;
+  transition: opacity var(--fp-normal) var(--fp-standard), transform var(--fp-normal) var(--fp-standard);
+}
+.fp-hinweis.weg { opacity: 0; transform: translate(-50%, 8px); }
+@keyframes fp-hinweis-auf {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ---------- Bedienungshilfen des Geräts ---------- */
+/* Bewegung reduzieren: keine Animationen, keine weichen Übergänge, kein weiches Scrollen. Inhalte bleiben vollständig. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  :where(button, [role="button"], a.btn, .btn):active { transform: none; }
+}
+
+/* Transparenz reduzieren: Milchglas wird zur festen Fläche. */
+@media (prefers-reduced-transparency: reduce) {
+  *, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+  :where(nav, header, aside, [role="dialog"], .tabbar, .topbar) { background-color: var(--surface, #fff); }
+}
+
+/* Mehr Kontrast: kräftigere Linien und Nebentexte, deutlicherer Fokus. */
+@media (prefers-contrast: more) {
+  :root {
+    --line: color-mix(in srgb, var(--fg, #000) 45%, transparent);
+    --muted: color-mix(in srgb, var(--fg, #000) 82%, var(--bg, #fff));
+    --fp-fokus: var(--fg, #000);
+  }
+  :where(button, .btn, .card, .chip, input, select, textarea) { border-color: var(--line); }
+}
+
+/* Erzwungene Farben (Windows-Kontrastmodus): Fokus und Zustände bleiben erkennbar. */
+@media (forced-colors: active) {
+  :where(a, button, input, select, textarea, [role="button"]):focus-visible { outline: 3px solid Highlight; }
+}
+
+/* Druck: nur der Inhalt, ohne Navigation und schwebende Elemente. */
+@media print {
+  .fp-hinweis { display: none !important; }
+}

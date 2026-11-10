@@ -11,26 +11,34 @@
 // - OpenAI nutzt API-Daten nicht zum Training und bewahrt Realtime-Daten höchstens 30 Tage zur Missbrauchsüberwachung auf.
 //   Mit EU-Datenresidenz (OPENAI_BASE_URL=https://eu.api.openai.com/v1) erfolgt die Verarbeitung in Europa.
 // - Fallpfad speichert weder Ton noch Mitschrift auf dem Server. Gezählt wird nur die Anzahl der Gespräche je Konto und Tag.
-import { BASE, CORS, MAX_SEKUNDEN, TAGESLIMIT, anmeldung, clean, json, rollenanweisung, szenario, zaehlen } from "../_shared/komm.ts";
+import { BASE, MAX_SEKUNDEN, TAGESLIMIT, anmeldung, clean, rollenanweisung, szenario, zaehlen } from "../_shared/komm.ts";
+import { antworten, koerper, vorpruefung } from "../_shared/sicherheit.ts";
 
-const MODEL = Deno.env.get("OPENAI_MODEL_GESPRAECH") ?? "gpt-realtime-2.1";
+const MODEL = Deno.env.get("OPENAI_MODEL_GESPRAECH") ?? "gpt-realtime-mini";
 const TRANSKRIPTION = Deno.env.get("OPENAI_MODEL_TRANSKRIPTION") ?? "gpt-4o-mini-transcribe";
 const STIMMEN = ["alloy", "ash", "ballad", "coral", "echo", "sage", "shimmer", "verse", "marin", "cedar"];
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  const vor = vorpruefung(req, 200_000);
+  if (vor) return vor;
+  const json = antworten(req);
   const KEY = Deno.env.get("OPENAI_API_KEY");
   if (!KEY) return json({ error: "Die Gesprächssimulation ist an dieser Schule noch nicht eingerichtet." }, 503);
 
-  const a = await anmeldung(req);
+  const a = await anmeldung(req, json);
   if (a instanceof Response) return a;
 
-  let b: any;
-  try { b = await req.json(); } catch { return json({ error: "Ungültige Anfrage." }, 400); }
+  const b = await koerper(req, 200_000);
+  if (!b) return json({ error: "Ungültige Anfrage." }, 400);
   const s = await szenario(b.szenario, b.def);
   if (!s) return json({ error: "Dieses Gespräch gibt es nicht oder die App ist nicht aktuell. Bitte lade die Seite neu." }, 400);
   if (b.einwilligung !== true) return json({ error: "Bitte bestätige zuerst den Hinweis zur Sprachverarbeitung." }, 400);
+  // Nachweis der Einwilligung (Art. 7 Abs. 1 DSGVO): Zeitpunkt und Textfassung, kein Inhalt. Widerruf über fp_einwilligung_widerrufen.
+  // Hat die Person widerrufen, legt erst eine neue Bestätigung in der App wieder eine gültige Einwilligung an.
+  try {
+    const { data: ew } = await a.admin.from("fp_einwilligungen").select("widerrufen_at").eq("user_id", a.uid).eq("zweck", "sprachsimulation").maybeSingle();
+    if (!ew || ew.widerrufen_at) await a.admin.from("fp_einwilligungen").upsert({ user_id: a.uid, zweck: "sprachsimulation", fassung: "v1", erteilt_at: new Date().toISOString(), widerrufen_at: null });
+  } catch { /* Tabelle noch nicht angelegt (sicherheit_haertung.sql): Gespräch trotzdem möglich */ }
 
   // Fortsetzen nach Verbindungsabbruch zählt nicht als neues Gespräch
   const verlauf = Array.isArray(b.verlauf) ? b.verlauf.slice(-14).map((x: any) => ({ r: x?.r === "du" ? "du" : "ki", t: clean(x?.t, 300) })).filter((x: any) => x.t) : [];

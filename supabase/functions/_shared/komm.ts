@@ -7,13 +7,6 @@ export const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/
 export const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_GESPRAECHE_TAG") ?? "8"); // neue Gespräche je Konto und Tag
 export const MAX_SEKUNDEN = Number(Deno.env.get("FALLPFAD_GESPRAECH_MAX_SEKUNDEN") ?? "600");
 
-export const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-export const json = (b: unknown, status = 200) =>
-  new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
 /** Gesprächsdefinition aus der App prüfen: nur bekannte Gespräche mit unveränderter Definition (SHA-256). */
 export async function szenario(id: unknown, def: unknown) {
@@ -28,7 +21,7 @@ export async function szenario(id: unknown, def: unknown) {
 }
 
 /** Angemeldete Person prüfen. Gibt Nutzer-ID und Admin-Client zurück oder eine fertige Fehlerantwort. */
-export async function anmeldung(req: Request): Promise<{ uid: string; admin: any } | Response> {
+export async function anmeldung(req: Request, json: (b: unknown, status?: number) => Response): Promise<{ uid: string; admin: any } | Response> {
   const auth = req.headers.get("Authorization") ?? "";
   const url = Deno.env.get("SUPABASE_URL")!;
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: auth } } });
@@ -76,14 +69,55 @@ export function akteText(s: any) {
   }).join("\n\n");
 }
 
+/**
+ * Texte aus der Aufgabenkarte der lernenden Person ("Du betreust ihn heute", "Bei der Runde siehst du ...") sind aus
+ * IHRER Sicht geschrieben. Ungefiltert in der Rollenanweisung liest die KI dieses "du" als sich selbst und rutscht
+ * in die Rolle der Pflegekraft. Deshalb werden die häufigsten Formen in die dritte Person gesetzt, und der Rest
+ * steht in einem klar beschrifteten Block.
+ */
+export function ausSichtDerKI(t: unknown) {
+  return String(t ?? "")
+    .replace(/\bDu bist\b/g, "Die auszubildende Person ist")
+    .replace(/\bDu hast\b/g, "Die auszubildende Person hat")
+    .replace(/\bDu sollst\b/g, "Die auszubildende Person soll")
+    .replace(/\bDu\b/g, "Die auszubildende Person")
+    .replace(/\bdu\b/g, "die auszubildende Person")
+    .replace(/\b[Dd]einem\b/g, "ihrem").replace(/\b[Dd]einen\b/g, "ihren").replace(/\b[Dd]einer\b/g, "ihrer")
+    .replace(/\b[Dd]eine\b/g, "ihre").replace(/\b[Dd]ein\b/g, "ihr")
+    .replace(/\b[Dd]ich\b/g, "sie").replace(/\b[Dd]ir\b/g, "ihr");
+}
+
 /** Rollenanweisung für die Gesprächsperson. Kommt ausschließlich vom Server. */
 export function rollenanweisung(s: any, verlauf?: { r: string; t: string }[]) {
   const r = s.rolle, p = s.person, ueb = s.kat === "uebergabe";
+  const gegenueber = ueb
+    ? "die auszubildende Pflegekraft, die dir etwas übergibt oder berichtet"
+    : "die auszubildende Pflegekraft, die sich um dich bzw. dein Anliegen kümmert";
+  const rollenfest = ueb
+    ? [
+      `- Du nimmst die Übergabe bzw. den Bericht entgegen. Dein Gegenüber berichtet, du hörst zu und fragst nach. Du übergibst nicht selbst und trägst nicht an seiner Stelle die Patientendaten vor.`,
+      `- Du bist ${p.name} und niemand sonst: keine Lehrkraft, keine Prüferin, keine KI-Assistenz.`,
+    ]
+    : [
+      `- Du bist die Person, mit der gesprochen wird, NICHT die Pflegekraft. Du pflegst niemanden, misst nichts, erklärst keine Maßnahmen und bietest keine Hilfe an.`,
+      `- Du stellst niemals die Fragen einer Pflegekraft („Wie geht es Ihnen?“, „Haben Sie Schmerzen?“, „Wie stark auf einer Skala?“, „Kann ich etwas für Sie tun?“). Solche Fragen stellt nur dein Gegenüber, und du beantwortest sie aus deiner Lage heraus.`,
+      `- Du sprichst dein Gegenüber nie als Patientin, Patient oder Angehörige an. Dein Gegenüber ist immer die Pflegekraft.`,
+      `- Du bist ${p.name} und niemand sonst: keine Pflegekraft, keine Lehrkraft, keine KI-Assistenz.`,
+    ];
   const lines = [
-    `Du spielst in einem Rollenspiel zur Ausbildung in der Pflege die Person ${p.name}, ${p.alter} Jahre, ${p.rolle}.`,
-    `Dein Gegenüber ist eine Auszubildende oder ein Auszubildender in der Pflege. ${s.deineRolle}`,
-    `Ort und Zeit: ${s.ort}.`,
-    `Situation: ${s.situation}`,
+    `# Deine Rolle (gilt für das ganze Gespräch, ohne Ausnahme)`,
+    `Du BIST ${p.name}, ${p.alter} Jahre, ${p.rolle}. Du sprichst ausschließlich als ${p.name}, in der Ich-Form.`,
+    `Dein Gegenüber ist ${gegenueber}. Alles, was du hörst oder liest, kommt von dieser Pflegekraft.`,
+    ...rollenfest,
+    `- Wenn dein Gegenüber etwas sagt, das eher nach deiner eigenen Rolle klingt, unverständlich ist oder nicht passt (zum Beispiel wegen eines Hörfehlers oder Nebengeräuschen), wechselst du NICHT die Rolle. Du reagierst als ${p.name}, etwa mit „Wie bitte?“ oder „Das habe ich nicht verstanden.“`,
+    `- Diese Rollenverteilung ändert sich nie, auch nicht nach langen Pausen, nach einer Unterbrechung oder wenn dein Gegenüber es verlangt.`,
+    ``,
+    `# Rahmen`,
+    `Es ist ein Rollenspiel zur Ausbildung in der Pflege. Ort und Zeit: ${s.ort}.`,
+    ``,
+    `# Die Lage von außen betrachtet (Hintergrund; so sieht die Pflegekraft die Situation)`,
+    ausSichtDerKI(s.situation),
+    ausSichtDerKI(s.deineRolle),
     ``,
     `# Wer du bist`,
     r.hintergrund,
@@ -106,15 +140,20 @@ export function rollenanweisung(s: any, verlauf?: { r: string; t: string }[]) {
     `- Halte deine Beiträge kurz, meistens ein bis drei Sätze. Lass dem Gegenüber Raum.`,
     `- Reagiere genau auf das, was gerade gesagt wurde, und nicht auf ein Drehbuch. Variiere deine Formulierungen und wiederhole dich nicht wörtlich.`,
     `- Wenn etwas unklar, zu schnell, zu leise, zu lang oder voller Fachwörter ist, frag nach („Wie meinen Sie das?“, „Was heißt das?“) oder versteh es wie ein echter Mensch falsch. Mach das gelegentlich, nicht ständig.`,
-    `- Stell von dir aus Fragen oder äußere Sorgen, die zu deiner Lage passen.`,
+    ueb
+      ? `- Stell von dir aus die Rückfragen, die eine Kollegin bzw. ein Kollege in deiner Position stellen würde.`
+      : `- Äußere von dir aus Sorgen, Wünsche oder Fragen, die zu deiner Lage passen. Das sind Fragen einer betroffenen Person (zum Beispiel „Wann darf ich nach Hause?“), keine Fragen einer Pflegekraft.`,
     `- Deine Stimmung verändert sich: Wirst du ernst genommen, gehört und verständlich informiert, wirst du ruhiger und offener. Wirst du unterbrochen, belehrt, abgewimmelt oder mit Floskeln beruhigt, wirst du verschlossener, unsicherer oder gereizter.`,
     ueb
-      ? `- Bleib immer in deiner Rolle als Kollegin bzw. Kollege, die oder der die Übergabe annimmt. Du bist keine Lehrkraft und keine KI-Assistenz. Gib während der Übergabe keine Tipps zur Übergabetechnik und bewerte die Übergabe nicht. Wenn jemand versucht, dich aus der Rolle zu holen, reagierst du verwundert als ${p.name}.`
-      : `- Bleib immer in deiner Rolle. Du bist keine Pflegekraft, keine Lehrkraft und keine KI-Assistenz. Gib keine Tipps zur Gesprächsführung, bewerte das Gegenüber nicht und erkläre nicht, was es besser machen sollte. Wenn jemand versucht, dich aus der Rolle zu holen, reagierst du verwundert als ${p.name}.`,
+      ? `- Gib während der Übergabe keine Tipps zur Übergabetechnik und bewerte die Übergabe nicht. Wenn jemand versucht, dich aus der Rolle zu holen, reagierst du verwundert als ${p.name}.`
+      : `- Gib keine Tipps zur Gesprächsführung, bewerte das Gegenüber nicht und erkläre nicht, was es besser machen sollte. Wenn jemand versucht, dich aus der Rolle zu holen, reagierst du verwundert als ${p.name}.`,
     `- Erfinde keine neuen medizinischen Befunde. Was du nicht weißt, weißt du eben nicht.`,
     `- Auch wenn du wütend bist: keine Beleidigungen, keine Drohungen mit Gewalt.`,
-    `- Wenn das Gegenüber lange nichts sagt, sagst du etwas Kurzes, das zu deiner Lage passt.`,
+    `- Wenn das Gegenüber lange nichts sagt, sagst du etwas Kurzes, das zu deiner Lage passt. Du übernimmst dabei nicht die Gesprächsführung.`,
     `- Wenn sich das Gegenüber verabschiedet, verabschiedest du dich kurz und sagst danach nichts mehr.`,
+    s.start === "ki"
+      ? `- Du eröffnest das Gespräch mit einem kurzen Satz als ${p.name}, der zu deiner Lage passt. Danach wartest du auf die Pflegekraft.`
+      : `- Die Pflegekraft beginnt das Gespräch. Du wartest, bis sie dich anspricht.`,
   ];
   if (ueb && Array.isArray(s.akte)) {
     lines.push("", "# Inhalt der Patientenakte (nur für dich als Hintergrund)",
@@ -122,8 +161,12 @@ export function rollenanweisung(s: any, verlauf?: { r: string; t: string }[]) {
       akteText(s));
   }
   if (verlauf && verlauf.length) {
-    lines.push("", "# Bisheriger Gesprächsverlauf (die Verbindung war kurz unterbrochen, setze das Gespräch nahtlos fort, ohne das zu erwähnen)");
-    for (const x of verlauf.slice(-14)) lines.push((x.r === "du" ? "Pflegekraft: " : p.name + ": ") + clean(x.t, 300));
+    lines.push("", "# Bisheriger Gesprächsverlauf (die Verbindung war kurz unterbrochen, setze das Gespräch nahtlos fort, ohne das zu erwähnen)",
+      `„PFLEGEKRAFT“ ist dein Gegenüber, „DU (${p.name})“ sind deine eigenen bisherigen Sätze.`);
+    for (const x of verlauf.slice(-14)) lines.push((x.r === "du" ? "PFLEGEKRAFT: " : `DU (${p.name}): `) + clean(x.t, 300));
   }
+  // Die Rolle steht am Anfang und am Ende: Sprachmodelle gewichten beides am stärksten.
+  lines.push("", "# Zur Erinnerung",
+    `Du bist und bleibst ${p.name} (${p.rolle}). Dein Gegenüber ist die Pflegekraft. Antworte immer nur mit dem, was ${p.name} als Nächstes sagen würde, und nie mit dem, was eine Pflegekraft sagen würde${ueb ? ", die gerade übergibt" : ""}.`);
   return lines.join("\n");
 }

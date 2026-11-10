@@ -1,0 +1,19 @@
+# Fallpfad Backend (Supabase). Bereitstellen mit der Supabase-CLI:
+#   supabase link --project-ref <projekt-ref>
+#   supabase functions deploy
+# Alle Funktionen verlangen ein gültiges Anmelde-Token (verify_jwt) und prüfen die Rolle zusätzlich selbst.
+
+[functions.gespraech-sitzung]
+verify_jwt = true
+
+[functions.gespraech-auswertung]
+verify_jwt = true
+
+[functions.uebersetzen]
+verify_jwt = true
+
+[functions.folien-import]
+verify_jwt = true
+
+[functions.konto-loeschen]
+verify_jwt = true

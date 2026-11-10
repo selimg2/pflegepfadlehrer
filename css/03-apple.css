@@ -1,0 +1,195 @@
+/* ===== Fallpfad Design im Stil von Apple (Erinnerungen): gruppierte Listen, ruhige Flächen, klare Typografie =====
+   Gilt für Schüler-App und Lehrer-Portal. Steht als letztes Stylesheet im Dokument. */
+
+/* ---------- Grundlagen ---------- */
+html body{background:var(--bg)!important;color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue","Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.006em}
+html body main.main,html body .main{background:var(--bg)!important;background-image:none!important}
+html body ::selection{background:color-mix(in srgb,var(--accent) 28%,transparent)}
+html body h1,html body h2,html body h3,html body h4{color:var(--fg)}
+html body h2{letter-spacing:-.022em}
+html body .muted{color:var(--muted)}
+
+/* Großer Titel wie in iOS */
+html body .hello h1,html body main h1{font-size:clamp(28px,4.4vw,34px)!important;font-weight:700!important;letter-spacing:-.025em!important;line-height:1.12}
+html body .hello p{color:var(--muted)!important;font-size:16px!important;margin-top:4px}
+html body .eyebrow,html body main.main .hello .eyebrow{color:var(--muted)!important;font-size:12.5px!important;font-weight:600!important;letter-spacing:.02em!important;text-transform:uppercase}
+html body .fx-t .eyebrow,html body .mod .eyebrow{color:var(--muted)!important}
+html body .sec h2,html body .trsech{font-size:20px!important;font-weight:700!important;letter-spacing:-.02em!important;text-transform:none!important;color:var(--fg)!important}
+html body .trsech{font-size:13px!important;font-weight:600!important;text-transform:uppercase!important;letter-spacing:.02em!important;color:var(--muted)!important;margin:26px 4px 8px!important}
+
+/* ---------- Seitenleiste (wie die Listenleiste in Erinnerungen auf dem Mac) ---------- */
+@media (min-width:960px){
+  html body .side{background:var(--fx-side)!important;border-right:1px solid var(--line)!important;box-shadow:none!important;padding-left:12px!important;padding-right:12px!important;gap:1px!important}
+  html body .side .tab{border-radius:8px!important;padding:6px 10px!important;min-height:34px;font-size:14.5px!important;font-weight:500!important;color:var(--fg)!important;gap:10px!important;background:transparent!important;box-shadow:none!important}
+  html body .side .tab:hover{background:color-mix(in srgb,var(--fg) 5%,transparent)!important}
+  html body .side .tab[aria-current=page],html body .side .tab.on{background:color-mix(in srgb,var(--fg) 9%,transparent)!important;color:var(--fg)!important;font-weight:600!important}
+  html body .side .tab::before,html body .side .tab.fx-nav::before{display:none!important}
+  /* Symbol als farbiger Kreis mit weißem Zeichen */
+  html body .side .tab svg{width:26px!important;height:26px!important;padding:5px;border-radius:50%;background:var(--c,var(--accent));color:#fff!important;stroke:#fff;flex:0 0 26px;transform:none!important;filter:none!important}
+  html body .side .tab .tbadge{background:transparent!important;color:var(--muted)!important;font-weight:600;font-size:13px;box-shadow:none!important;min-width:0;padding:0}
+  html body .side .brand{padding:6px 8px 14px!important;margin-bottom:6px!important}
+  html body .side .brand b{font-size:17px;letter-spacing:-.02em}
+  html body .side .brand span{color:var(--muted)}
+  html body .side .sideprof{border-radius:10px!important;background:transparent!important}
+  html body .side .sideprof:hover{background:color-mix(in srgb,var(--fg) 5%,transparent)!important}
+}
+/* Farben der Bereiche aus der Profilpalette */
+html body .side .tab:nth-of-type(1),html body .side .tab:nth-of-type(1){--c:var(--p0)!important}
+html body .side .tab:nth-of-type(2),html body .side .tab:nth-of-type(2){--c:var(--p1)!important}
+html body .side .tab:nth-of-type(3),html body .side .tab:nth-of-type(3){--c:var(--p2)!important}
+html body .side .tab:nth-of-type(4),html body .side .tab:nth-of-type(4){--c:var(--p3)!important}
+html body .side .tab:nth-of-type(5),html body .side .tab:nth-of-type(5){--c:var(--p4)!important}
+html body .side .tab:nth-of-type(6),html body .side .tab:nth-of-type(6){--c:var(--p5)!important}
+html body .side .tab:nth-of-type(7),html body .side .tab:nth-of-type(7){--c:var(--p6)!important}
+html body .side .tab:nth-of-type(8),html body .side .tab:nth-of-type(8){--c:var(--p7)!important}
+html body .side .tab:nth-of-type(n+9),html body .side .tab:nth-of-type(n+9){--c:var(--p1)!important}
+
+/* Logo: flach wie das App-Symbol */
+html body .brand .logo,html body .logo{width:34px!important;height:34px!important;border-radius:8px!important;background:var(--accent)!important;color:var(--on-accent)!important;box-shadow:none!important;filter:none!important;background-image:none!important;border:0!important}
+html body .brand .logo::before,html body .brand .logo::after,html body .logo::before,html body .logo::after{display:none!important}
+html body .brand .logo svg,html body .logo svg{width:22px!important;height:22px!important;filter:none!important}
+html body .brand .logo svg path,html body .logo svg path{stroke:currentColor!important;stroke-width:3.2!important}
+
+/* ---------- Kopfzeile ---------- */
+html body .topbar{background:var(--glass)!important;-webkit-backdrop-filter:saturate(180%) blur(20px)!important;backdrop-filter:saturate(180%) blur(20px)!important;border-bottom:1px solid var(--line)!important;box-shadow:none!important}
+html body .topbar .iconbtn{border:0!important;background:transparent!important;color:var(--accent)!important;box-shadow:none!important;border-radius:10px!important}
+html body .topbar .iconbtn:hover{background:color-mix(in srgb,var(--accent) 10%,transparent)!important}
+html body .iconbtn{border-radius:10px!important}
+
+/* ---------- Karten und gruppierte Listen ---------- */
+html body .card,html body .mod,html body .msg2,html body .aitem,html body .ateaser,html body .nwaufgi,html body .nwcard,html body .ttcard,html body .bd,html body .fps-card{background:var(--surface)!important;border:0!important;border-radius:14px!important;box-shadow:none!important;background-image:none!important}
+html[data-theme=dark] body .card,html[data-theme=dark] body .mod{box-shadow:none!important}
+html body .card::before,html body .card::after{background-image:none}
+html body .msg2::before{width:0!important}
+html body .msg2{padding:14px 16px!important}
+
+/* Kacheln wie die intelligenten Listen in Erinnerungen */
+html body .fx-t,html body .trtile{background:var(--surface)!important;background-image:none!important;border:0!important;border-radius:14px!important;box-shadow:none!important}
+html body .fx-t::after,html body .fx-t::before,html body .trtile::after,html body .trtile::before{display:none!important}
+html body button.fx-t:hover,html body a.fx-t:hover,html body .trtile:hover{transform:none!important;box-shadow:none!important;background:color-mix(in srgb,var(--fg) 3%,var(--surface))!important}
+html body .fx-ic,html body .trico{background:var(--c,var(--accent))!important;color:#fff!important;box-shadow:none!important;border-radius:50%!important;border:0!important}
+html body .fx-ic svg,html body .trico svg{color:#fff!important;stroke:#fff}
+html body .trtile{padding:14px 14px 12px!important;gap:8px!important;min-height:0!important}
+html body .trtxt b{font-size:16px!important;font-weight:650!important;letter-spacing:-.015em}
+html body .trtxt span{color:var(--muted)!important}
+html body .trgo{color:var(--muted)!important}
+html body .trgrid{gap:10px!important}
+html body .mod{padding:18px!important}
+html body .mod .chip.blue{background:var(--accent-soft)!important;color:var(--accent)!important}
+/* Kachelfarben aus der Profilpalette: je Bereich ein Ton statt bunter Mischung */
+html body .fx-qa .fx-t:nth-of-type(1){--c:var(--p0)!important}
+html body .fx-qa .fx-t:nth-of-type(2){--c:var(--p3)!important}
+html body .fx-qa .fx-t:nth-of-type(3){--c:var(--p4)!important}
+html body .fx-qa .fx-t:nth-of-type(4){--c:var(--p2)!important}
+html body .fx-qa .fx-t:nth-of-type(5){--c:var(--p1)!important}
+html body .fx-qa .fx-t:nth-of-type(6){--c:var(--p5)!important}
+html body .trsec:nth-of-type(1) .trtile{--c:var(--p0)!important}
+html body .trsec:nth-of-type(2) .trtile{--c:var(--p1)!important}
+html body .trsec:nth-of-type(3) .trtile{--c:var(--p2)!important}
+html body .trsec:nth-of-type(4) .trtile{--c:var(--p6)!important}
+html body .yearsec:nth-of-type(1) .mod,html body .grid .mod{--c:var(--p0)}
+html body .fx-n,html body .tbadge{background:var(--bad)!important;color:#fff!important;box-shadow:none!important}
+
+/* ---------- Bedienelemente ---------- */
+html body .btn{border-radius:12px!important;min-height:44px;font-weight:600!important;font-size:15.5px!important;letter-spacing:-.01em;box-shadow:none!important;background:var(--btn);background-image:none!important;filter:none!important}
+html body .btn:not(.ghost):hover{filter:brightness(1.06)!important}
+html body .btn.ghost{background:color-mix(in srgb,var(--accent) 11%,transparent)!important;color:var(--accent)!important;border:0!important}
+html body .btn.ghost:hover{background:color-mix(in srgb,var(--accent) 16%,transparent)!important}
+html body .btn.sm{min-height:34px;font-size:14px!important;border-radius:10px!important}
+html body .skip{color:var(--accent)!important}
+html body .chip{border:0!important;border-radius:999px!important;background:var(--fill,var(--surface2))!important;color:var(--fg)!important;font-weight:500!important}
+html body .chip.on,html body .chip[aria-pressed=true],html body .chip.blue{background:var(--accent-soft)!important;color:var(--accent)!important}
+html body .input,html body input.input,html body select.input,html body textarea.input,html body .field input,html body .field select,html body .field textarea{background:var(--fill,var(--surface2))!important;border:1px solid transparent!important;border-radius:10px!important;box-shadow:none!important;color:var(--fg)!important}
+html body .input:focus,html body .field input:focus,html body .field textarea:focus{border-color:var(--accent)!important;background:var(--surface)!important;outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)!important}
+/* Segment-Schalter wie in iOS */
+html body .seg3,html body .fxpm-seg,html body .nwseg,html body .nwhub{background:var(--fill,var(--surface2))!important;border:0!important;border-radius:9px!important;padding:2px!important;box-shadow:none!important}
+html body .seg3 button,html body .fxpm-seg button,html body .nwseg button,html body .nwhub button{border-radius:7px!important;border:0!important;background:transparent!important;color:var(--fg)!important;font-weight:500!important;box-shadow:none!important}
+html body .seg3 button[aria-pressed=true],html body .fxpm-seg button.on,html body .nwseg button.on,html body .nwseg button[aria-pressed=true],html body .nwhub button.on,html body .nwhub button[aria-pressed=true]{background:var(--surface)!important;color:var(--fg)!important;font-weight:600!important;box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)!important}
+html[data-theme=dark] body .seg3 button[aria-pressed=true],html[data-theme=dark] body .fxpm-seg button.on{background:#636366!important}
+/* Schalter: iOS-Grün */
+html body .switch[role=switch]{background:var(--fill,#e9e9ee)!important;border:0!important;box-shadow:none!important}
+html body .switch[role=switch][aria-checked=true]{background:#34C759!important}
+html body .switch i{background:#fff!important;box-shadow:0 2px 6px rgba(0,0,0,.18)!important;color:var(--muted)}
+html body .topbar .switch[role=switch][aria-checked=true]{background:#636366!important}
+
+/* ---------- Untere Leiste auf dem Handy wie die iOS-Tab-Bar ---------- */
+@media (max-width:959px){
+  html body .tabbar{left:0!important;right:0!important;transform:none!important;bottom:0!important;width:auto!important;border-radius:0!important;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))!important;background:var(--glass)!important;-webkit-backdrop-filter:saturate(180%) blur(20px)!important;backdrop-filter:saturate(180%) blur(20px)!important;border:0!important;border-top:1px solid var(--line)!important;box-shadow:none!important;justify-content:space-around;-webkit-mask-image:none!important;mask-image:none!important;gap:0!important}
+  html body .tabbar .tab{background:transparent!important;box-shadow:none!important;color:var(--muted)!important;border-radius:8px!important;flex:1 1 0!important;min-width:0!important;padding:4px 0 2px!important;font-size:10px!important;font-weight:500!important;gap:2px!important}
+  html body .tabbar .tab svg{color:var(--muted)!important;width:24px!important;height:24px!important;transform:none!important;filter:none!important}
+  html body .tabbar .tab[aria-current=page],html body .tabbar .tab.on{color:var(--accent)!important}
+  html body .tabbar .tab[aria-current=page] svg,html body .tabbar .tab.on svg{color:var(--accent)!important}
+  html body .tabbar .tab::before{display:none!important}
+  html body .tabbar .tab .tbadge{top:0!important}
+  html body .main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+}
+
+/* ---------- Profilmenü und Blätter ---------- */
+html body .fxpm{background:var(--surface)!important;border:0!important;border-radius:14px!important;box-shadow:0 20px 60px -12px rgba(0,0,0,.35),0 0 0 .5px var(--line)!important}
+html body .fxpm-bg.sheet .fxpm,html body .fxpm-bg.sheet .ls-pick{border-radius:14px 14px 0 0!important}
+html body .fxpm-row{border-radius:9px!important;font-weight:500!important}
+html body .fxpm-row:hover{background:color-mix(in srgb,var(--fg) 6%,transparent)!important}
+html body .fxpm-row svg{color:var(--accent)}
+html body .fxpm-row.bad,html body .fxpm-row.bad svg{color:var(--bad)!important}
+html body .fxpm-sec>span{color:var(--muted)!important;font-weight:600!important;letter-spacing:.02em}
+
+/* ---------- Einstellungen (Schüler-App) ---------- */
+html body .fp-only-settings{display:flex;flex-direction:column;gap:18px;max-width:720px;margin:0 auto}
+html body .fp-only-settings>.wrap{display:contents}
+html body .fp-only-settings .wrap>.hello,html body .fp-only-settings .wrap>:not(.fp-setmark):not(.fp-setmark ~ *){display:none!important}
+html body .fp-only-settings .fp-setmark{display:none!important}
+html body .fp-only-settings .card{margin:0!important}
+html body .fp-only-progress .fp-setmark,html body .fp-only-progress .fp-setmark ~ *{display:none!important}
+html body .fps-head h1{margin:6px 0 0}
+html body .fps-card{padding:6px 0!important;overflow:hidden}
+html body .fps-h{margin:0;padding:12px 16px 6px;font-size:13px!important;font-weight:600!important;text-transform:uppercase;letter-spacing:.02em;color:var(--muted)!important}
+html body .fps-row{display:flex;align-items:center;gap:12px;width:100%;padding:10px 16px;min-height:48px;border:0;background:transparent;color:var(--fg);font:inherit;text-align:left;cursor:pointer;text-decoration:none;position:relative}
+html body .fps-row+.fps-row::before{content:"";position:absolute;top:0;left:56px;right:0;border-top:1px solid var(--line)}
+html body .fps-row:hover{background:color-mix(in srgb,var(--fg) 4%,transparent)}
+html body .fps-ic{width:30px;height:30px;border-radius:8px;background:var(--ic);color:#fff;display:grid;place-items:center;flex:0 0 30px}
+html body .fps-ic svg{width:17px;height:17px}
+html body .fps-t{flex:1;min-width:0;display:flex;flex-direction:column}
+html body .fps-t b{font-weight:500;font-size:15.5px}
+html body .fps-t small{color:var(--muted);font-size:13px;margin-top:1px;overflow-wrap:anywhere}
+html body .fps-v{font-style:normal;color:var(--muted);font-size:15px;white-space:nowrap;max-width:40%;overflow:hidden;text-overflow:ellipsis}
+html body .fps-ch{color:#c4c4c7;display:grid}
+html body .fps-row.bad .fps-t b{color:var(--bad)}
+html body .fps-sws{display:flex;gap:14px;flex-wrap:wrap;padding:8px 16px 14px}
+html body .fps-sw{display:flex;flex-direction:column;align-items:center;gap:6px;border:0;background:none;font:inherit;font-size:12.5px;color:var(--muted);cursor:pointer;padding:0}
+html body .fps-sw i{width:34px;height:34px;border-radius:50%;background:var(--a);box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);transition:box-shadow .2s}
+html body .fps-sw.on i{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--a)}
+html body .fps-sw.on{color:var(--fg);font-weight:600}
+html body .fp-only-settings .setrow{border-color:var(--line)!important}
+html body .fp-only-settings .card h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.02em;color:var(--muted)}
+
+/* ---------- Kleine Dinge ---------- */
+html body .fx-tourchip{display:none!important}
+html body .notice,html body .hinweis{border-radius:12px!important}
+html body .ring{filter:none!important}
+html body .demo-chip,html body .fx-demo{box-shadow:none}
+html body .fp-legal a{color:var(--muted)}
+
+/* ---------- Dunkelmodus: echtes Schwarz, erhöhte graue Flächen ---------- */
+html[data-theme=dark] body .side,html:not([data-theme=light]) body .side{border-right-color:var(--line)!important}
+html[data-theme=dark] body .fps-ch{color:#5a5a5e}
+@media (prefers-color-scheme:dark){html:not([data-theme=light]) body .fps-ch{color:#5a5a5e}}
+html[data-theme=dark] body .chip:not(.on):not(.blue){background:#2c2c2e!important}
+html[data-theme=dark] body .msg2 .msg2tag,html[data-theme=dark] body .ttbadge{filter:saturate(.9)}
+html body button.mod.fx-t,html body .mod.fx-t,html body .grid .mod{border:0!important;border-top:0!important}
+html body .mod .ring,html body .mod .ring *{filter:none}
+@media (max-width:959px){
+  html body .tabbar .tab span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em}
+  html body .tabbar .tab span[data-short]{font-size:0!important}
+  html body .tabbar .tab span[data-short]::after{content:attr(data-short);font-size:10px!important}
+}
+/* Lehrer-Portal: Kurskarten ruhiger, Titel in der Kursfarbe wie Listen in Erinnerungen */
+
+/* Patientenbilder: Buchstabe unten rechts statt über dem Gesicht, kein Pulsieren beim Antippen */
+html body .pxpatav .pxbadge{left:auto!important;top:auto!important;right:-7px!important;bottom:-5px!important;width:19px!important;height:19px!important;font-size:10.5px!important}
+html body .pxavw,html body .pxavw svg,html body .av svg{transition:none!important}
+html body .pxavw.fxm-ring,html body .av.fxm-ring{animation:none!important}
+
+/* Kurskarten: Lernenden-Kreise zentriert (die Klassen p1 bis p5 kollidieren sonst mit einem allgemeinen Raster) */
+html body .ksbfaces i,html body .ksav,html body .klegend i{display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;gap:0!important;margin-top:0!important}
+html body .ksbfaces i.pn{color:var(--muted)!important}
+html body .ksbh .eyebrow{color:rgba(255,255,255,.82)!important}

@@ -5,17 +5,13 @@
 // Lehrkräfte und Admins löschen ihr Konto nicht hier, sondern über die Schulverwaltung (Schutz vor Datenverlust der Schule).
 // Protokoll: nur Zeitpunkt und Rolle, keine Inhalte, keine Kennung (Nachweis der Löschung nach Art. 5 Abs. 2 DSGVO).
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-const json = (b: unknown, status = 200) => new Response(JSON.stringify(b), { status, headers: { ...CORS, "Content-Type": "application/json" } });
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
-  if (req.method !== "POST") return json({ error: "Nur POST." }, 405);
+  const vor = vorpruefung(req, 4_000);
+  if (vor) return vor;
+  const json = antworten(req);
   const url = Deno.env.get("SUPABASE_URL")!;
   const user = createClient(url, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } } });
   const { data: u } = await user.auth.getUser();
