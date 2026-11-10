@@ -159,7 +159,7 @@
       h("div", { className: "row", style: { gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 12 } },
         h("div", { className: "az-seg" }, [["neu", "Neu"], ["in_arbeit", "In Arbeit"], ["erledigt", "Erledigt"], ["alle", "Alle"]].map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": filt === x[0], onClick: function () { setFilt(x[0]); } }, x[1]); })),
         h("span", { className: "az-note" }, "Feedback kommt aus dem Menü „Feedback geben“ in Schüler-App und Lehrer-Portal.")),
-      err && h("div", { className: "notice bad" }, fehlt(err) ? "Die Feedback-Tabelle ist in Supabase noch nicht angelegt (supabase/admin_statistik.sql)." : err),
+      err && h("div", { className: "notice bad" }, fehlt(err) ? "Feedback ist gerade nicht verfügbar." : "Feedback konnte nicht geladen werden."),
       stats.length ? h("div", { className: "card" }, h("h3", { style: { marginTop: 0 } }, "Nach Kategorie"), h(Bars, { rows: stats })) : null,
       !list ? h("p", { className: "muted" }, "Wird geladen …") : !list.length ? h("p", { className: "muted" }, "Keine Rückmeldungen in dieser Ansicht.") :
         h("div", { className: "az-fb", style: { marginTop: 12 } }, list.map(function (f) {
@@ -222,7 +222,7 @@
       h("div", { className: "row", style: { justifyContent: "space-between", flexWrap: "wrap", gap: 10, alignItems: "center" } },
         h("nav", { className: "az-nav", "aria-label": "Admin-Bereiche" }, TABS.map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": tab === x[0], onClick: function () { go(x[0]); } }, x[1], x[2] ? h("span", { className: "az-b" }, x[2]) : null); })),
         ["uebersicht", "nutzung"].indexOf(tab) >= 0 && h("div", { className: "az-seg" }, [[7, "7 Tage"], [30, "30 Tage"], [90, "90 Tage"], [365, "1 Jahr"]].map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": tage === x[0], onClick: function () { setTage(x[0]); } }, x[1]); }))),
-      err && h("div", { className: "notice bad" }, fehlt(err) ? "Die Statistik-Funktionen sind in Supabase noch nicht angelegt (supabase/admin_statistik.sql). Schulen und Lehrkräfte funktionieren trotzdem." : err),
+      err && h("div", { className: "notice bad" }, fehlt(err) ? "Statistiken sind gerade nicht verfügbar." : "Statistiken konnten nicht geladen werden."),
       !d ? h("p", { className: "muted" }, "Wird geladen …") :
         tab === "uebersicht" ? h(Uebersicht, { d: d }) :
         tab === "schulen" ? (Schulen ? h(Schulen, { eingebettet: true }) : null) :
