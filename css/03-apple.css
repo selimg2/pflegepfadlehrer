@@ -193,3 +193,18 @@ html body .pxavw.fxm-ring,html body .av.fxm-ring{animation:none!important}
 html body .ksbfaces i,html body .ksav,html body .klegend i{display:flex!important;align-items:center!important;justify-content:center!important;line-height:1!important;gap:0!important;margin-top:0!important}
 html body .ksbfaces i.pn{color:var(--muted)!important}
 html body .ksbh .eyebrow{color:rgba(255,255,255,.82)!important}
+
+/* Lehrer-Portal auf Handy und iPad: viele Bereiche in der unteren Leiste. Feste Breite je Eintrag, seitlich wischen statt gequetschter Beschriftungen */
+@media (max-width:959px){
+  html body .tabbar:has(.tab:nth-child(8)){overflow-x:auto!important;justify-content:flex-start!important;scrollbar-width:none;scroll-snap-type:x proximity;-webkit-mask-image:linear-gradient(90deg,#000 90%,transparent);mask-image:linear-gradient(90deg,#000 90%,transparent);padding-right:24px!important}
+  html body .tabbar:has(.tab:nth-child(8))::-webkit-scrollbar{display:none}
+  html body .tabbar:has(.tab:nth-child(8)) .tab{flex:0 0 70px!important;scroll-snap-align:start}
+}
+@media (min-width:700px) and (max-width:959px){
+  html body .tabbar:has(.tab:nth-child(8)) .tab{flex:1 0 56px!important}
+}
+/* Abschnittsköpfe mit mehreren Knöpfen: auf dem Handy Überschrift oben, Knöpfe darunter */
+@media (max-width:599px){
+  html body .sec:has(> .btn ~ .btn){flex-wrap:wrap;row-gap:10px}
+  html body .sec:has(> .btn ~ .btn) > h2{flex:1 0 100%}
+}

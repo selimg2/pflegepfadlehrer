@@ -83,12 +83,14 @@
 })();
 /* Handy: kurze Beschriftungen in der unteren Leiste */
 (function () {
-  var S = { "Kurse & Schüler": "Kurse", "Ausbildungsnachweis": "Nachweis", "Team-Krankenhaus": "Team", "Einstellungen": "Optionen", "Stundenplan": "Plan", "Nachrichten": "Nachricht." };
+  var S = { "Kurse & Schüler": "Kurse", "Ausbildungsnachweis": "Nachweis", "Team-Krankenhaus": "Team", "Einstellungen": "Optionen", "Stundenplan": "Plan" };
   function run() {
     document.querySelectorAll(".tabbar .tab span").forEach(function (sp) {
       var t = (sp.textContent || "").trim();
       if (S[t] && sp.getAttribute("data-short") !== S[t]) sp.setAttribute("data-short", S[t]);
     });
+    var cur = document.querySelector(".tabbar .tab[aria-current=page]");
+    if (cur && cur !== run.last) { run.last = cur; try { cur.scrollIntoView({ block: "nearest", inline: "nearest" }); } catch (e) { /* alte Browser */ } }
   }
   var q = 0;
   function start() { run(); new MutationObserver(function () { if (q) return; q = 1; requestAnimationFrame(function () { q = 0; run(); }); }).observe(document.body, { childList: true, subtree: true }); }
