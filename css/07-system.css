@@ -1,0 +1,27 @@
+/* =====================================================================
+   Fallpfad Lehrer-Portal – Ebene 07 (lädt als letzte CSS-Datei)
+   Gleiche Regeln wie die Schüler-App (dort css/08-system.css):
+   Navigation einfarbig, aktiv = Akzent. Eine Farbe bedeutet eine Sache.
+   ===================================================================== */
+
+/* Seitenleiste: farbige Kreise hinter den Symbolen entfernen, Symbole einfarbig */
+html:root body .side .tab.fx-nav svg,html:root body .side .tab svg{
+  color:var(--muted)!important;stroke:currentColor!important;background:none!important;
+  box-shadow:none!important;padding:3px!important;filter:none!important;transform:none!important}
+html:root body .side .tab.fx-nav svg path,html:root body .side .tab svg path{stroke:currentColor!important}
+html:root body .side .tab.fx-nav[aria-current=page],html:root body .side .tab.fx-nav.on,
+html:root body .side .tab[aria-current=page]{
+  background:color-mix(in srgb,var(--accent) 10%,transparent)!important;color:var(--fg)!important;box-shadow:none!important}
+html:root body .side .tab.fx-nav[aria-current=page] svg,html:root body .side .tab.fx-nav.on svg,
+html:root body .side .tab[aria-current=page] svg{color:var(--accent)!important}
+html:root body .side .tab.fx-nav:hover:not([aria-current=page]){background:color-mix(in srgb,var(--fg) 5%,transparent)!important}
+html:root body .side .tab.fx-nav:hover svg{transform:none!important}
+html:root body .side .tab.fx-nav[aria-current=page]::before,html:root body .side .tab.fx-nav.on::before{display:none!important}
+
+/* Logo bleibt im Akzent, aber ruhig (kein Verlauf nötig) */
+html:root body .side .brand .logo{box-shadow:none!important}
+
+/* Untere Tab-Leiste (Handy): gleiche Logik */
+html:root body .tabbar .tab svg{color:var(--muted)!important;background:none!important}
+html:root body .tabbar .tab[aria-current=page] svg,html:root body .tabbar .tab.on svg{color:var(--accent)!important}
+html:root body .tabbar .tab[aria-current=page]{color:var(--accent)!important}

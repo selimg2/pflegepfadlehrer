@@ -99,7 +99,12 @@
     { k: "arbeitsblatt", ic: "file", c: "#30B0C7", t: "Arbeitsblatt erstellen", d: "Aufgaben mit Operatoren und Zeitangaben", text: "Erstelle ein Arbeitsblatt für eine Doppelstunde zum Thema " },
     { k: "ewh", ic: "exam", c: "#5856D6", t: "Erwartungshorizont", d: "Erwartete Punkte und Punkteverteilung", text: "Erstelle einen Erwartungshorizont mit Punkteverteilung für folgende Aufgabe: " },
     { k: "daz", ic: "globe", c: "#FF9500", t: "Text vereinfachen", d: "Für Lernende mit Deutsch als Zweitsprache", text: "Vereinfache diesen Text auf Sprachniveau B1 und erkläre die Fachbegriffe: " },
-    { k: "frage", ic: "bulb", c: "#34C759", t: "Fachfrage klären", d: "Antwort mit Quellen aus Fallpfad", text: "" }
+    { k: "frage", ic: "bulb", c: "#34C759", t: "Fachfrage klären", d: "Antwort mit Quellen aus Fallpfad", text: "" },
+    { k: "beurteilung", ic: "chat", c: "#0D9488", t: "Rückmeldung formulieren", d: "Wertschätzender Lernstands-Kommentar", text: "Formuliere eine wertschätzende, konkrete Rückmeldung an eine Auszubildende / einen Auszubildenden. Stärken, Lücken und nächste Schritte: " },
+    { k: "differenzierung", ic: "layers", c: "#4F46E5", t: "Differenzieren", d: "Gleicher Inhalt auf drei Niveaustufen", text: "Erstelle dieses Material in drei Niveaustufen (Grundniveau, Standard, erweitert) mit gleichen Lernzielen: " },
+    { k: "praxisauftrag", ic: "seal", c: "#B45309", t: "Praxisauftrag erstellen", d: "Lernauftrag für den Einsatz mit Beobachtungsbogen", text: "Erstelle einen Praxisauftrag für den Praxiseinsatz mit Lernziel, Arbeitsschritten und Beobachtungsbogen zum Thema " },
+    { k: "reflexion", ic: "file", c: "#DB2777", t: "Reflexionsbogen", d: "Leitfragen zur Reflexion nach dem Einsatz", text: "Erstelle einen Reflexionsbogen mit Leitfragen für Auszubildende nach einem Praxiseinsatz zum Thema " },
+    { k: "fallbesprechung", ic: "users", c: "#0284C7", t: "Fallbesprechung vorbereiten", d: "Moderationsleitfaden mit Zeitplan", text: "Erstelle einen Moderationsleitfaden für eine 45-minütige Fallbesprechung im Kurs zum Thema " }
   ];
 
   /* Dokumente (Lernsituation, Arbeitsblatt, Erwartungshorizont …) als Word-Datei: HTML mit Word-Kopf, öffnet in Word, Pages und LibreOffice */
