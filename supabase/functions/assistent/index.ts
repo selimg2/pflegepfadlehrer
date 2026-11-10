@@ -11,6 +11,7 @@
 //   Keine Namen aus dem Konto, keine E-Mail, keine Nutzerkennung. E-Mail-Adressen und Telefonnummern werden entfernt.
 // - store=false, keine Inhalte in Logs. Fallpfad speichert den Chat nicht auf dem Server (nur auf dem Gerät).
 // - Für das Tageslimit wird je Konto und Tag nur die Anzahl der Nachrichten gezählt (fp_assistent_nutzung).
+// - Lernende nutzen den Assistenten nur, wenn sie in einem Kurs sind (fp_ki_erlaubt).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { antworten, kiErlaubt, koerper, OHNE_KURS, vorpruefung } from "../_shared/sicherheit.ts";
 
