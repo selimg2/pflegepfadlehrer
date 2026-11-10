@@ -1,6 +1,5 @@
 -- Fallpfad: Sicherheits-Audit November 2026 – Mandantentrennung bei Kursen
--- STATUS: ENTWURF, NOCH NICHT AUF DER PRODUKTIVDATENBANK AUSGEFÜHRT.
--- Erst in einer Kopie/Branch testen, dann nach ausdrücklicher Freigabe ausführen.
+-- STATUS: Am 10.11.2026 nach Freigabe auf der Produktivdatenbank ausgeführt (Migration audit_mandantentrennung).
 -- Reihenfolge: zuerst pflegeplanung_sicherheit.sql, danach diese Datei.
 --
 -- Befund (AUDIT_REPORT.md, S-01):
@@ -110,6 +109,11 @@ begin
     execute format('grant execute on function %s to authenticated', f.sig);
   end loop;
 end $$;
+
+-- e) Nachtrag (Migration audit_nachtrag_rechte): Trigger- und Wartungsfunktionen nicht per API aufrufbar
+revoke all on function public.fp_kurs_wechsel_guard() from public, anon, authenticated;
+revoke execute on function public.fp_pruef_aufraeumen() from public, anon, authenticated;
+revoke execute on function public.messages_aufraeumen() from public, anon, authenticated;
 
 commit;
 

@@ -1,5 +1,6 @@
 -- Fallpfad: Pflegeplanung (Tageszähler) und Sicherheits-Härtung, Stand 10.11.2026.
 -- Einmal im Supabase SQL-Editor ausführen (wiederholbar).
+-- STATUS: Am 10.11.2026 nach Freigabe auf der Produktivdatenbank ausgeführt (Migration pflegeplanung_sicherheit).
 
 -- =====================================================================
 -- 1. Pflegeplanung: Tageszähler für die KI-Rückmeldung (nur Anzahl, keine Inhalte)

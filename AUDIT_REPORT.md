@@ -16,7 +16,7 @@
 
 **Rahmenbedingungen der Prüfung**
 - Es wurden ausschließlich die Demo-Konten mit synthetischen Daten genutzt. Keine echten Patienten-, Pflege- oder Gesundheitsdaten wurden verarbeitet, fotografiert oder an Dienste gesendet.
-- Die Datenbank wurde nur lesend abgefragt. Für die Zugriffstests wurden Abfragen in einer Transaktion mit simuliertem Konto ausgeführt und zurückgerollt. Es wurde nichts auf der Produktivdatenbank geändert, keine Edge Function neu bereitgestellt.
+- Während des Audits wurde die Datenbank nur lesend abgefragt (Zugriffstests in zurückgerollten Transaktionen). **Nachtrag 10.11.2026, 20:15 Uhr:** Nach ausdrücklicher Freigabe wurden die Migrationen `pflegeplanung_sicherheit`, `audit_mandantentrennung` und `audit_nachtrag_rechte` auf der Produktivdatenbank ausgeführt. Edge Functions wurden nicht neu bereitgestellt.
 - Die Testumgebung kann `*.supabase.co` nicht erreichen. Live-Tests gegen die API (Anmeldung, KI-Funktionen) waren deshalb nicht möglich; die Oberflächen wurden mit blockierten Netzwerkaufrufen im Demo-Modus getestet.
 - Keine Penetrationstests gegen Produktivsysteme.
 
@@ -27,12 +27,12 @@
 | Bereich | Ergebnis |
 |---|---|
 | Fortschrittskreise | Ursache gefunden (Geometrie des großen Rings, starre Breite der Checkpoint-Leiste) und behoben. Automatischer Test: vorher 14 fehlerhafte Prüfungen, nachher 0 bei 840 Ringen in 7 Bildschirmgrößen/Zoomstufen und 5 Füllständen. ✅ |
-| Sicherheit | **1 hoher Befund** (Mandantentrennung bei Kursen: neues Konto sieht Kurse und Kurscodes aller Schulen und kann ohne Code beitreten), 5 mittlere, mehrere niedrige. Für den hohen Befund liegt eine getestete SQL-Korrektur vor, die **noch nicht** auf der Produktivdatenbank ausgeführt ist. |
+| Sicherheit | **1 hoher Befund** (Mandantentrennung bei Kursen: neues Konto sah Kurse und Kurscodes aller Schulen und konnte ohne Code beitreten), 5 mittlere, mehrere niedrige. Der hohe Befund ist **behoben und auf der Produktivdatenbank nachgeprüft**; anonym aufrufbare Datenbankfunktionen von 33 auf 15 reduziert, die bewusst öffentlich sind. |
 | Datenschutz | Gute technische Grundlage (EU-Region, RLS auf allen Tabellen, Datensparsamkeit bei KI, Löschfunktion, Datenauskunft, Einwilligungen). Offen sind vor allem organisatorische und rechtliche Punkte: Impressum/Datenschutzerklärung enthalten Platzhalter, AV-Verträge, VVT, DSFA-Entscheidung, Drittlandtransfer zu OpenAI. |
 | Funktionen | Beide Apps im Demo-Modus in 3 Bildschirmgrößen × hell/dunkel durchgeklickt (9 bzw. 13 Bereiche): keine JavaScript-Fehler, keine Überbreite. Stationsalltag-Engine: 300 Varianten je Station ohne Fehler. ✅ |
 | Barrierefreiheit | Basisprüfung: alle Bedienelemente haben Namen, alle Bilder alt-Text, alle Felder Beschriftung, `lang="de"`. Zu kleine Tippflächen (23 px) korrigiert. Kein vollständiger WCAG-Test. |
 
-**Bereitschaft:** Bereit für einen **begleiteten Testbetrieb mit synthetischen Daten bzw. Demo-Konten**. **Nicht** bereit für den Produktivstart mit echten Lernenden, bevor die Punkte in Abschnitt 10 (insbesondere S-01 und die rechtlichen Unterlagen) erledigt sind.
+**Bereitschaft:** Bereit für einen **begleiteten Testbetrieb mit einer Testschule**. **Nicht** bereit für den Produktivstart mit echten Lernenden, bevor die offenen Punkte in Abschnitt 10 (Auth-Einstellungen, rechtliche Unterlagen, Live-Test) erledigt sind.
 
 ---
 
@@ -42,9 +42,9 @@ Bewertung angelehnt an OWASP ASVS 5.0.0 (Kapitel in Klammern) und eine einfache 
 
 | ID | Schwere | Befund | Nachweis | Status |
 |---|---|---|---|---|
-| **S-01** | **Hoch** | **Mandantentrennung Kurse (ASVS V8 Autorisierung).** Policy `courses_select` erlaubt allen angemeldeten Konten das Lesen aller Kurse (`using (true)`). Die einschränkende Schul-Policy lässt Konten ohne Schule durch (`my_school() IS NULL`). Ein frisch registriertes Konto (Selbstregistrierung ist in der App möglich) sieht dadurch **alle Kurse aller Schulen inkl. Kurscode**. Zusätzlich darf ein Schülerkonto `profiles.course_id` direkt auf jede Kurs-ID setzen; die Schule wird übernommen. Folge: Beitritt zu fremden Kursen/Schulen ohne Code, Zugriff auf deren Kursnachrichten, Aufgaben, Stundenplan, Gruppenfälle. Daten anderer Lernender bleiben durch die übrigen Policies geschützt. | ✅ Live-Datenbank, simuliertes neues Konto, nur SELECT, zurückgerollt: 1 von 1 Kurs inkl. Code sichtbar. ✅ Lokales Postgres-Modell: Angriff vorher erfolgreich, nach Korrektur blockiert. | ⏳ Korrektur `supabase/audit_mandantentrennung.sql` liegt bereit (lokal getestet), **Ausführung braucht Freigabe**. Die Schüler-App nutzt bereits die neue sichere Funktion und fällt bis dahin auf den alten Weg zurück. |
-| S-02 | Mittel | **33 SECURITY-DEFINER-Funktionen ohne Anmeldung aufrufbar** (Supabase-Advisor). Die meisten prüfen intern `auth.uid()` oder eine Rolle; ohne Prüfung und ohne Anmeldung aufrufbar sind u. a. `course_settings`, `course_timetable` (Stundenplan inkl. Lehrkraftnamen/Räume bei bekannter Kurs-UUID), `team_create`/`team_patch`. | ✅ Advisor + Funktionsquelltexte gelesen | ⏳ `pflegeplanung_sicherheit.sql` (entzieht 17 Funktionen den anonymen Zugriff) und `audit_mandantentrennung.sql` (`course_settings`) – Freigabe nötig. Bewusst öffentlich bleiben Live-Unterricht, Unterschrift per Einmal-Link, Gruppencode. |
-| S-03 | Mittel | **Gruppenräume (Team-Krankenhaus) ohne Anmeldung und ohne Mengenbegrenzung**: anlegen, beitreten, bearbeiten nur mit 6-stelligem Code (32 Zeichen, ≈ 10⁹ Kombinationen), kein Rate-Limit. Missbrauch: Spam-Räume, Durchprobieren von Codes. Inhalte sind Lernnotizen der Gruppe. | 🔍 Funktionsquelltext | ⏳ Vorschlag: `team_create` nur angemeldet (in Entwurf enthalten), Rate-Limit je IP/Konto, längere Codes. |
+| **S-01** | **Hoch** | **Mandantentrennung Kurse (ASVS V8 Autorisierung).** Policy `courses_select` erlaubt allen angemeldeten Konten das Lesen aller Kurse (`using (true)`). Die einschränkende Schul-Policy lässt Konten ohne Schule durch (`my_school() IS NULL`). Ein frisch registriertes Konto (Selbstregistrierung ist in der App möglich) sieht dadurch **alle Kurse aller Schulen inkl. Kurscode**. Zusätzlich darf ein Schülerkonto `profiles.course_id` direkt auf jede Kurs-ID setzen; die Schule wird übernommen. Folge: Beitritt zu fremden Kursen/Schulen ohne Code, Zugriff auf deren Kursnachrichten, Aufgaben, Stundenplan, Gruppenfälle. Daten anderer Lernender bleiben durch die übrigen Policies geschützt. | ✅ Live-Datenbank, simuliertes neues Konto, nur SELECT, zurückgerollt: 1 von 1 Kurs inkl. Code sichtbar. ✅ Lokales Postgres-Modell: Angriff vorher erfolgreich, nach Korrektur blockiert. | ✅ **Behoben** (Migration am 10.11.2026). Nachprüfung live in zurückgerollter Transaktion: neues Konto sieht 0 Kurse; Lernende sehen nur den eigenen Kurs; falscher Code 0 Treffer, richtiger Code 1 Treffer; Profil speichern ohne Kurswechsel funktioniert; Kurswechsel ohne Code wird blockiert. |
+| S-02 | Mittel | **33 SECURITY-DEFINER-Funktionen ohne Anmeldung aufrufbar** (Supabase-Advisor). Die meisten prüfen intern `auth.uid()` oder eine Rolle; ohne Prüfung und ohne Anmeldung aufrufbar sind u. a. `course_settings`, `course_timetable` (Stundenplan inkl. Lehrkraftnamen/Räume bei bekannter Kurs-UUID), `team_create`/`team_patch`. | ✅ Advisor + Funktionsquelltexte gelesen | ✅ **Behoben**: Advisor meldet nur noch 15 anonym aufrufbare Funktionen, alle bewusst öffentlich (Live-Unterricht, Unterschrift per Einmal-Link, Praxisanleitungs-Gerät, Gruppencode, RLS-Hilfsfunktionen ohne Datenausgabe). Wartungs- und Triggerfunktionen sind nicht mehr per API aufrufbar. |
+| S-03 | Mittel | **Gruppenräume (Team-Krankenhaus) ohne Anmeldung und ohne Mengenbegrenzung**: anlegen, beitreten, bearbeiten nur mit 6-stelligem Code (32 Zeichen, ≈ 10⁹ Kombinationen), kein Rate-Limit. Missbrauch: Spam-Räume, Durchprobieren von Codes. Inhalte sind Lernnotizen der Gruppe. | 🔍 Funktionsquelltext | Teilweise: `team_create` nur noch angemeldet ✅. ⏳ Rate-Limit, längere Codes. |
 | S-04 | Mittel | **Tageslimit der Sprachsimulation umgehbar**: `gespraech-sitzung` zählt kein Gespräch, wenn die Anfrage einen Verlauf enthält („Fortsetzen“). Ein manipulierter Client erhält damit unbegrenzt Realtime-Sitzungen (Kostenrisiko). | 🔍 Code `functions/gespraech-sitzung/index.ts` | ⏳ Vorschlag: Fortsetzungen separat zählen (eigene Spalte, höheres Limit) – Schemaänderung, daher nur dokumentiert. |
 | S-05 | Mittel | **Zähler für Limits nicht atomar** (`uebersetzen`, `_shared/komm.ts`): Lesen und Schreiben getrennt, parallele Anfragen können das Limit überschreiten. | 🔍 Code | ⏳ Vorschlag: atomare Zähl-Funktion wie `fp_pp_zaehlen` (im Entwurf für die Pflegeplanung bereits so umgesetzt). |
 | S-06 | Mittel | **Schutz vor kompromittierten Passwörtern deaktiviert**; Mindestlänge in der App war 6 Zeichen (ASVS 5.0.0 V6.2.1 verlangt mindestens 8). | ✅ Advisor; 🔍 Code | Teilweise behoben: App verlangt bei Registrierung jetzt 8 Zeichen. ⏳ In Supabase Auth: Mindestlänge 8+ und „Leaked password protection“ einschalten (Dashboard, nicht per Code möglich). |
@@ -53,7 +53,7 @@ Bewertung angelehnt an OWASP ASVS 5.0.0 (Kapitel in Klammern) und eine einfache 
 | S-09 | Niedrig | **pdf.js 3.11.174** im Lehrer-Portal (Folien-Import) ist von CVE-2024-4367 betroffen (Skriptausführung über präparierte PDF). Die CSP ohne `unsafe-eval` blockiert den bekannten Angriffsweg; geöffnet werden nur eigene Dateien der Lehrkraft. | 🔍 Version + CSP | ⏳ Vorschlag: auf pdf.js ≥ 4.2.67 aktualisieren oder `isEvalSupported:false` setzen. |
 | S-10 | Niedrig | **SheetJS 0.18.5** (bekannte CVEs beim *Lesen* von Dateien). Die Apps nutzen nur den Export, kein Einlesen. | 🔍 Code | Kein akuter Handlungsbedarf; bei Gelegenheit aktualisieren. |
 | S-11 | Info | Tabellen haben Standard-Schreibrechte für `anon`; geschützt ist alles durch RLS (auf allen Tabellen aktiv). | ✅ Abfrage | Vorschlag: Rechte für `anon` zusätzlich entziehen (Defense in Depth). |
-| S-12 | Info | `fp_assistent_nutzung` hat RLS ohne Policy (= kein Zugriff, unkritisch). | ✅ Advisor | Im Entwurf `pflegeplanung_sicherheit.sql` explizite Sperr-Policy. |
+| S-12 | Info | `fp_assistent_nutzung` hat RLS ohne Policy (= kein Zugriff, unkritisch). | ✅ Advisor | ✅ Explizite Sperr-Policy angelegt; Advisor-Hinweis verschwunden. |
 
 **Positiv geprüft**
 
@@ -92,7 +92,7 @@ Rechtsgrundlagen und Pflichten werden hier nur als Prüfpunkte genannt. Welche R
 | D-02 | **Drittlandübermittlung an OpenAI (USA)** für Übersetzung, Assistent, Folien-Import, Pflegeplanung und Sprachsimulation. Grundlage laut Code-Kommentar: OpenAI-DPA mit Standardvertragsklauseln; das EU-US Data Privacy Framework wurde vom EuG im September 2025 bestätigt, ein Rechtsmittel beim EuGH ist anhängig. OpenAI bietet EU-Datenresidenz für berechtigte Kunden an; die App unterstützt sie per `OPENAI_BASE_URL`. | Art. 44 ff. DSGVO | ⏳ Prüfen: Ist der DPA abgeschlossen? EU-Datenresidenz verfügbar und aktiviert? Transfer-Folgenabschätzung dokumentiert? |
 | D-03 | **Auftragsverarbeitung** mit Supabase (Hosting/DB), Vercel/Netlify (Hosting), OpenAI (KI). Verhältnis Schule ↔ Betreiber der App ungeklärt (wer ist Verantwortlicher, wer Auftragsverarbeiter?). | Art. 28 DSGVO | ⏳ Verträge prüfen/abschließen; Unterauftragsverarbeiter-Listen ablegen. |
 | D-04 | **DSFA-Entscheidung fehlt.** Kriterien aus den DSFA-Muss-Listen der Aufsichtsbehörden können berührt sein (z. B. Daten schutzbedürftiger Personen/Auszubildender, Bewertung von Leistung, Einsatz neuer Technologien/KI). | Art. 35 DSGVO, DSK/Länder-Muss-Listen | ⏳ Schwellwertanalyse durch die Schule/DSB; Vorlage siehe Abschnitt 8. |
-| D-05 | **Löschfristen** sind für Zähler, Live-Sitzungen, abgelaufene Nachrichten, Gruppenräume umgesetzt (`fp_datenschutz_aufraeumen`). **Kein Zeitplan aktiv** (pg_cron nicht installiert), die Funktion läuft also nicht automatisch. Für Meldungen, Abgaben, Puls, Feedback, Nachweis ist keine Frist hinterlegt. | Art. 5 Abs. 1 lit. e, Art. 17 | ⏳ Entwurf `pflegeplanung_sicherheit.sql` richtet pg_cron ein (Freigabe nötig). Fristen für übrige Daten festlegen (z. B. Aufbewahrungspflichten für Ausbildungsnachweise nach PflAPrV/Landesrecht klären). |
+| D-05 | **Löschfristen** sind für Zähler, Live-Sitzungen, abgelaufene Nachrichten, Gruppenräume umgesetzt (`fp_datenschutz_aufraeumen`). pg_cron ist **seit 10.11.2026 aktiv** mit 7 nächtlichen Löschjobs (03:17–03:41 Uhr). Für Meldungen, Abgaben, Puls, Feedback, Nachweis ist weiterhin keine Frist hinterlegt. | Art. 5 Abs. 1 lit. e, Art. 17 | Teilweise ✅. ⏳ Erster Lauf in `cron.job_run_details` kontrollieren. Fristen für übrige Daten festlegen (z. B. Aufbewahrungspflichten für Ausbildungsnachweise nach PflAPrV/Landesrecht klären). |
 | D-06 | **Lehrkräfte sehen alle Lernenden der Schule** (siehe S-07). | Art. 5 Abs. 1 lit. c, Art. 25 | ⏳ Entscheidung der Schule. |
 | D-07 | **Meldungen an Lehrkräfte** können besonders sensible Inhalte enthalten (Gewalt, Belästigung). Zugriff: Lernende selbst und adressierte bzw. alle Lehrkräfte der Schule. | Art. 9, Art. 32 | ⏳ Zugriffskreis und Frist festlegen. |
 | D-08 | **Mindestalter / Minderjährige**: Auszubildende können unter 18 sein. Einwilligungen (Sprachsimulation) setzen Einwilligungsfähigkeit voraus. | Art. 8 DSGVO (für Online-Dienste), Landesrecht | ⏳ Prüfen durch Schule/DSB. |
@@ -115,7 +115,7 @@ Rechtsgrundlagen und Pflichten werden hier nur als Prüfpunkte genannt. Welche R
 | `js/app/01-app.bundle.js` | Kurssuche per Code über neue Funktion `fp_kurs_per_code` (mit Rückfall auf bisherigen Weg, solange die Funktion fehlt) | pflegepfad |
 | `js/app/01-app.bundle.js` | Passwort bei Registrierung mindestens 8 Zeichen (Anmeldung bestehender Konten unverändert) | pflegepfad |
 | `sw.js` | Cache-Version `fallpfad-v41`, damit Nutzer die Korrekturen erhalten | pflegepfad |
-| `supabase/audit_mandantentrennung.sql` | **Entwurf, nicht ausgeführt**: Korrektur S-01 (Policies, Beitrittsticket, Fehlversuchsbegrenzung 20/Tag, Trigger gegen Kurswechsel ohne Code, `course_settings` nur angemeldet) | beide |
+| `supabase/audit_mandantentrennung.sql` | **Ausgeführt am 10.11.2026**: Korrektur S-01 (Policies, Beitrittsticket, Fehlversuchsbegrenzung 20/Tag, Trigger gegen Kurswechsel ohne Code, `course_settings` nur angemeldet) | beide |
 | `werkzeuge/tests/*` | Neue automatisierte Tests (siehe Abschnitt 6) | beide |
 
 ---
@@ -158,7 +158,7 @@ Im Lehrer-Portal gibt es keine Fortschrittskreise (0 gefunden).
 | JavaScript-Syntax nach Bundle-Änderungen | `new Function(...)` | ✅ |
 | Pflegeplanung mit KI-Feedback | – | ⬜ KI-Antwort live nicht prüfbar (kein Zugang zu Supabase aus der Testumgebung); Oberfläche im Demo-Modus geprüft |
 | Anmeldung, Registrierung, Passwort-Reset live | – | ⬜ nicht möglich (siehe oben) |
-| Kurssuche über `fp_kurs_per_code` live | – | ⬜ Funktion noch nicht auf der Datenbank; Rückfallweg 🔍 |
+| Kurssuche über `fp_kurs_per_code` live | SQL als echtes Schülerkonto, zurückgerollt | ✅ Funktion arbeitet; Aufruf aus der App selbst ⬜ (kein Netz zu Supabase aus der Testumgebung) |
 | Screenreader (VoiceOver/TalkBack), Kontraste | – | ⬜ nicht durchgeführt |
 | Lasttest | – | ⬜ nicht durchgeführt (keine Tests gegen Produktion ohne Freigabe) |
 
@@ -166,9 +166,9 @@ Im Lehrer-Portal gibt es keine Fortschrittskreise (0 gefunden).
 
 ## 7. Offene Risiken
 
-1. **S-01 bleibt offen, bis die SQL-Korrektur ausgeführt ist.** Bis dahin kann sich jedes neu registrierte Konto in jeden Kurs einschreiben. Kurzfristige Alternative ohne Code-Änderung: Selbstregistrierung in Supabase Auth deaktivieren und Konten nur durch die Schule anlegen.
+1. Die Kurssuche der Schüler-App mit der neuen Funktion wurde noch nicht mit einem echten Konto in der App ausprobiert. Bitte einmal einen Kursbeitritt per Code testen (siehe Abschnitt 10).
 2. Kostenrisiko durch umgehbare Limits (S-04, S-05).
-3. Keine automatische Löschung (pg_cron fehlt).
+3. Löschfristen für Meldungen, Abgaben, Puls, Feedback und Nachweis fehlen.
 4. Rechtliche Unterlagen unvollständig (D-01 bis D-04, D-08).
 5. Keine Live-Tests der Anmeldung und KI-Funktionen aus dieser Umgebung.
 6. Freitextfelder können trotz Hinweis echte Patientendaten enthalten.
@@ -190,7 +190,7 @@ Im Lehrer-Portal gibt es keine Fortschrittskreise (0 gefunden).
 | 8 | Löschfristen je Datenart festlegen, insbesondere Ausbildungsnachweis (Aufbewahrungspflichten) | Schule |
 | 9 | Prozess für Datenpannen (Art. 33/34): Meldeweg, 72-Stunden-Frist, Kontakt Aufsichtsbehörde | Schule, Betreiber |
 | 10 | Supabase Auth: Mindestlänge Passwort ≥ 8, Leaked-Password-Protection an, E-Mail-Bestätigung an, Selbstregistrierung bewusst entscheiden | Betreiber (Dashboard) |
-| 11 | Freigabe und Ausführung der SQL-Entwürfe (`pflegeplanung_sicherheit.sql`, dann `audit_mandantentrennung.sql`) zuerst auf einem Supabase-Branch, dann produktiv | Betreiber |
+| 11 | ✅ SQL-Korrekturen ausgeführt (10.11.2026); Kursbeitritt per Code einmal live in der App testen | Betreiber |
 | 12 | Lernende und Lehrkräfte schriftlich anweisen, keine echten Patientendaten einzugeben | Schule |
 | 13 | Externer Penetrationstest vor Produktivstart mit vielen Schulen | Betreiber |
 
@@ -210,7 +210,7 @@ Im Lehrer-Portal gibt es keine Fortschrittskreise (0 gefunden).
 
 | Priorität | Vorschlag | Aufwand | Hinweis |
 |---|---|---|---|
-| P1 | SQL-Entwürfe nach Test auf Branch ausführen (S-01, S-02, D-05) | klein | Freigabe nötig |
+| ~~P1~~ | ~~SQL-Korrekturen ausführen (S-01, S-02, D-05)~~ | – | ✅ erledigt am 10.11.2026 |
 | P1 | Supabase-Auth-Einstellungen (Punkt 8.10) | klein | Dashboard |
 | P1 | Rechtliche Platzhalter ausfüllen | klein | nur durch Verantwortliche |
 | P2 | Limits atomar zählen, Fortsetzungen begrenzen (S-04, S-05) | mittel | Schemaänderung + Deployment |
@@ -227,11 +227,12 @@ Im Lehrer-Portal gibt es keine Fortschrittskreise (0 gefunden).
 
 ## 10. Checkliste Produktivstart
 
-- [ ] `pflegeplanung_sicherheit.sql` auf Branch getestet und produktiv ausgeführt
-- [ ] `audit_mandantentrennung.sql` auf Branch getestet und produktiv ausgeführt; Prüfabfrage am Ende der Datei ergibt 0
-- [ ] Supabase-Advisor erneut ausgeführt, keine Befunde der Stufe WARN zu anonymen Funktionen außer den bewusst öffentlichen
+- [x] `pflegeplanung_sicherheit.sql` produktiv ausgeführt (10.11.2026)
+- [x] `audit_mandantentrennung.sql` produktiv ausgeführt; Prüfabfrage ergibt 0
+- [x] Supabase-Advisor erneut ausgeführt: nur noch bewusst öffentliche Funktionen anonym aufrufbar
 - [ ] Auth: Passwortlänge ≥ 8, Leaked-Password-Protection, E-Mail-Bestätigung, Entscheidung Selbstregistrierung
-- [ ] pg_cron aktiv, Löschjobs laufen (Kontrolle in `cron.job_run_details`)
+- [x] pg_cron aktiv, 7 Löschjobs eingeplant
+- [ ] Erster nächtlicher Lauf kontrolliert (`cron.job_run_details`)
 - [ ] Impressum und Datenschutzerklärung vollständig, mit Datum
 - [ ] AV-Verträge/DPA abgeschlossen und abgelegt (Schule, Supabase, OpenAI, Hosting)
 - [ ] VVT angelegt, DSFA-Schwellwertanalyse dokumentiert
