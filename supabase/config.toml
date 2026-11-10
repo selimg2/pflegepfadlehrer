@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.konto-loeschen]
 verify_jwt = true
+
+[functions.assistent]
+verify_jwt = true

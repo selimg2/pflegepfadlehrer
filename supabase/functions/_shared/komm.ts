@@ -1,7 +1,7 @@
 // Fallpfad Training "Kommunikation": gemeinsame Bausteine für die Edge Functions
 // "gespraech-sitzung" und "gespraech-auswertung".
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { HASHES } from "./komm-szenarien.ts";
+import { HASHES, VORHER } from "./komm-szenarien.ts";
 
 export const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
 export const TAGESLIMIT = Number(Deno.env.get("FALLPFAD_GESPRAECHE_TAG") ?? "8"); // neue Gespräche je Konto und Tag
@@ -17,7 +17,7 @@ export async function szenario(id: unknown, def: unknown) {
   if (roh.length > 60000) return null;
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(roh));
   const ist = Array.from(new Uint8Array(buf)).map((x) => x.toString(16).padStart(2, "0")).join("");
-  return ist === soll ? (def as any) : null;
+  return ist === soll || (VORHER[key] ?? []).includes(ist) ? (def as any) : null;
 }
 
 /** Angemeldete Person prüfen. Gibt Nutzer-ID und Admin-Client zurück oder eine fertige Fehlerantwort. */

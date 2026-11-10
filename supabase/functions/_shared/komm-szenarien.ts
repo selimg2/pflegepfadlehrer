@@ -25,7 +25,7 @@ export const HASHES: Record<string, string> = {
  "ueb-hueft": "1498763ced42180b29f2d8e0721cdb5560130c9470e105a78e30be46b37a1344",
  "ueb-hypo": "857aff242f73faf4e05a03d514a10b646ebf4fc927b596d7aa6c60c0d14ac869",
  "ueb-delir": "c0f8b8ae642190e4a54202ae6152f76ee56a7a8cc23a36c8cae493ed79dc771f",
- "ueb-sepsis": "bde5d5d7d195d5789a82915435c73a494c4062ab23b8603c3604e5aa2c3eb803",
+ "ueb-sepsis": "cc104fdbe13ea0618cf3cd534a87139440a8d1f4cb71ded0ffb9c473d56367e4",
  "ueb-palliativ": "953b39419d1c9794ac78e43149e6ef0425e46b4086f2435a9febe4fd91889e5d",
  "ueb-drei": "efb568f9ea465724267624f7d3f4e9982ae719d4a96828de61560d5532f7fff0",
  "pat-depression": "f60a486c9bf72a34180c53520775c46cb4637295de7c2a81dba9d71acdb473ba",
@@ -61,6 +61,11 @@ export const HASHES: Record<string, string> = {
  "ang-verfuegung": "d5404f0cd7cc16eca3e96f7704da944274878b307360e62b42cdd5f0fcb44fb9",
  "kon-notaufnahme": "ce91b0ef36a1ddc1352bba3a0a8531b06185bc2ed5441783397af2a866c133b3",
  "ueb-op": "6724869e8ab8ba24caff83a87581d0ac651f0193333ae1229334e9139f5929f4",
- "ueb-arzt": "5b05eeb0d51601fdb3e603c522ce9400eb4b90329ac122e704a42db9cfcf082e",
+ "ueb-arzt": "87b41ae30746f88992c38091295dabe573383536a40b26734540f533ea279ea8",
  "ueb-rea": "b27edfc9d0e191664baf23e5e7a1ddd1b1d7977175883d7757b3edba75a03311"
+};
+// Vorherige Fassungen (Übergangszeit, bis alle Geräte die neue App geladen haben). Können später entfernt werden.
+export const VORHER: Record<string, string[]> = {
+ "ueb-sepsis": ["bde5d5d7d195d5789a82915435c73a494c4062ab23b8603c3604e5aa2c3eb803"],
+ "ueb-arzt": ["5b05eeb0d51601fdb3e603c522ce9400eb4b90329ac122e704a42db9cfcf082e"]
 };

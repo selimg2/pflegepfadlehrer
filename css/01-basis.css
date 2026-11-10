@@ -703,7 +703,7 @@ table.lab tr:last-child td{border-bottom:0}
 .camres{padding:14px;border-radius:16px;display:flex;flex-direction:column;gap:4px;animation:fadeUp .45s var(--ease)}.camres span{font-size:14.5px;line-height:1.5}
 .camres.pos{background:var(--crit-tint);border:1px solid var(--bad)}.camres.pos b{color:var(--bad-ink)}.camres.neg{background:var(--ok-soft);border:1px solid var(--ok)}.camres.neg b{color:var(--ok-ink)}
 
-/* NEWS2 */
+/* Punktetabelle */
 .news{display:flex;flex-direction:column;gap:6px}
 .nrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:var(--surface2);flex-wrap:wrap}.nrow.ok{background:var(--ok-soft)}.nrow.bad{background:var(--bad-soft)}
 .nk{flex:1;min-width:150px;display:flex;justify-content:space-between;gap:10px}.nk span{font-variant-numeric:tabular-nums;font-weight:650}

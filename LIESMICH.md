@@ -25,7 +25,25 @@ Die Reihenfolge der `<script>`-Zeilen in `index.html` nicht ändern.
 - **KI-Gesprächsperson bleibt in ihrer Rolle:** Die Rollenanweisung in `_shared/komm.ts` ist neu aufgebaut. Ursache des Rollenwechsels war, dass Texte aus der Aufgabenkarte der Lernenden („Du bist Auszubildende …“) unverändert in der Anweisung der KI standen.
 - Nach dem Hochladen: Edge Functions neu bereitstellen (`supabase functions deploy`), `sicherheit_haertung.sql` ausführen.
 
-## Neu in dieser Version: Training „Kommunikation“
+## Neu in dieser Version: Assistent
+
+Reiter **Assistent** (links, nach der Übersicht). Er erstellt Module, Klausuren und Unterrichtspläne und beantwortet Fachfragen, aber nur aus Quellen:
+
+- **Eigene Quellen:** PDF, PowerPoint oder eingefügter Text. Liegen nur im Browser der Lehrkraft. Vor dem Hochladen bestätigen, dass keine Patientendaten enthalten sind.
+- **Fallpfad-Module** lassen sich zusätzlich einbeziehen (Schalter).
+- **Modul aus Quellen:** baut über den Folien-Import ein Modul und öffnet es im Editor. Vor dem Veröffentlichen fachlich prüfen.
+- Jede Aussage trägt eine Quellenangabe. Was nicht in den Quellen steht, schreibt der Assistent nicht.
+- 3 Nachrichten pro Tag (Secret `FALLPFAD_ASSISTENT_TAG_LEHRER`).
+
+### Einrichtung (einmalig)
+
+```bash
+supabase functions deploy assistent gespraech-sitzung gespraech-auswertung --project-ref sngnzhazulypdvdkhwja
+```
+
+Danach `supabase/assistent.sql` im SQL-Editor ausführen. `gespraech-*` muss neu bereitgestellt werden, weil sich zwei Szenarien geändert haben (NEWS2 entfernt).
+
+## Aus der letzten Version: Training „Kommunikation“
 
 - **Neuer Bereich unter Training > Kommunikation** mit fünf Kategorien: Patientengespräch, Angehörigengespräch, Konflikt- und Beschwerdegespräch, Aufnahmegespräch und Beratungsgespräch. Je Kategorie drei Gespräche (insgesamt 15), alle Personen erfunden.
 - **Sprachsimulation in Echtzeit:** Die lernende Person spricht über das Mikrofon mit einer KI, die die Gesprächsperson spielt und mit natürlicher Stimme antwortet. Die Person fragt nach, versteht manchmal etwas nicht, reagiert auf Fachwörter, Tempo und Ton und gibt Wichtiges erst preis, wenn gut nachgefragt wird. Die Stimmung verändert sich je nach Gesprächsführung. Live-Untertitel sind zuschaltbar, statt zu sprechen kann man auch schreiben. Höchstens 10 Minuten je Gespräch, bei Verbindungsabbruch geht das Gespräch nahtlos weiter.

@@ -482,7 +482,15 @@
       if (!host) { host = document.createElement("div"); host.id = "fxi-root"; document.body.appendChild(host); root = RD.createRoot(host); }
       root.render(h(Modal, { key: Date.now(), ziel: ziel, close: function () { root.render(null); } }));
     },
-    _test: { draftModule: draftModule, draftLive: draftLive, draftTeam: draftTeam, fixModule: fixModule, fixLive: fixLive, fixTeam: fixTeam }
+    _test: { draftModule: draftModule, draftLive: draftLive, draftTeam: draftTeam, fixModule: fixModule, fixLive: fixLive, fixTeam: fixTeam },
+    /* Für den Assistenten: Dateien lesen und aus Quellen ein Modul bauen (gleicher KI-Weg wie beim Folien-Import) */
+    lesen: function (file, onStep) { return /\.pdf$/i.test(file.name) ? readPdf(file, onStep || function () {}) : readPptx(file, onStep || function () {}); },
+    ausQuellen: function (o, onStep) {
+      var slides = (o.quellen || []).map(function (q, i) { return { n: i + 1, titel: clean(q.titel).slice(0, 160), text: String(q.text || "").slice(0, 6000), notiz: "", bilder: [] }; });
+      var opt = { ziel: "modul", jahr: String(o.jahr || 2), laenge: LAENGE[o.umfang] ? o.umfang : "mittel", hinweis: String(o.hinweis || "").slice(0, 800), titel: String(o.titel || "").slice(0, 120), datei: "Assistent", bilder: {}, ki: true };
+      return aiAvailable().then(function (ok) { opt.ki = ok; return generate(slides, opt, onStep || function () {}); });
+    },
+    oeffnen: function (m) { if (window.FP_openEditor) window.FP_openEditor(m); }
   };
   /* Knöpfe neben "Neues Modul", "Eigenen Fall erstellen", "Neue Gruppenarbeit" */
   var ANCH = [[/^Neues Modul$/, "modul"], [/^Eigenen Fall erstellen$/, "live"], [/^Neue Gruppenarbeit$/, "team"]];
