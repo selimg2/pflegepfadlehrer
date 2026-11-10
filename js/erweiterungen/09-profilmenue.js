@@ -28,11 +28,12 @@
     out: '<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>',
     chart: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
     play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/>',
+    fb: '<path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/>',
     bell: '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
     del: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
     lang: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>'
   };
-  var TILE = { pic: "#0A84FF", lang: "#5856D6", bell: "#FF3B30", set: "#8E8E93", play: "#FF9500", chart: "#34C759" };
+  var TILE = { pic: "#0A84FF", lang: "#5856D6", bell: "#FF3B30", set: "#8E8E93", play: "#FF9500", chart: "#34C759", fb: "#30B0C7" };
   function ic(k) { return '<span class="fxpm-ic" style="--t:' + (TILE[k] || "#8E8E93") + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICO[k] + "</svg></span>"; }
   var CHEV = '<svg class="fxpm-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
   function legal() {
@@ -101,6 +102,7 @@
     if (KIND !== "lehrer" && window.FP_NATIVE && window.FP_NATIVE.reminder) rows.push('<button type="button" class="fxpm-row" data-a="remind">' + ic("bell") + '<span>Lern-Erinnerung</span><em class="fxpm-val">' + (window.FP_NATIVE.reminder.get() ? "täglich " + window.FP_NATIVE.reminder.get() + " Uhr" : "Aus") + "</em>" + CHEV + "</button>");
     rows.push('<button type="button" class="fxpm-row" data-a="set">' + ic("set") + "<span>Einstellungen</span>" + CHEV + "</button>");
     rows.push('<button type="button" class="fxpm-row" data-a="tour">' + ic("play") + "<span>Tutorial ansehen</span>" + CHEV + "</button>");
+    if (window.FP_FEEDBACK) rows.push('<button type="button" class="fxpm-row" data-a="fb">' + ic("fb") + "<span>Feedback geben</span>" + CHEV + "</button>");
     m.innerHTML =
       '<div class="fxpm-head">' + avatarHtml() + '<div><b>' + esc(name) + "</b><small>" + esc(sub) + "</small></div></div>" +
       '<div class="fxpm-grp fxpm-look">' +
@@ -139,6 +141,7 @@
       if (act === "del" && window.FP_KONTO) window.FP_KONTO.open();
       if (act === "tour" && window.FP_TOUR) { window.scrollTo(0, 0); setTimeout(function () { window.FP_TOUR.start(); }, 200); }
       if (act === "remind" && window.FP_NATIVE) { var on = !!window.FP_NATIVE.reminder.get(); window.FP_NATIVE.reminder.set(!on, 19, 0); }
+      if (act === "fb" && window.FP_FEEDBACK) window.FP_FEEDBACK.open();
       if (act === "set") { if (pp.go) pp.go("einstellungen"); window.scrollTo(0, 0); }
       if (act === "out" && pp.signOut) pp.signOut();
     });

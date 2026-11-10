@@ -152,7 +152,8 @@
           h("label", { className: "adm-check sm" }, h("input", { type: "checkbox", checked: man.leit, onChange: function (e) { setMan(Object.assign({}, man, { leit: e.target.checked })); } }), h("span", null, h("b", null, "Schulleitung"))),
           h("button", { type: "submit", className: "btn", disabled: busy || !man.email }, "Freischalten"))));
   }
-  function AdminPage() {
+  function AdminPage(pp) {
+    pp = pp || {};
     var l = useState(null), list = l[0], setList = l[1];
     var e = useState(null), err = e[0], setErr = e[1];
     var o = useState(null), open = o[0], setOpen = o[1];
@@ -170,9 +171,9 @@
     var cur = open && list && list.find(function (x) { return x.id === open; });
     var tot = (list || []).reduce(function (a, s) { a.l += Number(s.lernende) || 0; a.t += Number(s.lehrkraefte) || 0; return a; }, { l: 0, t: 0 });
     return h("div", { className: "wrap wide" },
-      h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", { style: { marginTop: 8 } }, "Schulen"), h("p", null, "Hier legst du Schulen an, schaltest sie frei, erzeugst Einladungscodes für Lehrkräfte und siehst, wie aktiv jede Schule ist. Jede Schule sieht nur ihre eigenen Daten.")),
+      !pp.eingebettet && h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", { style: { marginTop: 8 } }, "Schulen"), h("p", null, "Hier legst du Schulen an, schaltest sie frei, erzeugst Einladungscodes für Lehrkräfte und siehst, wie aktiv jede Schule ist. Jede Schule sieht nur ihre eigenen Daten.")),
       err && h("div", { className: "notice bad" }, err, " ", h("button", { type: "button", className: "skip", onClick: function () { setErr(null); } }, "Ausblenden")),
-      list && h(Anfragen, { schools: list, err: setErr, reload: load }),
+      list && !pp.eingebettet && h(Anfragen, { schools: list, err: setErr, reload: load }),
       h("div", { className: "card adm-view" }, h("div", null, h("b", null, "Ansicht im Portal"), h("small", null, view ? "Du siehst gerade das Portal wie eine Lehrkraft dieser Schule." : "Du siehst gerade die Daten aller Schulen zusammen.")),
         h("select", { className: "input", value: view || "", onChange: function (ev) { doView(ev.target.value || null); } }, h("option", { value: "" }, "Alle Schulen"), (list || []).map(function (s) { return h("option", { key: s.id, value: s.id }, s.name); }))),
       h("div", { className: "row", style: { justifyContent: "space-between", margin: "22px 0 10px" } }, h("h2", { style: { margin: 0, fontSize: 20 } }, (list ? list.length : 0) + " Schulen · " + tot.t + " Lehrkräfte · " + tot.l + " Lernende"), h("button", { type: "button", className: "btn", onClick: function () { setNeu(true); setOpen(null); } }, "+ Neue Schule")),
@@ -187,4 +188,6 @@
       })));
   }
   window.FP_AdminPage = AdminPage;
+  window.FP_AdminSchulen = AdminPage;
+  window.FP_AdminAnfragen = Anfragen;
 })();

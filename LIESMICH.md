@@ -163,3 +163,26 @@ Die ausführliche Schritt-für-Schritt-Anleitung mit Datenschutz-Checkliste steh
 5. `schulen.sql` muss ausgeführt sein.
 
 Datenschutz eingebaut: Die Datei bleibt im Browser, nur Folientexte gehen über die Edge Function an OpenAI (USA, Standardvertragsklauseln, höchstens 30 Tage Speicherung zur Missbrauchserkennung, kein Training), `store=false`, keine Namen oder Konten der Lehrkräfte, E-Mail-Adressen, Telefonnummern und Datumsangaben werden vor dem Versand entfernt, die Lehrkraft bestätigt vorher, dass keine personenbezogenen Daten enthalten sind, Ergebnisse sind als KI-erstellt gekennzeichnet, das Protokoll enthält keine Inhalte und wird nach 90 Tagen gelöscht.
+
+## Admin-Zentrale (November 2026)
+
+Der Admin-Reiter (nur für Plattform-Admins) hat jetzt sechs Bereiche:
+
+| Bereich | Inhalt |
+|---|---|
+| Übersicht | Kennzahlen, Aktivität und KI-Nutzung im Zeitverlauf (7/30/90/365 Tage), Schulvergleich |
+| Schulen | Schulen anlegen und sperren, Einladungscodes erzeugen, als Schule ansehen |
+| Lehrkräfte | Freischaltungs-Anfragen, durchsuchbare Kontenliste |
+| Feedback | Rückmeldungen aus beiden Apps mit Status und Notiz |
+| Nutzung | Beliebteste Module, Trainings und Portalbereiche |
+| Datenschutz | Was erfasst wird und was nicht |
+
+**Einmalig nötig:** `supabase/admin_statistik.sql` ausführen. Das legt `fp_nutzung`, `fp_feedback` und die Admin-Funktionen an.
+
+**Datenschutz:**
+- Nutzung wird nur als Tageszähler pro Schule, App, Ereignis und Schlüssel gespeichert, ohne Nutzer-ID.
+- Feedback ist anonym, außer die Person kreuzt „Rückmeldung erwünscht“ an.
+
+Außerdem:
+- `content.json` enthält jetzt 75 Module.
+- `js/kern/06-fachlexikon.js` ist das erweiterte Fachlexikon für den Assistenten.

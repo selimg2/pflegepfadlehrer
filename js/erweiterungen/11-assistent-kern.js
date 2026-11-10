@@ -108,6 +108,11 @@
       var list = cards[mid] || [];
       for (var i = 0; i < list.length; i += 6) docs.push({ id: "lk:" + mid + ":" + (i / 6), gruppe: "lk:" + mid, mod: mid, ci: -1, titel: "Lernkarten · " + (m ? modTitle(m) : mid), text: list.slice(i, i + 6).map(function (c) { return c[0] + ": " + c[1]; }).join(" | ") });
     });
+    (window.FP_LEXIKON || []).forEach(function (x, i, all) {
+      if (i % 8) return;
+      var part = all.slice(i, i + 8);
+      docs.push({ id: "lx:" + (i / 8), gruppe: "lx", titel: "Fachlexikon · " + (part[0][2] || "Begriffe"), text: part.map(function (c) { return c[0] + ": " + c[1]; }).join(" | ") });
+    });
     (window.FP_POCKET || []).forEach(function (p) {
       if (!Array.isArray(p)) return;
       docs.push({ id: "kt:" + p[0], gruppe: "kt", titel: "Kitteltasche · " + p[1], text: (p[3] || []).map(function (r) { return Array.isArray(r) ? r.join(": ") : String(r); }).join(" | ") });
