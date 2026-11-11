@@ -212,3 +212,10 @@ Der Admin-Reiter (nur für Plattform-Admins) hat jetzt sechs Bereiche:
 Außerdem:
 - `content.json` enthält jetzt 75 Module.
 - `js/kern/06-fachlexikon.js` ist das erweiterte Fachlexikon für den Assistenten.
+
+## Nachtrag 3 – Schneller laden und lesbare Download-Knöpfe
+
+- **Home, Kurse & Schüler laden schneller:** Nachweis- und Begleitungsdaten werden beim Start einmal im Hintergrund geladen und danach 20 Sekunden lang zwischengespeichert. Mehrere Bereiche, die dieselben Daten brauchen, teilen sich eine einzige Anfrage. Beim Wechseln zwischen Home, Kursen und Schülern erscheinen die Daten sofort und werden im Hintergrund aufgefrischt.
+- **Mehr als 1000 Einträge:** Supabase liefert pro Anfrage höchstens 1000 Zeilen. Einsätze, Einträge und Signaturen werden jetzt seitenweise geladen, damit nichts mehr abgeschnitten wird.
+- **Unterschriften werden erst bei Bedarf geladen:** Die Unterschriften-Striche sind groß und werden nur noch beim Export geladen (ZIP, PDF, Drucken), nicht bei jedem Seitenaufruf.
+- **Download-Knöpfe im Kurskopf:** Im hellen Modus weiß hinterlegt mit dunkler Schrift, im dunklen Modus halbtransparent mit weißer Schrift und Rahmen.

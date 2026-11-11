@@ -30,3 +30,17 @@ html:root body .tabbar .tab[aria-current=page]{color:var(--accent)!important}
 html body .ttdays button.today{background:var(--surface)!important;box-shadow:none}
 html body .ttdays button.on,html body .ttdays button.on.today{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
 html body .ttdays button.on small{color:rgba(255,255,255,.85)!important}
+
+/* Kurskopf: Download-Knöpfe gut lesbar (hell: weiß, dunkel: helles Glas) */
+html body .kshead .btn.light{background:#fff!important;color:#0f172a!important;border:0!important;box-shadow:0 2px 10px rgba(15,23,42,.18);font-weight:600}
+html body .kshead .btn.light .ico,html body .kshead .btn.light svg{color:#0f172a!important;stroke:currentColor}
+html body .kshead .btn.light:hover:not(:disabled){background:#f1f5f9!important}
+html[data-theme=dark] body .kshead .btn.light{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;box-shadow:none;backdrop-filter:blur(6px)}
+html[data-theme=dark] body .kshead .btn.light svg,html[data-theme=dark] body .kshead .btn.light .ico{color:#fff!important}
+html[data-theme=dark] body .kshead .btn.light:hover:not(:disabled){background:rgba(255,255,255,.28)!important}
+html body .kshead .btn.light:disabled{opacity:.55}
+@media (prefers-color-scheme:dark){
+html:not([data-theme=light]) body .kshead .btn.light{background:rgba(255,255,255,.18)!important;color:#fff!important;border:1px solid rgba(255,255,255,.35)!important;box-shadow:none;backdrop-filter:blur(6px)}
+html:not([data-theme=light]) body .kshead .btn.light svg,html:not([data-theme=light]) body .kshead .btn.light .ico{color:#fff!important}
+html:not([data-theme=light]) body .kshead .btn.light:hover:not(:disabled){background:rgba(255,255,255,.28)!important}
+}

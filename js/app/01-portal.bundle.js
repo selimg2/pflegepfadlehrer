@@ -2297,7 +2297,7 @@
     const v = VV(vorlage), X = v.export, paOf = (id) => (pas || []).find((p) => p.id === id);
     const sigOf = (id) => signaturen.filter((s) => s.eintrag_id === id);
     const docId = "FP-" + (person.id || "x").slice(0, 8).toUpperCase() + "-" + (erstellt || (/* @__PURE__ */ new Date()).toISOString()).slice(0, 10).replace(/-/g, "");
-    const sigCell = (x) => sigOf(x.id).map((s) => `<div class="sig ${s.widerrufen_at ? "rev" : ""}">${sigSvg(s.strokes, 96, 38)}<span>${esc(sigText(s))}<br>${new Date(s.signed_at).toLocaleString("de-DE")}${s.widerrufen_at ? " \xB7 widerrufen" : ""}</span></div>`).join("") || "<em>\u2013</em>";
+    const sigCell = (x) => sigOf(x.id).map((s) => `<div class="sig ${s.widerrufen_at ? "rev" : ""}">${sigSvg(s.strokes !== void 0 ? s.strokes : window.__fpStrokes && window.__fpStrokes.get(s.id), 96, 38)}<span>${esc(sigText(s))}<br>${new Date(s.signed_at).toLocaleString("de-DE")}${s.widerrufen_at ? " \xB7 widerrufen" : ""}</span></div>`).join("") || "<em>\u2013</em>";
     const rows = (list) => list.map((x) => `<tr><td>${fmtDate(x.datum)}</td><td>${esc(typLabel(x, v))}</td><td class="r">${x.stunden ? fmtH(x.stunden) : ""}</td><td>${esc(summary(x, v))}</td><td>${esc((STATUS[x.status] || [x.status])[0])}${x.hash && X.pruefsumme ? `<br><code>${x.hash.slice(0, 16)}</code>` : ""}</td><td>${sigCell(x)}</td></tr>`).join("");
     const formular = (x, titel2, felder) => `<div class="gesp"><h4>${esc(titel2)} am ${fmtDate(x.datum)}${x.data.teilnehmende ? " \xB7 " + esc(x.data.teilnehmende) : ""}</h4>${felder.map((f) => `<p><b>${esc(f.label)}:</b> ${esc(x.data[f.key] || "\u2013")}</p>`).join("")}<div class="sigs">${sigCell(x)}</div></div>`;
     const g = gesamt(einsaetze, eintraege);
@@ -3496,10 +3496,42 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
       const c = await sb();
       chk(await c.from("team_rooms").delete().eq("id", id));
     },
-    async nwAll() {
+    async nwAll(opt) {
+      // Zwischenspeicher: gleichzeitige Aufrufe teilen sich eine Anfrage, frische Daten (unter 20 s) kommen sofort
+      const C = window.__fpNwCache || (window.__fpNwCache = { d: null, at: 0, p: null });
+      const force = !!(opt && opt.force);
+      if (C.p) return C.p;
+      if (!force && C.d && Date.now() - C.at < 2e4) return C.d;
+      C.p = (async () => {
+        const c = await sb();
+        // Supabase liefert höchstens 1000 Zeilen pro Anfrage: in Seiten laden
+        const alle = async (mk) => {
+          const out = [];
+          for (let from = 0; ; from += 1e3) {
+            const r = chk(await mk().range(from, from + 999)) || [];
+            out.push(...r);
+            if (r.length < 1e3) break;
+          }
+          return out;
+        };
+        const SIG = "id, eintrag_id, rolle, name, pa_id, verifiziert, methode, hash, signed_at, widerrufen_at, funktion, geraet, bekannt, titel";
+        const [a, b, s2, p, t, v, z, d] = await Promise.all([alle(() => c.from("nw_einsatz").select("*").order("beginn").order("id")), alle(() => c.from("nw_eintrag").select("*").order("datum").order("id")), alle(() => c.from("nw_signatur").select(SIG).order("id")), c.from("nw_pa").select("id, name, einrichtung, email, invite, aktiv, freigegeben, quelle, rolle, qualifikation, created_at, last_seen").order("name"), c.from("nw_aufgabe").select("*").order("created_at", { ascending: false }), c.from("nw_vorlage").select("*").order("updated_at", { ascending: false }), c.from("nw_zeugnis").select("*"), c.from("nw_pa_device").select("id, pa_id, user_agent, created_at, last_used")]);
+        return { einsaetze: a, eintraege: b, signaturen: s2, pa: chk(p), aufgaben: chk(t), vorlagen: chk(v), zeugnisse: chk(z), devices: chk(d) };
+      })().then((d) => { C.d = d; C.at = Date.now(); C.p = null; return d; }, (e) => { C.p = null; throw e; });
+      return C.p;
+    },
+    // Unterschriftsbilder erst beim Export laden (sie sind groß und werden in der Übersicht nicht gebraucht)
+    async nwStrokes() {
+      const M = window.__fpStrokes || (window.__fpStrokes = new Map());
+      if (window.__fpStrokesAt && Date.now() - window.__fpStrokesAt < 6e4) return M;
       const c = await sb();
-      const [a, b, s, p, t, v, z, d] = await Promise.all([c.from("nw_einsatz").select("*").order("beginn"), c.from("nw_eintrag").select("*").order("datum"), c.from("nw_signatur").select("*"), c.from("nw_pa").select("id, name, einrichtung, email, invite, aktiv, freigegeben, quelle, rolle, qualifikation, created_at, last_seen").order("name"), c.from("nw_aufgabe").select("*").order("created_at", { ascending: false }), c.from("nw_vorlage").select("*").order("updated_at", { ascending: false }), c.from("nw_zeugnis").select("*"), c.from("nw_pa_device").select("id, pa_id, user_agent, created_at, last_used")]);
-      return { einsaetze: chk(a), eintraege: chk(b), signaturen: chk(s), pa: chk(p), aufgaben: chk(t), vorlagen: chk(v), zeugnisse: chk(z), devices: chk(d) };
+      for (let from = 0; ; from += 1e3) {
+        const r = chk(await c.from("nw_signatur").select("id, strokes").not("strokes", "is", null).order("id").range(from, from + 999)) || [];
+        r.forEach((x) => M.set(x.id, x.strokes));
+        if (r.length < 1e3) break;
+      }
+      window.__fpStrokesAt = Date.now();
+      return M;
     },
     async nwLog(uid4) {
       const c = await sb();
@@ -3616,7 +3648,14 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
       } catch (e) {
       }
     },
-    async bgAll() {
+    async bgAll(opt) {
+      const C = window.__fpBgCache || (window.__fpBgCache = { d: null, at: 0, p: null });
+      if (C.p) return C.p;
+      if (!(opt && opt.force) && C.d && Date.now() - C.at < 2e4) return C.d;
+      C.p = this.bgLaden().then((d) => { C.d = d; C.at = Date.now(); C.p = null; return d; }, (e) => { C.p = null; throw e; });
+      return C.p;
+    },
+    async bgLaden() {
       const c = await sb();
       const rs = await Promise.all([c.from("fp_bezug").select("*"), c.from("fp_einsatz_feedback").select("*").order("updated_at", { ascending: false }), c.from("fp_meldung").select("*").order("created_at", { ascending: false }).limit(500), c.from("fp_puls").select("*").order("woche", { ascending: false }).limit(5e3), c.from("fp_pruefung").select("*").order("updated_at", { ascending: false }), c.rpc("fp_lehrkraefte")]);
       if (rs.some((r) => r.error && /does not exist|Could not find|schema cache/i.test(r.error.message))) return { missing: true, bezug: [], feedback: [], meldungen: [], puls: [], pruefungen: [], lehrer: [] };
@@ -8000,7 +8039,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
 ${e ? `<table class="kpi"><tr><td>Einsatz<b>${escHtml(artLabel(e.art, V))}</b></td><td>Einrichtung<b>${escHtml(e.einrichtung)}${e.bereich ? " \xB7 " + escHtml(e.bereich) : ""}</b></td><td>Zeitraum<b>${fmtDate(e.beginn)} bis ${fmtDate(e.ende)}</b></td></tr></table>` : ""}
 ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""}
 <table><thead><tr><th>Punkt</th><th>Eintrag</th></tr></thead><tbody>${info.felder.map((f) => `<tr><td><b>${escHtml(f.label)}</b></td><td>${escHtml(d[f.key] == null || d[f.key] === "" ? "\u2013" : d[f.key])}</td></tr>`).join("")}${x.typ === "einsatznachweis" && x.stunden ? `<tr><td><b>Angerechnete Stunden</b></td><td>${fmtH(x.stunden)}</td></tr>` : ""}</tbody></table>
-<h2>Unterschriften</h2>${sig.length ? sig.map((s) => `<div class="sig ${s.widerrufen_at ? "rev" : ""}">${sigSvg(s.strokes, 130, 52)}<span>${escHtml(sigText(s))}<br>${new Date(s.signed_at).toLocaleString("de-DE")}${s.widerrufen_at ? " \xB7 widerrufen" : ""}</span></div>`).join("") : '<p class="meta">Noch nicht unterschrieben.</p>'}
+<h2>Unterschriften</h2>${sig.length ? sig.map((s) => `<div class="sig ${s.widerrufen_at ? "rev" : ""}">${sigSvg(s.strokes !== void 0 ? s.strokes : window.__fpStrokes && window.__fpStrokes.get(s.id), 130, 52)}<span>${escHtml(sigText(s))}<br>${new Date(s.signed_at).toLocaleString("de-DE")}${s.widerrufen_at ? " \xB7 widerrufen" : ""}</span></div>`).join("") : '<p class="meta">Noch nicht unterschrieben.</p>'}
 <p class="foot">${x.hash ? `Pr\xFCfsumme (SHA-256): ${escHtml(x.hash)}. ` : ""}Best\xE4tigte Eintr\xE4ge sind in der Datenbank gesperrt; die Pr\xFCfsumme wurde beim Best\xE4tigen \xFCber den Inhalt gebildet. Dokument-ID ${escHtml(String(x.id).slice(0, 8).toUpperCase())}.</p></body></html>`;
   }
   function zeugnisHtml({ z, person, kurs, schule }) {
@@ -8066,6 +8105,7 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
     });
   }
   async function zipErstellen(gruppen, name2, onProgress) {
+    try { if (API.nwStrokes) await API.nwStrokes(); } catch (e) {}
     const all = gruppen.flatMap((g) => g.docs.map((d) => ({ g, d }))), files = [];
     let i = 0;
     for (const { g, d } of all) {
@@ -8079,6 +8119,7 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
     return files.length;
   }
   async function pdfSpeichern(d) {
+    try { if (API.nwStrokes) await API.nwStrokes(); } catch (e) {}
     const b = await pdfBytes(d.html());
     speichern(new Blob([b], { type: "application/pdf" }), d.datei);
   }
@@ -8101,10 +8142,10 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
     return v ? { ...v.data, name: v.name, land: v.land } : null;
   };
   function useNw() {
-    const [nw, setNw] = (0, import_react14.useState)(null), [err, setErr] = (0, import_react14.useState)(null);
-    const load2 = (0, import_react14.useCallback)(async () => {
+    const [nw, setNw] = (0, import_react14.useState)(() => window.__fpNwCache && window.__fpNwCache.d || null), [err, setErr] = (0, import_react14.useState)(null);
+    const load2 = (0, import_react14.useCallback)(async (soft) => {
       try {
-        const d = await API.nwAll();
+        const d = await API.nwAll({ force: soft !== true });
         d.at = /* @__PURE__ */ new Date();
         setNw(d);
         setErr(null);
@@ -8113,7 +8154,7 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
       }
     }, []);
     (0, import_react14.useEffect)(() => {
-      load2();
+      load2(true);
       const iv = setInterval(() => {
         if (!document.hidden) load2();
       }, 6e4);
@@ -8214,6 +8255,7 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
         log = await API.nwLog(r.s.id);
       } catch (e) {
       }
+      try { if (API.nwStrokes) await API.nwStrokes(); } catch (e) {}
       printHtml(nachweisHtml({ person: { id: r.s.id, name: r.s.display_name || r.s.email }, kurs: course ? course.name : "", schule: SETTINGS.school || "", einsaetze: r.es, eintraege: r.xs, signaturen: nw.signaturen.filter((x) => r.xs.some((e) => e.id === x.eintrag_id)), log, vorlage: vorlageFor2(nw.vorlagen, r.s), deckblatt: deck, pas: nw.pa, zeugnisse: nw.zeugnisse.filter((z) => z.user_id === r.s.id) }), personOrdner(r.s.display_name || r.s.email) + "_Ausbildungsnachweis_gesamt_" + isoDay(/* @__PURE__ */ new Date()) + ".pdf");
       close();
     };
@@ -8564,17 +8606,17 @@ ${d.teilnehmende ? `<p><b>Teilnehmende:</b> ${escHtml(d.teilnehmende)}</p>` : ""
   var import_react16 = __toESM(require_shim_react());
   var nameOf = (s) => s && (s.display_name || (s.email || "").split("@")[0]) || "Ohne Namen";
   function useBg() {
-    const [bg, setBg] = (0, import_react16.useState)(null), [err, setErr] = (0, import_react16.useState)(null);
-    const load2 = (0, import_react16.useCallback)(async () => {
+    const [bg, setBg] = (0, import_react16.useState)(() => window.__fpBgCache && window.__fpBgCache.d || null), [err, setErr] = (0, import_react16.useState)(null);
+    const load2 = (0, import_react16.useCallback)(async (soft) => {
       try {
-        setBg(await API.bgAll());
+        setBg(await API.bgAll({ force: soft !== true }));
         setErr(null);
       } catch (e) {
         setErr(e.message);
       }
     }, []);
     (0, import_react16.useEffect)(() => {
-      load2();
+      load2(true);
       const iv = setInterval(() => {
         if (!document.hidden) load2();
       }, 6e4);
@@ -10009,6 +10051,8 @@ ${a.kritisch.length ? `<div class="box"><b>Kritische Kriterien mit 5 oder 6 bewe
     }, [user]);
     const reload = (0, import_react21.useCallback)(async () => {
       try {
+        // Nachweis und Begleitung schon parallel vorladen, damit Übersicht und Kurse sofort erscheinen
+        try { API.nwAll && API.nwAll().catch(() => {}); API.bgAll && API.bgAll().catch(() => {}); } catch (e) {}
         const [r, c, s, p] = await Promise.all([API.modules(), API.courses(), API.students(), API.progress()]);
         let as = [], sb2 = [], miss = false;
         try {
