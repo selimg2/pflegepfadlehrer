@@ -10,6 +10,7 @@
 // - Fallpfad speichert die Mitschrift nicht auf dem Server. Gezählt wird nur die Anzahl der Auswertungen je Konto und Tag.
 import { BASE, TAGESLIMIT, akteText, anmeldung, clean, szenario, zaehlen } from "../_shared/komm.ts";
 import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
+import { kiFehlertext, kiJson } from "../_shared/openai.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_AUSWERTUNG") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const EFFORT = Deno.env.get("OPENAI_REASONING_AUSWERTUNG") ?? "low"; // "none" = Parameter weglassen
@@ -150,31 +151,13 @@ Deno.serve(async (req) => {
   };
   const mitschrift = verlauf.map((x: any) => (x.r === "du" ? "Pflegekraft: " : s.person.name + ": ") + x.t).join("\n");
 
-  const body: Record<string, unknown> = {
-    model: MODEL,
-    instructions: anweisung(s),
+  const ki = await kiJson({
+    key: KEY, base: BASE, model: MODEL, effort: EFFORT, instructions: anweisung(s),
     input: "Messwerte aus der App (Orientierung, nicht überbewerten):\n" + JSON.stringify(mess) + "\n\nMitschrift:\n" + mitschrift,
-    text: { format: { type: "json_schema", name: "auswertung", strict: true, schema: s.kat === "uebergabe" ? SCHEMA_UEB : SCHEMA } },
-    store: false,
-    max_output_tokens: 6000,
-  };
-  if (EFFORT !== "none") body.reasoning = { effort: EFFORT };
-
-  let r: Response;
-  try {
-    r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
-    return json({ error: "Der Auswertungsdienst ist gerade nicht erreichbar." }, 502);
-  }
-  if (!r.ok) {
-    console.error("OpenAI responses", r.status);
-    return json({ error: r.status === 429 ? "Die Auswertung ist gerade ausgelastet. Bitte gleich noch einmal versuchen." : "Die Auswertung hat nicht geklappt (" + r.status + ")." }, 502);
-  }
-  const o = await r.json();
-  let text = "";
-  for (const item of o.output || []) if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
-  let aus: any = null;
-  try { aus = JSON.parse(text); } catch { /* leer */ }
+    schema: s.kat === "uebergabe" ? SCHEMA_UEB : SCHEMA, name: "auswertung", maxTokens: 6000,
+  });
+  if (!ki.ok) return json({ error: kiFehlertext(ki, "Die Auswertung") }, 502);
+  const aus: any = ki.daten;
   if (!aus || typeof aus.gesamt !== "number") return json({ error: "Die Auswertung war unvollständig. Bitte noch einmal versuchen." }, 502);
   const clamp = (n: unknown) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
   aus.gesamt = clamp(aus.gesamt);

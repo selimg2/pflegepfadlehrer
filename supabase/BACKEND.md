@@ -11,6 +11,7 @@ und Edge Functions für alles, was einen geheimen Schlüssel braucht. In den App
 | `sicherheit_haertung.sql` | Schritt 13: Härtung, Einwilligungsprotokoll, Datenauskunft |
 | `datenschutz_aufraeumen.sql` | automatische Löschfristen (pg_cron, jede Nacht) |
 | `functions/_shared/sicherheit.ts` | CORS nur für die eigenen Apps, Sicherheits-Header, Größenbegrenzung. Von allen Funktionen genutzt |
+| `functions/_shared/openai.ts` | robuster KI-Aufruf: bei Fehler 400 automatisch einfachere Fassungen und zuletzt ein Ausweichmodell. Genutzt von Assistent, Folien-Import, Pflegeplanung und Gesprächsauswertung |
 | `functions/_shared/komm.ts` | Anmeldung prüfen, Tageslimits, Rollenanweisung der KI-Gesprächsperson |
 | `functions/_shared/komm-szenarien.ts` | Prüfsummen der erlaubten Gespräche (keine eigenen Anweisungen einschleusbar) |
 | `functions/gespraech-sitzung` | kurzlebiger Schlüssel für ein Sprachgespräch, protokolliert die Einwilligung |
@@ -36,8 +37,9 @@ und Edge Functions für alles, was einen geheimen Schlüssel braucht. In den App
 | `OPENAI_BASE_URL` | empfohlen | `https://eu.api.openai.com/v1` für Verarbeitung in der EU |
 | `FALLPFAD_ORIGINS` | bei eigener Domain | weitere erlaubte Adressen, mit Komma getrennt, z. B. `https://app.meineschule.de` |
 | `FALLPFAD_GESPRAECHE_TAG`, `FALLPFAD_LS_ZEICHEN_TAG`, `FALLPFAD_LIMIT_TAG` | nein | Tageslimits |
-| `FALLPFAD_ASSISTENT_TAG`, `FALLPFAD_ASSISTENT_TAG_LEHRER` | nein | Nachrichten an den Assistenten je Tag (Standard 3) |
+| `FALLPFAD_ASSISTENT_LIMIT`, `FALLPFAD_ASSISTENT_LIMIT_LEHRER` | nein | Nachrichten an den Assistenten je Tag (Standard 40 bzw. 80) |
 | `OPENAI_MODEL_ASSISTENT` | nein | eigenes Modell für den Assistenten, sonst `OPENAI_MODEL` |
+| `OPENAI_MODEL_FALLBACK` | nein | Ausweichmodell, falls das eingestellte Modell eine Anfrage ablehnt (Standard `gpt-4.1-mini`) |
 
 Ohne `FALLPFAD_ORIGINS` sind erlaubt: `pflegepfad.vercel.app`, `pflegepfadlehrer.vercel.app`, die native App und `localhost`.
 
@@ -55,5 +57,5 @@ geleakten Passwörtern einschalten.
 
 - Der Client sucht passende Stellen selbst (Modulauszüge, Lernkarten, eigene Quellen der Lehrkraft) und schickt nur diese mit.
 - Die Funktion zählt vor dem KI-Aufruf (`fp_assistent_zaehlen`), bei Fehlern wird zurückgebucht. Tabelle `fp_assistent_nutzung` speichert nur Konto, Tag und Anzahl, keine Inhalte.
-- Antwort als JSON. Quellen-IDs, die nicht mitgeschickt wurden, und Klausurfragen ohne gültige Quelle werden serverseitig entfernt.
+- Antwort als strukturiertes JSON (JSON-Schema). Lehnt das Modell einen Parameter ab (Fehler 400), probiert `_shared/openai.ts` einfachere Fassungen. Quellen-IDs, die nicht mitgeschickt wurden, und Klausurfragen ohne gültige Quelle werden serverseitig entfernt.
 - Lehrerrolle wird über `is_teacher` geprüft.

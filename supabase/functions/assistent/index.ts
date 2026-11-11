@@ -14,6 +14,7 @@
 // - Lernende nutzen den Assistenten nur, wenn sie in einem Kurs sind (fp_ki_erlaubt).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { antworten, kiErlaubt, koerper, OHNE_KURS, vorpruefung } from "../_shared/sicherheit.ts";
+import { kiFehlertext, kiJson } from "../_shared/openai.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_ASSISTENT") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -30,6 +31,23 @@ const SPRACHEN: Record<string, string> = {
   sq: "Albanisch", sr: "Serbisch", it: "Italienisch", ku: "Kurdisch (Kurmandschi)", ml: "Malayalam", bs: "Bosnisch",
   hr: "Kroatisch", el: "Griechisch", pt: "Portugiesisch", ta: "Tamil",
 };
+
+// Strukturierte Ausgabe (strict): alle Felder sind Pflicht, nicht passende Felder kommen als null.
+const S = (x: Record<string, unknown>) => ({ type: "object", additionalProperties: false, required: Object.keys(x), properties: x });
+const STR = { type: "string" }, INT = { type: "integer" }, STRS = { type: "array", items: STR };
+const PLAN = S({ titel: STR, ziel: STR, tage: { type: "array", items: S({ datum: STR, titel: STR, schritte: { type: "array", items: S({ modul: STR, was: STR, minuten: INT }) } }) } });
+const KLAUSUR = S({ titel: STR, minuten: INT, fragen: { type: "array", items: S({ frage: STR, optionen: STRS, richtig: INT, erklaerung: STR, quelle: STR }) } });
+const MODUL = S({ titel: STR, jahr: INT, umfang: { type: "string", enum: ["kurz", "mittel", "lang"] }, schwerpunkte: STRS, hinweis: STR });
+const DOKUMENT = S({ titel: STR, zielgruppe: STR, abschnitte: { type: "array", items: S({ ueberschrift: STR, text: STR }) } });
+const oderNull = (x: unknown) => ({ anyOf: [x, { type: "null" }] });
+function schema(rolle: "schueler" | "lehrer") {
+  const p: Record<string, unknown> = {
+    art: { type: "string", enum: ["antwort", "plan", "klausur", ...(rolle === "lehrer" ? ["modul", "dokument"] : [])] },
+    text: STR, quellen: STRS, vorschlaege: STRS, plan: oderNull(PLAN), klausur: oderNull(KLAUSUR),
+  };
+  if (rolle === "lehrer") { p.modul = oderNull(MODUL); p.dokument = oderNull(DOKUMENT); }
+  return S(p);
+}
 
 function clean(t: unknown, max = 2000) {
   return String(t ?? "")
@@ -85,7 +103,7 @@ Antworte ausschließlich mit einem JSON-Objekt:
  "plan":{"titel":"…","ziel":"YYYY-MM-DD oder leer","tage":[{"datum":"YYYY-MM-DD oder leer","titel":"…","schritte":[{"modul":"Modul-ID oder leer","was":"…","minuten":30}]}]},
  "klausur":{"titel":"…","minuten":30,"fragen":[{"frage":"…","optionen":["…","…","…"],"richtig":0,"erklaerung":"…","quelle":"Kennung"}]},${rolle === "lehrer" ? '\n "modul":{"titel":"…","jahr":2,"umfang":"mittel","schwerpunkte":["…"],"hinweis":"…"},\n "dokument":{"titel":"…","zielgruppe":"…","abschnitte":[{"ueberschrift":"…","text":"…"}]},' : ""}
  "vorschlaege":["kurze Anschlussfrage", "…"]}
-Felder, die nicht zur art passen, lässt du weg. "vorschlaege": 2 bis 3 sinnvolle nächste Fragen in der Sprache der Antwort.`;
+Felder, die nicht zur art passen, setzt du auf null. "vorschlaege": 2 bis 3 sinnvolle nächste Fragen in der Sprache der Antwort.`;
   return gemeinsam + (rolle === "lehrer" ? lehrer : schueler) + format;
 }
 
@@ -208,40 +226,16 @@ Deno.serve(async (req) => {
     e.nachricht,
   ].join("\n");
 
-  const body: Record<string, unknown> = {
-    model: MODEL,
+  const ki = await kiJson({
+    key: KEY, base: BASE, model: MODEL, effort: EFFORT,
     instructions: anweisung(rolle, SPRACHEN[lang], heute, jahr),
-    input,
-    text: { format: { type: "json_object" } },
-    store: false,
-    max_output_tokens: 9000,
-  };
-  if (EFFORT !== "none") body.reasoning = { effort: EFFORT };
-
-  let r: Response;
-  try {
-    r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
+    input, schema: schema(rolle), name: "fallpfad_assistent", maxTokens: 9000,
+  });
+  if (!ki.ok) {
     await zurueck();
-    return json({ error: "Der Assistent ist gerade nicht erreichbar. Deine Nachricht wurde nicht gezählt." }, 502);
+    return json({ error: kiFehlertext(ki) + " Deine Nachricht wurde nicht gezählt." }, ki.status === 429 ? 429 : 502);
   }
-  if (!r.ok) {
-    let code = "";
-    try { const x = await r.json(); code = x?.error?.code || x?.error?.type || ""; } catch { /* leer */ }
-    console.error("OpenAI", r.status, code);
-    await zurueck();
-    const msg = r.status === 429 ? "Der Assistent ist gerade ausgelastet." : r.status === 403 || r.status === 404 ? "Das KI-Modell ist für diese Schule nicht freigeschaltet (" + (code || r.status) + ")." : "Der Assistent hat einen Fehler gemeldet (" + r.status + ").";
-    return json({ error: msg + " Deine Nachricht wurde nicht gezählt." }, 502);
-  }
-  const o = await r.json();
-  let text = "";
-  for (const item of o.output || []) if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
-  let roh: any = null;
-  try { roh = JSON.parse(text); } catch { /* leer */ }
-  if (!roh || typeof roh !== "object") {
-    await zurueck();
-    return json({ error: "Die Antwort war unvollständig. Bitte noch einmal senden, die Nachricht wurde nicht gezählt." }, 502);
-  }
+  const roh = ki.daten;
   const antwort = bereinigen(roh, e, rolle);
   return json({ antwort, rest: Number(n) >= limit ? 0 : null, meta: { anbieter: "OpenAI", region: BASE.includes("eu.api") ? "EU" : "USA" } });
 });

@@ -2,6 +2,16 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Neu in dieser Version (11.11.2026)
+
+- **Assistent: Fehler 400 behoben.** Neue Datei `supabase/functions/_shared/openai.ts`: strukturierte Ausgabe und automatisches Ausweichen auf einfachere Anfragen bzw. ein Ausweichmodell, wenn OpenAI einen Parameter ablehnt. Genutzt von `assistent`, `folien-import`, `pflegeplanung` und `gespraech-auswertung`. Bitte neu bereitstellen:
+  `supabase functions deploy assistent folien-import pflegeplanung gespraech-auswertung`
+  Optionales Secret `OPENAI_MODEL_FALLBACK` (Standard `gpt-4.1-mini`).
+- **`content.json` aktualisiert:** Module fm61 bis fm75 haben jetzt denselben Aufbau wie die übrigen Module (6 bis 8 Stationen mit Fallsituation, Praxisauftrag, Zusammenfassung und Dokumentation).
+- **Fachlexikon** (`js/kern/06-fachlexikon.js`) um rund 710 Begriffe erweitert, steht auch dem Assistenten der Lehrkräfte zur Verfügung.
+- Assistent: bedeutungslose Punkte unter dem Eingabefeld entfernt, doppelte Quellen in der Demo-Antwort entfernt.
+- Admin-Statistik: Eintrag „Akutsimulation“ entfernt (das Training gibt es in der Schüler-App nicht mehr).
+
 ## Anmeldung, Freischaltung und Kurs-Pflicht (10.11.2026, Abend)
 
 **Ablauf Lehrkraft:** Registrieren im Portal (optional mit Einladungscode, auch per Link `…/?einladung=CODE`) → Mail „Willkommen bei Fallpfad“ → Klick führt direkt zurück ins Lehrer-Portal und meldet an → ein Code aus der Registrierung wird beim Bestätigen automatisch eingelöst. Ohne gültigen Code sieht das Konto nur die Seite „Zugang zu deiner Schule freischalten“.

@@ -7,6 +7,7 @@
 // Einrichtung: siehe Admin-Handbuch, Abschnitt "KI-Folien-Import mit OpenAI".
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { antworten, vorpruefung } from "../_shared/sicherheit.ts";
+import { kiFehlertext, kiJson } from "../_shared/openai.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -174,39 +175,9 @@ Deno.serve(async (req) => {
 
   const a = aufgabe(b);
   if (!a) return json({ error: "Unbekannter Schritt." }, 400);
-  const body: Record<string, unknown> = {
-    model: MODEL,
-    instructions: GRUNDREGELN,
-    input: a.text + "\n\n" + schemaText(a.tool),
-    text: { format: { type: "json_object" } },
-    store: false,
-    max_output_tokens: a.max + 6000,
-  };
-  if (EFFORT !== "none") body.reasoning = { effort: EFFORT };
-  let r: Response;
-  try {
-    r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
-    return json({ error: "Der KI-Dienst ist nicht erreichbar." }, 502);
-  }
-  if (!r.ok) {
-    // Nur Status und Fehlercode protokollieren, niemals Inhalte
-    let code = "";
-    try { const e = await r.json(); code = e?.error?.code || e?.error?.type || ""; } catch { /* leer */ }
-    console.error("OpenAI", r.status, code);
-    const msg = r.status === 429 ? "Der KI-Dienst ist gerade ausgelastet oder das Guthaben ist aufgebraucht. Bitte später erneut versuchen."
-      : r.status === 401 ? "Der API-Schlüssel ist ungültig."
-      : r.status === 403 || r.status === 404 ? "Der API-Schlüssel ist für dieses Modell nicht freigeschaltet (" + r.status + ")."
-      : "Der KI-Dienst hat einen Fehler gemeldet (" + r.status + ").";
-    return json({ error: msg }, 502);
-  }
-  const out = await r.json();
-  if (out.status === "incomplete") return json({ error: "Die Antwort war zu lang. Bitte einen kürzeren Umfang wählen." }, 502);
-  let text = "";
-  for (const item of out.output || []) {
-    if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
-  }
-  let result: unknown;
-  try { result = JSON.parse(text); } catch { return json({ error: "Die KI hat kein gültiges Ergebnis geliefert. Bitte erneut versuchen." }, 502); }
+  const ki = await kiJson({ key: KEY, base: BASE, model: MODEL, effort: EFFORT, instructions: GRUNDREGELN, input: a.text + "\n\n" + schemaText(a.tool), maxTokens: a.max + 6000 });
+  if (!ki.ok) return json({ error: ki.code === "unvollstaendig" ? "Die Antwort war zu lang. Bitte einen kürzeren Umfang wählen." : kiFehlertext(ki, "Der KI-Dienst") }, 502);
+  const result: unknown = ki.daten;
+  const out = { model: ki.modell };
   return json({ result, meta: { anbieter: "OpenAI", modell: out.model || MODEL, region: BASE.includes("eu.api") ? "EU" : "USA" } });
 });

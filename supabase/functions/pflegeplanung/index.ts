@@ -15,6 +15,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { antworten, koerper, vorpruefung, kiErlaubt, OHNE_KURS } from "../_shared/sicherheit.ts";
 import { FAELLE } from "../_shared/pflegeplanung-faelle.ts";
+import { kiFehlertext, kiJson } from "../_shared/openai.ts";
 
 const MODEL = Deno.env.get("OPENAI_MODEL_PFLEGEPLANUNG") ?? Deno.env.get("OPENAI_MODEL_AUSWERTUNG") ?? Deno.env.get("OPENAI_MODEL") ?? "gpt-6.1-terra";
 const BASE = (Deno.env.get("OPENAI_BASE_URL") ?? "https://api.openai.com/v1").replace(/\/+$/, "");
@@ -165,33 +166,12 @@ Deno.serve(async (req) => {
   if (n === -1) return json({ error: "Du hast heute schon sehr viele Rückmeldungen bekommen. Morgen geht es weiter." }, 429);
   const zurueck = async () => { try { await admin.rpc("fp_pp_zurueck", { p_user: u.user.id }); } catch { /* leer */ } };
 
-  const body: Record<string, unknown> = {
-    model: MODEL,
-    instructions: anweisung(b.lang === "einfach"),
+  const ki = await kiJson({
+    key: KEY, base: BASE, model: MODEL, effort: EFFORT, instructions: anweisung(b.lang === "einfach"),
     input: fallText(fall) + "\n\nPFLEGEPLANUNG DER LERNENDEN PERSON (als JSON-Rückmeldung bewerten):\n" + plan.text,
-    text: { format: { type: "json_schema", name: "rueckmeldung", strict: true, schema: SCHEMA } },
-    store: false,
-    max_output_tokens: 6000,
-  };
-  if (EFFORT !== "none") body.reasoning = { effort: EFFORT };
-  let r: Response;
-  try {
-    r = await fetch(BASE + "/responses", { method: "POST", headers: { Authorization: "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
-    await zurueck();
-    return json({ error: "Der KI-Dienst ist gerade nicht erreichbar. Bitte gleich noch einmal versuchen." }, 502);
-  }
-  if (!r.ok) {
-    let code = ""; try { const x = await r.json(); code = String(x?.error?.code || x?.error?.type || "").slice(0, 60); } catch { /* leer */ }
-    console.error("OpenAI", r.status, code);
-    await zurueck();
-    return json({ error: r.status === 429 ? "Der KI-Dienst ist gerade ausgelastet. Bitte gleich noch einmal versuchen." : "Die Rückmeldung hat gerade nicht geklappt. Bitte noch einmal versuchen." }, 502);
-  }
-  const o = await r.json();
-  let text = "";
-  for (const item of o.output || []) if (item.type === "message") for (const c of item.content || []) if (c.type === "output_text") text += c.text;
-  let roh: any = null;
-  try { roh = JSON.parse(text); } catch { /* leer */ }
-  if (!roh) { await zurueck(); return json({ error: "Die Rückmeldung war unvollständig. Bitte noch einmal versuchen." }, 502); }
+    schema: SCHEMA, name: "rueckmeldung", maxTokens: 6000,
+  });
+  if (!ki.ok) { await zurueck(); return json({ error: kiFehlertext(ki, "Die KI-Rückmeldung") + " Bitte noch einmal versuchen." }, 502); }
+  const roh: any = ki.daten;
   return json({ rueckmeldung: bereinigen(roh, plan.anzahl), meta: { anbieter: "OpenAI", region: BASE.includes("eu.api") ? "EU" : "USA" } });
 });

@@ -44,7 +44,7 @@
     var m = (window.FP_MODS || []).filter(function (x) { return x.id === id; })[0];
     return m ? String(m.title || id).replace(/^Fallmodul \d+ · /, "") : id;
   };
-  var EREIGNIS = { sitzung: "Sitzungen", modul_start: "Modul geöffnet", training: "Training geöffnet", bildbefund: "Bildbefund gelöst", akutsim: "Akutsimulation", bereich: "Portal-Bereich" };
+  var EREIGNIS = { sitzung: "Sitzungen", modul_start: "Modul geöffnet", training: "Training geöffnet", bildbefund: "Bildbefund gelöst", bereich: "Portal-Bereich" };
 
   function Kpi(p) { return h("div", { className: "az-kpi" }, h("b", null, p.v), h("small", null, p.l), p.s ? h("i", null, " · " + p.s) : null); }
 

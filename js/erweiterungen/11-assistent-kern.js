@@ -402,7 +402,7 @@
       var hit = fr.slice(0, 8);
       if (hit.length) return { art: "klausur", text: "**Beispiel aus der Demo:** Diese Fragen stammen aus den passenden Stationen in Fallpfad.", quellen: [], klausur: { titel: "Testklausur", minuten: hit.length * 2, fragen: hit.map(function (x) { var src = ctx.quellen.filter(function (s) { return s.id.indexOf(x.id + ":") === 0; })[0] || ctx.quellen.filter(function (s) { return s.mod === x.mod; })[0]; return { frage: x.q.q, optionen: x.q.o, richtig: x.q.a, erklaerung: x.q.e || "", quelle: src ? src.id : ctx.quellen[0].id }; }) }, vorschlaege: [] };
     }
-    return { art: "antwort", text: ctx.quellen.length ? "**Demo ohne KI:** Im Demo-Konto ist der Assistent nicht mit dem Schulserver verbunden. Diese Stellen in Fallpfad passen zu deiner Frage:\n" + ctx.quellen.slice(0, 4).map(function (q) { return "- **" + q.titel + "**"; }).join("\n") : "**Demo ohne KI:** Dazu habe ich in Fallpfad nichts gefunden. Versuch es mit einem Fachbegriff, zum Beispiel „Dekubitusprophylaxe“.", quellen: ctx.quellen.slice(0, 4).map(function (q) { return q.id; }), vorschlaege: ["Erstelle mir einen Prüfungsplan", "Erstelle mir eine Testklausur zu Diabetes"] };
+    return { art: "antwort", text: ctx.quellen.length ? "**Demo ohne KI:** Im Demo-Konto ist der Assistent nicht mit dem Schulserver verbunden. Diese Stellen in Fallpfad passen zu deiner Frage:\n" + ctx.quellen.filter(function (q, i, a) { return a.findIndex(function (x) { return x.titel === q.titel; }) === i; }).slice(0, 4).map(function (q) { return "- **" + q.titel + "**"; }).join("\n") : "**Demo ohne KI:** Dazu habe ich in Fallpfad nichts gefunden. Versuch es mit einem Fachbegriff, zum Beispiel „Dekubitusprophylaxe“.", quellen: ctx.quellen.slice(0, 4).map(function (q) { return q.id; }), vorschlaege: ["Erstelle mir einen Prüfungsplan", "Erstelle mir eine Testklausur zu Diabetes"] };
   }
 
   /* ================= Seite ================= */
@@ -506,7 +506,7 @@
           onKeyDown: function (e) { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); send(txt[0]); } } }),
         h("button", { type: "submit", className: "ast-send", "aria-label": "Senden", disabled: !txt[0].trim() || busy[0] || rest[0] === 0 }, h(Ic, { k: "send", s: 18, w: 2.4 }))),
       h("div", { className: "ast-meta" },
-        h("span", { className: "ast-dots", "aria-label": restTxt }, Array.from({ length: limit[0] }).map(function (_, i) { return h("i", { key: i, className: rest[0] != null && i >= rest[0] ? "off" : "" }); }), h("span", { style: { marginLeft: 6 } }, restTxt)),
+        (rest[0] === 0 ? h("span", { role: "status" }, "Für heute ist das Limit erreicht. Morgen geht es weiter.") : h("span", { "aria-hidden": "true" })),
         h("span", null, l[0] && window.FP_LS ? "Antwortet auf " + window.FP_LS.label() : "Nur Inhalte aus Fallpfad")));
 
     var sv = saved[0];
