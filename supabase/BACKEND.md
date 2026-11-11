@@ -18,6 +18,7 @@ und Edge Functions für alles, was einen geheimen Schlüssel braucht. In den App
 | `functions/gespraech-auswertung` | Auswertung der Mitschrift |
 | `functions/uebersetzen` | „Meine Sprache“ |
 | `functions/folien-import` | Folien-Import für Lehrkräfte |
+| `functions/stundenplan-import` | Stundenplan aus PDF, Word, Excel, Foto oder Text mit KI erkennen (nur Lehrkräfte, speichert nichts) |
 | `functions/konto-loeschen` | Konto löschen (Art. 17 DSGVO) |
 | `config.toml` | Einstellungen für die Supabase-CLI |
 

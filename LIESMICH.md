@@ -2,6 +2,22 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Neu in dieser Version (11.11.2026, Nachtrag 2): Stundenplan ohne KI per Excel-Vorlage
+
+- Das Fenster „Stundenplan hochladen“ (Kurs- und Lehrer-Stundenplan) hat zwei Reiter: „Mit KI: beliebige Datei“ und „Ohne KI: Excel-Vorlage“.
+- Ohne KI: Die App zeigt, welche Spalte was enthält (A Datum oder Tag, B Beginn, C Ende, D Thema, danach Raum/Lehrkraft/Status/Notiz bzw. Kurs/Raum/Notiz), bietet die passende Vorlage zum Download an und liest die ausgefüllte Datei (.xlsx, .xls, .ods, .csv) direkt im Browser.
+- Erkannt werden Datum (12.11.2026, ISO, Excel-Datum) oder Wochentag, Uhrzeiten wie 8:00 oder „8 Uhr“, Status wie Entfall/Raumänderung/Vertretung. Überschriften dürfen leicht abweichen.
+- Danach dieselbe Vorschau wie bei der KI: prüfen, korrigieren, auf weitere Wochen übertragen, speichern. Kein KI-Kontingent, keine Edge Function nötig.
+
+## Stundenplan mit KI übernehmen (11.11.2026, Nachtrag)
+
+- Unter **Stundenplan** heißt der Knopf jetzt **„Stundenplan hochladen (KI)“**, sowohl beim Lehrer-Stundenplan als auch beim Schüler-Stundenplan eines Kurses. Hochladen lässt sich alles, wie es gerade vorliegt: PDF, Word (.docx), Excel/CSV, Text, Foto oder Screenshot, oder einfach eingefügter Text. Die Tabelle muss nicht ordentlich sein.
+- Die Datei wird im Browser ausgelesen (Bilder werden verkleinert, gescannte PDFs als Bild geschickt). Die neue Edge Function `stundenplan-import` erkennt Datum, Uhrzeit, Thema, Raum, Lehrkraft bzw. Kurs und Ausfälle/Raumänderungen. Stehen nur Wochentage im Plan, werden sie der geöffneten Woche zugeordnet und lassen sich auf bis zu 20 weitere Wochen übertragen.
+- Vor dem Speichern erscheint eine Vorschau, in der jede Stunde geändert oder abgewählt werden kann. Gespeichert wird erst mit „Übernehmen“. Das Einfügen ohne KI bleibt über „Ohne KI: Tabelle einfügen“ möglich.
+- Gezählt wird gemeinsam mit dem Tageslimit des Assistenten der Lehrkräfte. Optionales Secret `OPENAI_MODEL_STUNDENPLAN`.
+- **Einrichten:** `supabase functions deploy stundenplan-import`
+- Außerdem: Im Stundenplan war der heutige Tag unsichtbar (weiße Schrift auf weißem Grund), behoben.
+
 ## Neu in dieser Version (11.11.2026)
 
 - **Assistent: Fehler 400 behoben.** Neue Datei `supabase/functions/_shared/openai.ts`: strukturierte Ausgabe und automatisches Ausweichen auf einfachere Anfragen bzw. ein Ausweichmodell, wenn OpenAI einen Parameter ablehnt. Genutzt von `assistent`, `folien-import`, `pflegeplanung` und `gespraech-auswertung`. Bitte neu bereitstellen:

@@ -17,6 +17,7 @@ export type KiAnfrage = {
   effort: string; // "none" = Parameter weglassen
   instructions: string;
   input: string;
+  bild?: string; // optional: Bild als data-URL (PNG/JPEG/WebP), etwa ein fotografierter Stundenplan
   schema?: Record<string, unknown>;
   name?: string;
   maxTokens?: number;
@@ -28,6 +29,11 @@ export type KiErgebnis =
 type Variante = { format: "schema" | "objekt" | "frei"; effort: string; model?: string };
 
 const FALLBACK = (Deno.env.get("OPENAI_MODEL_FALLBACK") ?? "gpt-4.1-mini").trim();
+
+function baueInput(text: string, bild?: string): unknown {
+  if (!bild) return text;
+  return [{ role: "user", content: [{ type: "input_text", text }, { type: "input_image", image_url: bild, detail: "high" }] }];
+}
 
 function varianten(a: KiAnfrage): Variante[] {
   const v: Variante[] = [];
@@ -67,7 +73,7 @@ export async function kiJson(a: KiAnfrage): Promise<KiErgebnis> {
     const body: Record<string, unknown> = {
       model,
       instructions: a.instructions + (v.format === "schema" ? "" : "\n\nAntworte ausschließlich mit einem gültigen JSON-Objekt, ohne weiteren Text."),
-      input: (v.format === "schema" ? "" : "Antworte im JSON-Format.\n\n") + a.input,
+      input: baueInput((v.format === "schema" ? "" : "Antworte im JSON-Format.\n\n") + a.input, a.bild),
       store: false,
       max_output_tokens: a.maxTokens ?? 8000,
     };

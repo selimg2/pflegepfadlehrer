@@ -25,3 +25,8 @@ html:root body .side .brand .logo{box-shadow:none!important}
 html:root body .tabbar .tab svg{color:var(--muted)!important;background:none!important}
 html:root body .tabbar .tab[aria-current=page] svg,html:root body .tabbar .tab.on svg{color:var(--accent)!important}
 html:root body .tabbar .tab[aria-current=page]{color:var(--accent)!important}
+
+/* Stundenplan: der heutige Tag kollidierte mit der Klasse .today der Tagesaufträge (weiße Schrift auf weißem Grund) */
+html body .ttdays button.today{background:var(--surface)!important;box-shadow:none}
+html body .ttdays button.on,html body .ttdays button.on.today{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
+html body .ttdays button.on small{color:rgba(255,255,255,.85)!important}
