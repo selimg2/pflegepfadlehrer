@@ -13,11 +13,11 @@
     if (!t) return;
     if (!asked) {
       asked = true;
-      if (!window.FP_SB) schoolName = "Pflegeschule am Klinikum Beispielstadt";
+      if (!window.FP_SB) { schoolName = "Pflegeschule am Klinikum Beispielstadt"; window.FP_SCHOOL_NAME = schoolName; }
       else rpc("fp_my_school").then(function (d) {
         var r = d && d[0];
         window.FP_ME_ROLE = r ? r.rolle : null;
-        schoolName = r ? (r.name || (r.rolle === "admin" ? "Alle Schulen (Administration)" : "")) : "";
+        schoolName = r ? (r.name || (r.rolle === "admin" ? "Alle Schulen (Administration)" : "")) : ""; window.FP_SCHOOL_NAME = r && r.name ? r.name : "";
         badge();
       }).catch(function () { schoolName = ""; });
     }

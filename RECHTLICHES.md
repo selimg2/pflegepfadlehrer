@@ -16,7 +16,7 @@ Legende: ✅ technisch umgesetzt · ⚠️ teilweise, braucht dich · ❌ offen,
 | Nachweis der Einwilligung (Art. 7) | ✅ | Tabelle `fp_einwilligungen`, Widerruf in der App |
 | Auskunft und Übertragbarkeit (Art. 15, 20) | ✅ | „Meine Daten herunterladen“, Funktion `fp_meine_daten` |
 | Löschung (Art. 17), Löschfristen | ✅ / ⚠️ | Konto löschen und automatische Fristen sind gebaut. Aufbewahrungsfristen für den Ausbildungsnachweis nach Landesrecht festlegen |
-| Drittland (Art. 44 ff.) | ⚠️ | Datenbank liegt in der EU. OpenAI verarbeitet ohne EU-Datenresidenz in den USA. Empfehlung: `OPENAI_BASE_URL=https://eu.api.openai.com/v1` |
+| Drittland (Art. 44 ff.) | ⚠️ | Datenbank liegt in der Schweiz (Zürich, eu-central-2; Angemessenheitsbeschluss der EU). OpenAI verarbeitet ohne EU-Datenresidenz in den USA. Empfehlung: `OPENAI_BASE_URL=https://eu.api.openai.com/v1` |
 | Datenschutz-Folgenabschätzung (Art. 35) | ❌ | Bei Stimmverarbeitung, KI-Auswertung und Daten von Lernenden sehr wahrscheinlich nötig. Erstellt die Schule mit deiner Zuarbeit |
 | Verzeichnis, TOM (Art. 30, 32) | ⚠️ | Verarbeitungsübersicht gibt es im Lehrer-Portal. Technische Maßnahmen: RLS, CSP, HSTS, Größen- und Tageslimits |
 | Gesundheitsdaten (Art. 9) | ⚠️ | Alle Patientinnen und Patienten sind erfunden. Fehlzeiten speichern nur Art und Stunden. Lernende dürfen keine echten Patientendaten eintragen (Hinweis in der App vorhanden) |

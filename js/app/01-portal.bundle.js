@@ -3229,6 +3229,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     appMissing: !APP && !isDemo,
     contentUrl: String(RAW.contentUrl || "").trim() || new URL("content.json", location.href).href
   };
+  Object.defineProperty(SETTINGS, "school", { get: () => window.FP_SCHOOL_NAME || "", enumerable: true });
   window.FP_APPURL = SETTINGS.appUrl;
   var configError = () => {
     const p = configDetail();
@@ -3605,10 +3606,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     },
     async laeufe() {
       const c = await sb();
-      try {
-        await c.rpc("fp_pruef_aufraeumen");
-      } catch (e) {
-      }
+      /* Aufräumen alter Prüfungsläufe erledigt ein Zeitplan in der Datenbank (pg_cron), nicht der Browser. */
       const r = await c.from("fp_pruef_lauf").select("*").order("created_at", { ascending: false });
       if (r.error) {
         if (/does not exist|Could not find|schema cache/i.test(r.error.message)) return null;
@@ -3643,10 +3641,8 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     },
     async messagesCleanup() {
       const c = await sb();
-      try {
-        await c.rpc("messages_aufraeumen");
-      } catch (e) {
-      }
+      /* Aufräumen abgelaufener Nachrichten erledigt ein Zeitplan in der Datenbank (pg_cron). */
+      void c;
     },
     async bgAll(opt) {
       const C = window.__fpBgCache || (window.__fpBgCache = { d: null, at: 0, p: null });
@@ -6552,7 +6548,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   function AuditModal({ data, mods, I, defCourse, close }) {
     const [course, setCourse] = (0, import_react6.useState)(defCourse && defCourse !== "alle" && defCourse !== "ohne" ? defCourse : (data.courses[0] || {}).id || "alle");
     const [z, setZ] = (0, import_react6.useState)("alle"), [modus, setModus] = (0, import_react6.useState)("klasse"), [pseudo, setPseudo] = (0, import_react6.useState)("pseudo");
-    const [schule, setSchule] = (0, import_react6.useState)(() => LS("fallpfad-schule", "")), [leitung, setLeitung] = (0, import_react6.useState)(() => LS("fallpfad-leitung", "")), [step, setStep] = (0, import_react6.useState)("form"), [msg, setMsg] = (0, import_react6.useState)(null);
+    const [schule, setSchule] = (0, import_react6.useState)(() => LS("fallpfad-schule", "") || (typeof SETTINGS !== "undefined" && SETTINGS.school) || ""), [leitung, setLeitung] = (0, import_react6.useState)(() => LS("fallpfad-leitung", "")), [step, setStep] = (0, import_react6.useState)("form"), [msg, setMsg] = (0, import_react6.useState)(null);
     const A = (0, import_react6.useMemo)(() => auswerten({ students: data.students, progress: data.progress, mods, I, courseId: course, zeitraum: z, pseudo }), [data, mods, I, course, z, pseudo]);
     const kname = course === "alle" ? "Alle Kurse" : (data.courses.find((c) => c.id === course) || {}).name || "\u2013";
     const stand = data.progress.reduce((m, p) => Math.max(m, Date.parse(p.updated_at) || 0), 0);
@@ -7826,7 +7822,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
   // lehrer_src/datenschutz.jsx
   var import_react12 = __toESM(require_shim_react());
   var KEY = "fallpfad-dsgvo-angaben";
-  var DEF = { schule: "", anschrift: "", leitung: "", dsb: "", betreiber: "", region: "konkrete EU-Region, z. B. Frankfurt (eu-central-1); im Supabase-Dashboard unter Project Settings pr\xFCfen", frist: "nach Landesrecht festzulegen", stand: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10) };
+  var DEF = { schule: "", anschrift: "", leitung: "", dsb: "", betreiber: "", region: "Z\xFCrich, Schweiz (eu-central-2); Angemessenheitsbeschluss der EU-Kommission", frist: "nach Landesrecht festzulegen", stand: (/* @__PURE__ */ new Date()).toISOString().slice(0, 10) };
   var KATEGORIEN = [
     ["Konto und Kurs", "profiles, courses, auth.users (Supabase Auth)", "Name, E-Mail, Rolle, Kurs, Passwort nur als Hash bei Supabase Auth", "Anmeldung, Zuordnung zum Kurs", "Lernende: eigenes Profil; Lehrkr\xE4fte: alle Profile der Schule"],
     ["Lernfortschritt", "progress, exam_results, submissions, assignments", "Antworten und Punkte in Lernmodulen, Examenssimulator, Aufgabenabgaben", "Unterricht und Lernbegleitung", "Lernende: eigene Daten; Lehrkr\xE4fte: Daten ihrer Schule"],
@@ -7857,7 +7853,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     ["Datensparsamkeit", "Fehlzeiten speichern nur Art und Stunden; die Datenbank entfernt jeden weiteren Inhalt. Keine Uploads von Bescheinigungen. Ger\xE4teangabe nur grob (Ger\xE4tetyp und Browser). Ger\xE4teschl\xFCssel nur als Pr\xFCfwert."],
     ["Schutz Dritter", "Hinweis und automatische Erkennung typischer Personenbez\xFCge (Namen mit Anrede, Zimmer, Geburtsdaten, lange Nummern) in allen Freitexten; im Nachweis ist vor dem Speichern eine ausdr\xFCckliche Pr\xFCfung n\xF6tig."],
     ["Transport", "Verbindungen ausschlie\xDFlich \xFCber HTTPS."],
-    ["Speicherort", "Datenbank, Anmeldung und Speicher in der gew\xE4hlten Supabase-Region; Auslieferung der Web-App \xFCber ein CDN ohne Speicherung von Nachweisdaten."],
+    ["Speicherort", "Datenbank, Anmeldung und Speicher in Z\xFCrich (Schweiz, Supabase-Region eu-central-2); Auslieferung der Web-App \xFCber ein CDN ohne Speicherung von Nachweisdaten. KI-Anfragen an OpenAI ohne Kontodaten; beim Sprachtraining verbindet sich das Ger\xE4t direkt mit OpenAI."],
     ["Betroffenenrechte", "Auskunft und Daten\xFCbertragbarkeit: Export je Person als PDF und JSON im Lehrer-Portal. L\xF6schung nach Ablauf der Aufbewahrungsfrist: Funktion im Lehrer-Portal mit Namensbest\xE4tigung, protokolliert."],
     ["Verf\xFCgbarkeit", "Sicherungen nach dem Tarif des Supabase-Projekts; Umfang und Aufbewahrung im Vertrag mit dem Betreiber festlegen."]
   ];
@@ -7868,7 +7864,7 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     ["Betroffene", "Auszubildende, Lehrkr\xE4fte, Praxisanleitende, Pflegefachpersonen und Leitungen der Einrichtungen."],
     ["Weisungen und Vertraulichkeit", "im AVV zu regeln; Zugriffe des Betreibers nur auf dokumentierte Weisung."],
     ["Technisch-organisatorische Ma\xDFnahmen", "siehe TOM in diesem Dokument; Anlage zum AVV."],
-    ["Unterauftragsverarbeiter", "Supabase (Datenbank, Anmeldung; eigene DPA des Anbieters), Hosting-Anbieter der Web-App; vollst\xE4ndige Liste und Regionen vom Betreiber best\xE4tigen lassen."],
+    ["Unterauftragsverarbeiter", "Supabase (Datenbank, Anmeldung, Server-Funktionen; Datenbank in Z\xFCrich), OpenAI (KI-Funktionen; USA, EU-Standardvertragsklauseln), Vercel (Auslieferung der Web-App); jeweils mit eigenem Auftragsverarbeitungsvertrag des Anbieters."],
     ["Unterst\xFCtzung bei Betroffenenrechten", "Export und L\xF6schung je Person im Lehrer-Portal."],
     ["L\xF6schung und R\xFCckgabe", "nach Vertragsende Export und L\xF6schung des Supabase-Projekts; Aufbewahrungsfrist der Nachweise nach Landesrecht."],
     ["Kontrollen", "Nachweise des Betreibers und der Unterauftragsverarbeiter; Pr\xFCfungsaudit und Protokoll im Portal."]
@@ -7879,20 +7875,20 @@ ${fb.gut ? `<h2>Das war gut</h2><div class="box">${nl(fb.gut)}</div>` : ""}${fb.
     return `<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Datenschutz-\xDCbersicht Fallpfad</title><style>@page{size:A4;margin:14mm}body{font-family:Inter,Arial,sans-serif;font-size:9pt;color:#0f172a}h1{font-size:16pt;margin:0}h2{font-size:11.5pt;margin:6mm 0 2mm;border-bottom:.4mm solid #2563eb;padding-bottom:1mm}table{width:100%;border-collapse:collapse;margin-top:2mm}th,td{border:.2mm solid #cbd5e1;padding:1.5mm;text-align:left;vertical-align:top}th{background:#f1f5f9;font-size:8pt}.meta{color:#475569}.box{background:#fff7ed;border:.3mm solid #f59e0b;padding:2mm 3mm;border-radius:2mm;margin-top:3mm}</style></head><body>
   <h1>Datenschutz-\xDCbersicht: Fallpfad an ${esc4(a.schule || "[Pflegeschule]")}</h1><div class="meta">Stand ${esc4(a.stand)} \xB7 Entwurf zur Vorbereitung von Verarbeitungsverzeichnis (Art. 30 DSGVO) und Auftragsverarbeitungsvertrag (Art. 28 DSGVO)</div>
   <div class="box">Diese \xDCbersicht beschreibt die technische Verarbeitung in Fallpfad. Rechtsgrundlagen, Aufbewahrungsfristen und Vertragstexte pr\xFCft und erg\xE4nzt die Schule mit ihrer oder ihrem Datenschutzbeauftragten. Sie ist keine Rechtsberatung.</div>
-  <h2>1. Beteiligte</h2>${tab(["Rolle", "Angabe"], [["Verantwortliche Stelle", `${a.schule || "[Schule]"}${a.anschrift ? ", " + a.anschrift : ""}`], ["Schulleitung", a.leitung || "[Name]"], ["Datenschutzbeauftragte/r", a.dsb || "[Name, Kontakt]"], ["Auftragsverarbeiter (Betreiber)", a.betreiber || "[Betreiber von Fallpfad]"], ["Unterauftragsverarbeiter Datenbank", `Supabase; Region: ${a.region}`], ["Auslieferung der Web-App", `${SETTINGS.appUrl ? new URL(SETTINGS.appUrl, location.href).host : "Web-Hosting"} (statische Dateien, keine Nachweisdaten)`]])}
+  <h2>1. Beteiligte</h2>${tab(["Rolle", "Angabe"], [["Verantwortliche Stelle", `${a.schule || "[Schule]"}${a.anschrift ? ", " + a.anschrift : ""}`], ["Schulleitung", a.leitung || "[Name]"], ["Datenschutzbeauftragte/r", a.dsb || "[Name, Kontakt]"], ["Auftragsverarbeiter (Betreiber)", a.betreiber || "[Betreiber von Fallpfad]"], ["Unterauftragsverarbeiter Datenbank", `Supabase Pte. Ltd.; Region: ${a.region}`], ["Unterauftragsverarbeiter KI", "OpenAI Ireland Ltd.; Verarbeitung in den USA auf Grundlage der EU-Standardvertragsklauseln; keine Kontodaten, kein Training, Speicherung h\xF6chstens 30 Tage"], ["Auslieferung der Web-App", `Vercel Inc., ${SETTINGS.appUrl ? new URL(SETTINGS.appUrl, location.href).host : "Web-Hosting"} (statische Dateien, keine Nachweisdaten)`]])}
   <h2>2. Verarbeitungs\xFCbersicht</h2>${tab(["Kategorie", "Tabelle in Supabase", "Daten", "Zweck / Grundlage (zu pr\xFCfen)", "Zugriff"], KATEGORIEN)}
   <p>Rechtsgrundlage f\xFCr den Ausbildungsnachweis ist voraussichtlich Art. 6 Abs. 1 lit. c und e DSGVO in Verbindung mit \xA7\xA7 10, 17 PflBG, \xA7 3 Abs. 5 PflAPrV und dem Schulrecht des Landes; f\xFCr die Fehlzeitart \u201Ekrank\u201C zus\xE4tzlich eine Grundlage nach Art. 9 Abs. 2 DSGVO. L\xF6schfrist: ${esc4(a.frist)}.</p>
   <h2>3. Datenabstammung des Ausbildungsnachweises</h2>${tab(["Schritt", "Was passiert", "Wo gespeichert"], [["1. Erfassung", "Auszubildende legen Einsatz und Eintr\xE4ge an; die Datenbank pr\xFCft Datum, Einsatzgrenzen und Stunden und entfernt bei Fehlzeiten alles au\xDFer der Art.", "nw_einsatz, nw_eintrag, nw_log"], ["2. Best\xE4tigung", "Die best\xE4tigende Person unterschreibt direkt auf dem Ger\xE4t der Auszubildenden oder freiwillig per Einmal-Link; die Datenbank pr\xFCft die zul\xE4ssige Funktion.", "nw_signatur, nw_pa, nw_token"], ["3. Sperre", "Server-Zeitstempel, SHA-256-Pr\xFCfsumme, Eintrag gesperrt.", "nw_eintrag.hash, nw_eintrag.bestaetigt_at"], ["4. Pr\xFCfung", "Lehrkr\xE4fte sehen Hinweise, fordern Korrekturen an (alte Fassung im Protokoll), pr\xFCfen im Pr\xFCfungsaudit alle Pr\xFCfsummen.", "nw_log"], ["5. Export", "PDF je Person oder als Sammel-Export; JSON-Auskunft je Person.", "lokal beim Export, nicht gespeichert"], ["6. L\xF6schung", "nach Ablauf der Aufbewahrungsfrist durch eine Lehrkraft; protokolliert ohne Inhalte.", "nw_log (nur Z\xE4hler)"]])}
   <h2>4. Rechtekonzept</h2>${tab(["Rolle", "Rechte"], RECHTE)}
   <h2>5. Technisch-organisatorische Ma\xDFnahmen</h2>${tab(["Ma\xDFnahme", "Umsetzung"], TOM)}
   <h2>6. Checkliste Auftragsverarbeitungsvertrag (Art. 28 Abs. 3 DSGVO)</h2>${tab(["Punkt", "Grundlage in diesem Dokument"], AVV)}
-  <h2>7. Vor dem Start zu erledigen</h2><ol><li>Region des Supabase-Projekts im Dashboard pr\xFCfen und eintragen; eine konkrete EU-Region w\xE4hlen, nicht nur \u201EEurope\u201C.</li><li>DPA von Supabase abschlie\xDFen (supabase.com/legal/dpa) und AVV zwischen Schule und Betreiber unterzeichnen.</li><li>Verarbeitungsverzeichnis, Datenschutz-Folgenabsch\xE4tzung und Informationen nach Art. 13 DSGVO f\xFCr Auszubildende und Praxisanleitende mit der oder dem Datenschutzbeauftragten fertigstellen.</li><li>Aufbewahrungsfrist nach Landesrecht festlegen.</li><li>Tr\xE4ger der praktischen Ausbildung \xFCber die Best\xE4tigung auf dem Ger\xE4t der Auszubildenden informieren.</li></ol>
+  <h2>7. Vor dem Start zu erledigen</h2><ol><li>Region des Supabase-Projekts best\xE4tigen (derzeit Z\xFCrich, eu-central-2).</li><li>Auftragsverarbeitungsvertr\xE4ge des Betreibers mit Supabase, OpenAI und Vercel nachweisen lassen und den AVV zwischen Schule und Betreiber unterzeichnen.</li><li>Verarbeitungsverzeichnis, Datenschutz-Folgenabsch\xE4tzung und Informationen nach Art. 13 DSGVO f\xFCr Auszubildende und Praxisanleitende mit der oder dem Datenschutzbeauftragten fertigstellen.</li><li>Aufbewahrungsfrist nach Landesrecht festlegen.</li><li>Tr\xE4ger der praktischen Ausbildung \xFCber die Best\xE4tigung auf dem Ger\xE4t der Auszubildenden informieren.</li></ol>
   </body></html>`;
   }
   function DatenschutzPage() {
     const [a, setA] = (0, import_react12.useState)(() => {
       try {
-        return { ...DEF, ...JSON.parse(localStorage.getItem(KEY)) || {} };
+        const o = { ...DEF, ...JSON.parse(localStorage.getItem(KEY)) || {} }; if (/^konkrete EU-Region/.test(o.region || "")) o.region = DEF.region; if (!o.schule && SETTINGS.school) o.schule = SETTINGS.school; return o;
       } catch (e) {
         return DEF;
       }

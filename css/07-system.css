@@ -44,3 +44,7 @@ html:not([data-theme=light]) body .kshead .btn.light{background:rgba(255,255,255
 html:not([data-theme=light]) body .kshead .btn.light svg,html:not([data-theme=light]) body .kshead .btn.light .ico{color:#fff!important}
 html:not([data-theme=light]) body .kshead .btn.light:hover:not(:disabled){background:rgba(255,255,255,.28)!important}
 }
+
+/* Text-Knöpfe mit Symbol (z. B. „‹ Optionen“ im Auditbericht): Symbol nicht riesig */
+html body .skip svg{width:16px;height:16px;flex:none}
+html body .skip:has(svg){display:inline-flex;align-items:center;gap:4px;text-decoration:none}
