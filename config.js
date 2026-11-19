@@ -1,4 +1,4 @@
-// Fallpfad Lehrer-Portal – Verbindung zur Datenbank (gleiche Werte wie in der Schüler-App)
+// Fallpfad Lehrer-Portal – Verbindung zur Datenbank (gleiche Werte wie in der Lernenden-App)
 // Den geheimen Schlüssel (service_role bzw. sb_secret_…) NIEMALS hier eintragen.
 window.FALLPFAD_CONFIG = {
   supabaseUrl: "https://sngnzhazulypdvdkhwja.supabase.co",

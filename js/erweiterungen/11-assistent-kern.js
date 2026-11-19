@@ -1,4 +1,4 @@
-/* Fallpfad "Assistent" (Schüler-App): KI-Chat, der nur mit Inhalten aus Fallpfad arbeitet.
+/* Fallpfad "Assistent" (Lernenden-App): KI-Chat, der nur mit Inhalten aus Fallpfad arbeitet.
    - Suche auf dem Gerät: Die App zerlegt Lernmodule, Lernkarten und Kitteltasche in kurze Abschnitte und sucht die passenden
      Abschnitte zur Frage heraus (BM25). Nur diese Abschnitte gehen mit der Frage an die Edge Function "assistent".
    - Antwortarten: Erklärung mit Quellen, Lernplan bis zur Prüfung (speicherbar, mit Kalenderdatei), Testklausur zum Üben.

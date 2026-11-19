@@ -1,6 +1,6 @@
 // Fallpfad Backend: gemeinsame Sicherheitsbausteine für alle Edge Functions.
 //
-// - CORS: Antworten sind nur für die eigenen Apps lesbar (Schüler-App, Lehrer-Portal, native App, lokale Entwicklung).
+// - CORS: Antworten sind nur für die eigenen Apps lesbar (Lernenden-App, Lehrer-Portal, native App, lokale Entwicklung).
 //   Weitere Adressen (eigene Domain, Vorschau) über das Secret FALLPFAD_ORIGINS, mit Komma getrennt.
 //   CORS ersetzt keine Anmeldung: Jede Funktion prüft zusätzlich das Anmelde-Token.
 // - Antworten tragen Sicherheits-Header und werden nie zwischengespeichert.

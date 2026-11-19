@@ -1,5 +1,5 @@
 /* Fallpfad Profilmenü: Klick auf das Profil (oben rechts oder unten links) öffnet ein Menü mit
-   Profil, Farbprofil, Hell/Dunkel, Einstellungen und Abmelden. Funktioniert in Schüler-App und Lehrer-Portal. */
+   Profil, Farbprofil, Hell/Dunkel, Einstellungen und Abmelden. Funktioniert in Lernenden-App und Lehrer-Portal. */
 (function () {
   var KIND = window.FP_APP_KIND || "schueler";
   function P() { return window.FP_PROF || {}; }
@@ -43,7 +43,7 @@
   }
 
   /* Gestaltung im Stil der iOS-Einstellungen (gruppierte Listen, farbige Symbol-Kacheln). Liegt hier, damit
-     Schüler-App und Lehrer-Portal identisch aussehen. Überschreibt ältere Regeln aus 02-training.css. */
+     Lernenden-App und Lehrer-Portal identisch aussehen. Überschreibt ältere Regeln aus 02-training.css. */
   var CSS = [
     "html body .fxpm{background:var(--bg,#f2f2f7);color:var(--fg);border:0;border-radius:22px;padding:12px;gap:10px;box-shadow:0 30px 80px -20px rgba(0,0,0,.45),0 0 0 .5px var(--line)}",
     "html body .fxpm-bg.sheet .fxpm{border-radius:24px 24px 0 0;padding:8px 14px calc(16px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto}",

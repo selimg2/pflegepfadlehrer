@@ -1,4 +1,4 @@
-/* Fallpfad: Links aus Anmelde-E-Mails direkt in der App einlösen (Schüler-App und Lehrer-Portal).
+/* Fallpfad: Links aus Anmelde-E-Mails direkt in der App einlösen (Lernenden-App und Lehrer-Portal).
    Unterstützt zwei Link-Arten:
    1. ?token_hash=…&type=signup|recovery|email_change|magiclink  (eigene Fallpfad-E-Mail-Vorlagen, geräteunabhängig)
    2. #access_token=…&refresh_token=…&type=…                      (Standard-Link von Supabase)

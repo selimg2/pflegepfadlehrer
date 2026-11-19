@@ -690,3 +690,14 @@ html.fp-native input,html.fp-native textarea,html.fp-native [contenteditable]{-w
 .fxi-consent input{margin-top:3px;flex:none;width:17px;height:17px}
 .fxi-consent small{display:block;color:var(--muted);margin-top:4px}
 .btn.fx-aibtn:disabled{opacity:.5;cursor:not-allowed;filter:grayscale(.3);transform:none}
+
+/* Theoriephase und Lerncoach im Freischalt-Fenster */
+.fxf-phase{margin-top:14px;padding:14px;border-radius:18px;background:var(--surface)}
+.fxf-phase h3{margin:0 0 4px;font-size:16px}
+.fxf-phase p{margin:4px 0 10px;font-size:14px}
+.fxf-phase summary{cursor:pointer}
+.fxf-coach{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fxf-star{flex:none;border:0;background:transparent;font-size:22px;line-height:1;min-width:44px;min-height:44px;border-radius:12px;cursor:pointer;color:var(--muted,#8e8e93)}
+.fxf-star.on{color:#f59e0b}
+.fxf-star:disabled{opacity:.35;cursor:not-allowed}
+.fxf-star:focus-visible{outline:2px solid var(--accent,#0062FF);outline-offset:2px}

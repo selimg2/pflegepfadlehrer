@@ -1,4 +1,4 @@
-/* Fallpfad Live: Körperkarte (Silhouette vorne/hinten) und benannte Zonen, gemeinsam für Lehrer-Portal und Schüler-App.
+/* Fallpfad Live: Körperkarte (Silhouette vorne/hinten) und benannte Zonen, gemeinsam für Lehrer-Portal und Lernenden-App.
    Koordinaten im viewBox 0 0 100 200. Antippungen werden als x 0..99, y 0..99 (halbe Höhe) übertragen. */
 (function () {
   var Z = {

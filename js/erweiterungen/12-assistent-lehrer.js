@@ -1,5 +1,5 @@
 /* Fallpfad Lehrer-Portal: KI-Assistent für Lehrkräfte.
-   - Gleicher Grundsatz wie in der Schüler-App: Antworten nur aus Fallpfad-Inhalten (content.json) und aus Quellen,
+   - Gleicher Grundsatz wie in der Lernenden-App: Antworten nur aus Fallpfad-Inhalten (content.json) und aus Quellen,
      die die Lehrkraft selbst hinzufügt (PDF, PowerPoint, eingefügter Text). Kein Internet.
    - Kann Module erstellen (über den Folien-Import), Klausuren mit Lösung, Unterrichtsplanungen und fachliche Fragen beantworten.
    - Eigene Quellen bleiben im Browser der Lehrkraft. An den KI-Dienst gehen nur die zur Frage passenden Abschnitte.

@@ -2,6 +2,15 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Neu in dieser Version (20.11.2026): Rückmeldungen aus der Pflegeschule
+
+Analyse und offene Punkte: `FEEDBACK_PRAXISLEHRKRAFT.md` im Ordner der Lernenden-App.
+
+- **Fenster „Module, Theoriephase und Lerncoach“** (vorher „Module freischalten“, Datei `js/erweiterungen/08-module-je-kurs-freischalten.js`): Mit dem Stern markierst du je Kurs die Module der aktuellen Theoriephase und benennst den Block. Die Lernenden sehen sie oben unter „Lernmodule“. Zusätzlich lässt sich eine Ansprechperson bei Lernschwierigkeiten (Lerncoach) hinterlegen.
+- **Begriffe:** „Kurse & Auszubildende“, „Stundenplan Auszubildende“, „Auszubildendenakte“, „Lernenden-App“. „Bildbefund“ wurde zu „Beobachtung“, PES zu PESR, „Examenssimulator“ zu „Prüfungswissen-Training“.
+- `content.json`: vier überarbeitete Abbildungen (Blutdruck-Haltung, Pulsorte, Fieberphasen, Schock) übernommen.
+- **Einrichten:** `supabase/theoriephase_lerncoach.sql` einmal ausführen (erweitert `course_settings` und legt `fp_kurs_hilfe()` an). Ohne die Datei lässt sich alles speichern, die Lernenden sehen Theoriephase und Lerncoach aber erst danach.
+
 ## Neu in dieser Version (11.11.2026, Nachtrag 2): Stundenplan ohne KI per Excel-Vorlage
 
 - Das Fenster „Stundenplan hochladen“ (Kurs- und Lehrer-Stundenplan) hat zwei Reiter: „Mit KI: beliebige Datei“ und „Ohne KI: Excel-Vorlage“.

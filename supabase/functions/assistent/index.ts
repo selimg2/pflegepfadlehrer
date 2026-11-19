@@ -1,4 +1,4 @@
-// Fallpfad: KI-Assistent für Lernende (Schüler-App) und Lehrkräfte (Lehrer-Portal)
+// Fallpfad: KI-Assistent für Lernende (Lernenden-App) und Lehrkräfte (Lehrer-Portal)
 // Supabase Edge Function "assistent".
 //
 // Grundsatz: Der Assistent antwortet nur aus Inhalten, die ihm die App mitschickt (Auszüge aus den Lernmodulen,

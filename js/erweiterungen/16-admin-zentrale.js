@@ -44,7 +44,7 @@
     var m = (window.FP_MODS || []).filter(function (x) { return x.id === id; })[0];
     return m ? String(m.title || id).replace(/^Fallmodul \d+ · /, "") : id;
   };
-  var EREIGNIS = { sitzung: "Sitzungen", modul_start: "Modul geöffnet", training: "Training geöffnet", bildbefund: "Bildbefund gelöst", bereich: "Portal-Bereich" };
+  var EREIGNIS = { sitzung: "Sitzungen", modul_start: "Modul geöffnet", training: "Training geöffnet", bildbefund: "Beobachtungsaufgabe gelöst", bereich: "Portal-Bereich" };
 
   function Kpi(p) { return h("div", { className: "az-kpi" }, h("b", null, p.v), h("small", null, p.l), p.s ? h("i", null, " · " + p.s) : null); }
 
@@ -158,13 +158,13 @@
     return h("div", null,
       h("div", { className: "row", style: { gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 12 } },
         h("div", { className: "az-seg" }, [["neu", "Neu"], ["in_arbeit", "In Arbeit"], ["erledigt", "Erledigt"], ["alle", "Alle"]].map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": filt === x[0], onClick: function () { setFilt(x[0]); } }, x[1]); })),
-        h("span", { className: "az-note" }, "Feedback kommt aus dem Menü „Feedback geben“ in Schüler-App und Lehrer-Portal.")),
+        h("span", { className: "az-note" }, "Feedback kommt aus dem Menü „Feedback geben“ in Lernenden-App und Lehrer-Portal.")),
       err && h("div", { className: "notice bad" }, fehlt(err) ? "Feedback ist gerade nicht verfügbar." : "Feedback konnte nicht geladen werden."),
       stats.length ? h("div", { className: "card" }, h("h3", { style: { marginTop: 0 } }, "Nach Kategorie"), h(Bars, { rows: stats })) : null,
       !list ? h("p", { className: "muted" }, "Wird geladen …") : !list.length ? h("p", { className: "muted" }, "Keine Rückmeldungen in dieser Ansicht.") :
         h("div", { className: "az-fb", style: { marginTop: 12 } }, list.map(function (f) {
           return h("div", { key: f.id, className: "az-fbi" },
-            h("div", { className: "h" }, h("span", null, dt(f.created_at, true) + " · " + (f.app === "lehrer" ? "Lehrer-Portal" : "Schüler-App") + (f.rolle ? " · " + (f.rolle === "student" ? "Lernende" : f.rolle === "teacher" ? "Lehrkraft" : f.rolle) : "") + (f.schule ? " · " + f.schule : "") + (f.seite ? " · Bereich: " + f.seite : "")),
+            h("div", { className: "h" }, h("span", null, dt(f.created_at, true) + " · " + (f.app === "lehrer" ? "Lehrer-Portal" : "Lernenden-App") + (f.rolle ? " · " + (f.rolle === "student" ? "Lernende" : f.rolle === "teacher" ? "Lehrkraft" : f.rolle) : "") + (f.schule ? " · " + f.schule : "") + (f.seite ? " · Bereich: " + f.seite : "")),
               h("span", null, f.bewertung ? h("span", { className: "s" }, "★★★★★".slice(0, f.bewertung) + "☆☆☆☆☆".slice(0, 5 - f.bewertung)) : null, " ", h("span", { className: "az-pill " + f.status }, f.status === "in_arbeit" ? "in Arbeit" : f.status))),
             f.kategorie ? h("div", { style: { marginTop: 6 } }, h("span", { className: "az-pill" }, f.kategorie)) : null,
             f.text ? h("p", null, f.text) : h("p", { className: "muted" }, "(nur Bewertung)"),

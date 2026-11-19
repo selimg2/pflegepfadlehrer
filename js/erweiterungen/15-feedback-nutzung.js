@@ -1,4 +1,4 @@
-/* Fallpfad: Feedback geben und anonyme Nutzungszähler (Schüler-App und Lehrer-Portal).
+/* Fallpfad: Feedback geben und anonyme Nutzungszähler (Lernenden-App und Lehrer-Portal).
    Datenschutz:
    - FP_ZAEHLE schickt nur Ereignisname und Schlüssel (z. B. "modul_start", "fm12"). Der Server zählt je Tag und Schule,
      ohne Nutzerkennung, ohne Inhalte. Gleiche Ereignisse werden pro Gerät höchstens alle 30 Minuten einmal gezählt.

@@ -7,7 +7,7 @@
   };
   var NAV = {
     "Home": C.blue, "Übersicht": C.blue, "Lernmodule": C.violet, "Module": C.violet, "Training": C.teal, "Praxis": C.green,
-    "Aufgaben": C.orange, "Fortschritt": C.pink, "Patientenakte": C.slate, "Kurse & Schüler": C.cyan, "Ausbildungsnachweis": C.green,
+    "Aufgaben": C.orange, "Fortschritt": C.pink, "Patientenakte": C.slate, "Kurse & Auszubildende": C.cyan, "Ausbildungsnachweis": C.green,
     "Feedback": C.pink, "Prüfen": C.indigo, "Nachrichten": C.sky, "Stundenplan": C.amber, "Live": C.red, "Team-Krankenhaus": C.purple,
     "Einstellungen": C.slate, "Schulen": C.indigo, "Mehr": C.slate
   };
@@ -83,7 +83,7 @@
 })();
 /* Handy: kurze Beschriftungen in der unteren Leiste */
 (function () {
-  var S = { "Kurse & Schüler": "Kurse", "Ausbildungsnachweis": "Nachweis", "Team-Krankenhaus": "Team", "Einstellungen": "Optionen", "Stundenplan": "Plan" };
+  var S = { "Kurse & Auszubildende": "Kurse", "Ausbildungsnachweis": "Nachweis", "Team-Krankenhaus": "Team", "Einstellungen": "Optionen", "Stundenplan": "Plan" };
   function run() {
     document.querySelectorAll(".tabbar .tab span").forEach(function (sp) {
       var t = (sp.textContent || "").trim();

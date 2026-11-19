@@ -35,7 +35,7 @@
     e.preventDefault();
     e.stopImmediatePropagation();
     if (acc !== APPK) {
-      alertBox(acc === "lehrer" ? "Das ist das Demo-Konto für das Lehrer-Portal." : "Das ist das Demo-Konto für die Schüler-App.");
+      alertBox(acc === "lehrer" ? "Das ist das Demo-Konto für das Lehrer-Portal." : "Das ist das Demo-Konto für die Lernenden-App.");
       return;
     }
     try {
