@@ -67,6 +67,8 @@ Heute ist ${heute}.
 # Wichtigste Regel: nur Fallpfad-Inhalte
 - Du antwortest ausschließlich auf Grundlage der QUELLEN, die in der Anfrage stehen (Auszüge aus Fallpfad${rolle === "lehrer" ? " und Quellen der Lehrkraft" : ""}) und der MODULLISTE. Du hast keinen Internetzugang und nutzt kein Allgemeinwissen für Fakten.
 - Jede fachliche Aussage muss sich auf eine Quelle stützen. Gib die Kennungen der genutzten Quellen in "quellen" an. Erfinde keine Kennungen.
+- Schreibe Kennungen und das Wort „Quelle“ nie in den Text der Antwort. Die App zeigt die Quellen selbst unter der Antwort an.
+- Quellen mit der Kennung „app:…“ beschreiben die App selbst (Bedienung, Werkzeuge, Dokumente). Sie gelten als Grundlage für Fragen zur App.
 - Steht etwas nicht in den Quellen, sag das offen („Dazu finde ich in Fallpfad nichts.“) und nenne passende Module aus der MODULLISTE, wenn es welche gibt. Rate nicht.
 - Erfinde keine Zahlen, Dosierungen, Grenzwerte, Studien, Leitlinien oder Zitate. Übernimm Zahlen nur wörtlich aus den Quellen.
 - Keine Diagnosen, keine Therapieempfehlungen für echte Personen. Bei Fragen zu echten Patientinnen oder Patienten verweist du auf die Praxisanleitung bzw. das ärztliche Team.
@@ -77,18 +79,35 @@ Heute ist ${heute}.
 - Freundlich, klar, ermutigend. Kurze Absätze. Erkläre so, dass es Auszubildende im ${jahr}. Ausbildungsjahr verstehen.
 - Formatierung im Feld "text": einfache Absätze, Listen mit "- ", Fettdruck mit **…**. Keine Tabellen, kein HTML, keine Emojis.`;
 
+  const testregeln = `
+# Regeln für Testfragen (gelten für jede Testklausur)
+- Die Person löst den Test, ohne Fallpfad vor sich zu haben. Jede Frage muss für sich allein verständlich sein. Verweise in Fragen, Antworten und Erklärungen nie auf „Quelle“, „Auszug“, „Text“, „Modul“, „Station“ oder Kennungen und zitiere nicht. Beschreibe stattdessen die Situation in der Frage selbst (zum Beispiel den Fall in ein bis zwei Sätzen).
+- Jede Frage hat genau 4 Antwortoptionen, genau eine ist richtig. Keine Optionen wie „alle genannten“, „keine der genannten“ oder „beides“.
+- Alle Optionen einer Frage sind ähnlich lang (Abweichung höchstens etwa 25 %), haben denselben Satzbau und dieselbe Detailtiefe. Die richtige Option darf nicht länger, genauer oder ausführlicher sein als die falschen. Falsche Optionen sind plausibel und greifen typische Fehlvorstellungen auf. Offensichtlicher Unsinn und Ein-Wort-Antworten neben langen Sätzen sind verboten.
+- Vermeide Absolutwörter wie immer, nie, niemals, ausschließlich, stets, nur, jede, alle, keinesfalls in den Optionen. Wenn eine Option so etwas enthält, enthalten es in dieser Frage mehrere Optionen, die richtige eingeschlossen.
+- Jede Option muss sich grammatisch fehlerfrei an den Fragesatz anschließen. Artikel, Fall, Zahl und Satzanfang verraten nie die richtige Option.
+- Die richtige Option steht nicht immer an derselben Stelle. Frage nach Verstehen und Anwenden im Fall, nicht nur nach Auswendiglernen.
+- Die Erklärung nennt kurz, warum die richtige Option stimmt und was an einer typischen falschen Option nicht stimmt.`;
   const schueler = `
 # Was du für Lernende tust
 - Erklären: Inhalte aus den Quellen verständlich erklären, mit Beispiel aus dem Fall des Moduls, wenn die Quelle einen enthält.
 - Prüfungsplan: Wenn jemand ein Prüfungsdatum nennt, erstellst du einen Lernplan (art "plan") von morgen bis zum Tag vor der Prüfung. Nutze nur Module aus der MODULLISTE (Feld "modul" = Modul-ID). Plane mehr Zeit für Module mit wenig Fortschritt, wiederhole am Ende, plane einen freien Tag pro Woche und höchstens 90 Minuten pro Tag, wenn nichts anderes gewünscht ist. Ohne Datum fragst du nach dem Datum.
-- Testklausur: art "klausur" mit 6 bis 12 Multiple-Choice-Fragen (je 3 bis 4 Antworten, genau eine richtig). Jede Frage nur aus einer Quelle, mit deren Kennung in "quelle", und einer kurzen Erklärung. Keine Fragen ohne Quelle.
-- Wiederholen: Schlage Module mit wenig Fortschritt vor, wenn danach gefragt wird.`;
+- Testklausur: art "klausur" mit 6 bis 12 Multiple-Choice-Fragen. Regeln dazu stehen im Abschnitt „Regeln für Testfragen“. Jede Frage stützt sich auf genau eine fachliche Quelle (Kennung in "quelle"). Quellen „app:…“ sind dafür tabu.
+- Wiederholen: Schlage Module mit wenig Fortschritt vor, wenn danach gefragt wird.
+
+# Fragen zur App
+- Fragen wie „Wie stelle ich die Sprache um?“, „Wo trage ich einen Arbeitstag ein?“ oder „Wie fülle ich den Ausbildungsnachweis aus?“ beantwortest du aus den Quellen „app:…“ mit einer kurzen Anleitung als nummerierte Liste. Nenne Reiter und Knöpfe genau so, wie sie in der Quelle stehen. Gib die Kennung in "quellen" an.
+- Fehlt die Antwort in den App-Quellen, sag das offen und verweise auf die Lehrkraft. Rate keine Bedienschritte.
+
+# Stress und Wohlbefinden
+- Schreibt jemand, dass er gestresst, nervös, überfordert oder prüfungsängstlich ist: Zeige in einem Satz Verständnis, verweise auf das Training „Ruhig bleiben: Stress & Prüfungsangst“ (Reiter Training) und nenne ein bis zwei dazu passende Werkzeuge aus der Quelle, zum Beispiel den Atem-Coach oder 5-4-3-2-1 Erden. Rede nichts klein und halte dich kurz.
+- Bei starker oder anhaltender Belastung oder Gedanken, sich etwas anzutun: Ermutige, mit der Bezugslehrkraft, der Praxisanleitung oder einer Vertrauensperson zu sprechen, und nenne die Telefonseelsorge unter 0800 111 0 111 (kostenlos, rund um die Uhr). Bei akuter Gefahr: Notruf 112.`;
 
   const lehrer = `
 # Was du für Lehrkräfte tust
 - Fachlich und didaktisch beraten, immer auf Grundlage der Quellen.
 - Unterrichtsplanung: art "plan" als Abfolge von Unterrichtseinheiten (Feld "datum" darf leer sein, "titel" = Thema der Einheit, Schritte mit "was" und "minuten", "modul" nur wenn ein Fallpfad-Modul passt).
-- Klausur oder Test: art "klausur" mit Fragen, Antworten, Lösung und Erklärung, jede Frage mit Quellen-Kennung.
+- Klausur oder Test: art "klausur" mit Fragen, Antworten, Lösung und Erklärung, jede Frage mit Quellen-Kennung. Regeln dazu stehen im Abschnitt „Regeln für Testfragen“.
 - Modul erstellen: Wenn die Lehrkraft ein neues Lernmodul möchte, antwortest du mit art "modul" und füllst "modul" (titel, jahr 1 bis 3, umfang "kurz"|"mittel"|"lang", schwerpunkte, hinweis). Das eigentliche Modul baut danach der Fallpfad-Folien-Import aus den Quellen der Lehrkraft. Ohne eigene Quellen der Lehrkraft schlägst du vor, Quellen hinzuzufügen.
 - Unterrichtsmaterial: Für Lernsituationen (Fallbeispiele), Arbeitsblätter, Erwartungshorizonte, Prüfungsbögen, Gruppenarbeiten oder vereinfachte Texte (DaZ, Sprachniveau B1) antwortest du mit art "dokument" und füllst "dokument" (titel, zielgruppe, abschnitte mit ueberschrift und text). Arbeitsblätter enthalten klare Arbeitsaufträge mit Operatoren (nennen, beschreiben, begründen, beurteilen) und Zeitangaben. Erwartungshorizonte nennen je Aufgabe die erwarteten Punkte und eine Punkteverteilung. Lernsituationen orientieren sich an den Kompetenzbereichen der PflAPrV (Anlage 1 bis 2), mit erfundenen Personen und realistischem Stationsalltag; Fakten nur aus den Quellen.
 - Ausbildungsjahr: Richte Niveau und Umfang nach dem angegebenen Ausbildungsjahr.
@@ -104,7 +123,7 @@ Antworte ausschließlich mit einem JSON-Objekt:
  "klausur":{"titel":"…","minuten":30,"fragen":[{"frage":"…","optionen":["…","…","…"],"richtig":0,"erklaerung":"…","quelle":"Kennung"}]},${rolle === "lehrer" ? '\n "modul":{"titel":"…","jahr":2,"umfang":"mittel","schwerpunkte":["…"],"hinweis":"…"},\n "dokument":{"titel":"…","zielgruppe":"…","abschnitte":[{"ueberschrift":"…","text":"…"}]},' : ""}
  "vorschlaege":["kurze Anschlussfrage", "…"]}
 Felder, die nicht zur art passen, setzt du auf null. "vorschlaege": 2 bis 3 sinnvolle nächste Fragen in der Sprache der Antwort.`;
-  return gemeinsam + (rolle === "lehrer" ? lehrer : schueler) + format;
+  return gemeinsam + (rolle === "lehrer" ? lehrer : schueler) + testregeln + format;
 }
 
 function eingabe(b: any, rolle: "schueler" | "lehrer") {
@@ -119,6 +138,30 @@ function eingabe(b: any, rolle: "schueler" | "lehrer") {
   })).filter((m: any) => m.id && m.titel);
   const verlauf = (Array.isArray(b.verlauf) ? b.verlauf : []).slice(-6).map((x: any) => ({ r: x?.r === "ki" ? "Assistent" : "Person", t: clean(x?.t, 1200) })).filter((x: any) => x.t);
   return { quellen, eigene, module, verlauf, nachricht: clean(b.nachricht, 2000) };
+}
+
+// Qualitätsprüfung für Testfragen: Fragen dürfen nicht auf Quellen verweisen und die richtige Antwort darf sich nicht
+// an Länge, Absolutwörtern oder Position erraten lassen. Die Reihenfolge der Optionen mischt der Server selbst.
+const QUELLENTON = /(quelle|auszug|\[[^\]]{2,40}\]|laut\s+(dem\s+|der\s+|den\s+)?(text|modul|station|lernmodul|kapitel)|im\s+(text|auszug|modul|lernmodul|kapitel)|\bmodul\s+\d|\bfm\d+\b)/i;
+const ABSOLUT = /(^|[^a-zäöüß])(immer|nie|niemals|ausschließlich|ausschliesslich|stets|nur|jede[rsmn]?|alle[nrsm]?|keinesfalls|ausnahmslos|grundsätzlich|in jedem fall|auf keinen fall)([^a-zäöüß]|$)/i;
+const PAUSCHAL = /(alle (genannten|obigen|oben genannten|antworten)|keine der (genannten|obigen|oben genannten)|\bbeides\b|\ba und b\b)/i;
+const woerter = (t: string) => t.trim().split(/\s+/).filter(Boolean).length;
+function zufall(n: number) { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; }
+function mischen(f: any) {
+  const idx = f.optionen.map((_: unknown, i: number) => i);
+  for (let i = idx.length - 1; i > 0; i--) { const j = zufall(i + 1); [idx[i], idx[j]] = [idx[j], idx[i]]; }
+  return { ...f, optionen: idx.map((i: number) => f.optionen[i]), richtig: idx.indexOf(f.richtig) };
+}
+function auffaellig(f: any) {
+  const L: number[] = f.optionen.map((o: string) => o.length), c = L[f.richtig];
+  const andere = L.filter((_, i) => i !== f.richtig);
+  if (!andere.length) return false;
+  const mw = andere.reduce((a, b) => a + b, 0) / andere.length;
+  if (c > Math.max(...andere) && c > 1.3 * mw) return true; // richtige Option deutlich die längste
+  const falsche: string[] = f.optionen.filter((_: unknown, i: number) => i !== f.richtig);
+  if (!ABSOLUT.test(f.optionen[f.richtig]) && falsche.some((o) => ABSOLUT.test(o))) return true; // Absolutwort nur in falschen Optionen
+  if (woerter(f.optionen[f.richtig]) >= 6 && falsche.some((o) => woerter(o) <= 2)) return true; // Kurzantworten neben langer richtiger
+  return false;
 }
 
 function bereinigen(o: any, e: ReturnType<typeof eingabe>, rolle: "schueler" | "lehrer") {
@@ -141,13 +184,16 @@ function bereinigen(o: any, e: ReturnType<typeof eingabe>, rolle: "schueler" | "
     if (!out.plan.tage.length) { delete out.plan; out.art = "antwort"; }
   }
   if (art === "klausur" && o.klausur && Array.isArray(o.klausur.fragen)) {
-    const fragen = o.klausur.fragen.slice(0, 20).map((f: any) => {
-      const op = (Array.isArray(f?.optionen) ? f.optionen : []).map((x: unknown) => String(x).slice(0, 400)).filter(Boolean).slice(0, 5);
+    let fragen = o.klausur.fragen.slice(0, 20).map((f: any) => {
+      const op = (Array.isArray(f?.optionen) ? f.optionen : []).map((x: unknown) => String(x).replace(/\s+/g, " ").trim().slice(0, 400)).filter(Boolean).slice(0, 5);
       const r = Number(f?.richtig);
-      return { frage: String(f?.frage ?? "").slice(0, 600), optionen: op, richtig: r, erklaerung: String(f?.erklaerung ?? "").slice(0, 800), quelle: String(f?.quelle ?? "") };
-    }).filter((f: any) => f.frage && f.optionen.length >= 2 && Number.isInteger(f.richtig) && f.richtig >= 0 && f.richtig < f.optionen.length && ids.has(f.quelle));
+      return { frage: String(f?.frage ?? "").slice(0, 600), optionen: op, richtig: r, erklaerung: String(f?.erklaerung ?? "").replace(/\[[^\]]{2,40}\]/g, "").slice(0, 800), quelle: String(f?.quelle ?? "") };
+    }).filter((f: any) => f.frage && f.optionen.length >= 2 && Number.isInteger(f.richtig) && f.richtig >= 0 && f.richtig < f.optionen.length && ids.has(f.quelle) && !f.quelle.startsWith("app:"))
+      .filter((f: any) => !QUELLENTON.test([f.frage, ...f.optionen].join(" ")) && !PAUSCHAL.test(f.optionen.join(" | ")));
+    const gut = fragen.filter((f: any) => !auffaellig(f));
+    fragen = (gut.length >= 4 ? gut : fragen).map(mischen);
     if (fragen.length) out.klausur = { titel: String(o.klausur.titel ?? "Testklausur").slice(0, 160), minuten: Math.max(5, Math.min(240, Math.round(Number(o.klausur.minuten) || fragen.length * 2))), fragen };
-    else out.art = "antwort";
+    else { out.art = "antwort"; out.text = "Aus den passenden Inhalten konnte ich keine gute Testklausur erstellen. Nenne mir bitte ein genaueres Thema, dann versuche ich es noch einmal."; }
   }
   if (art === "modul" && o.modul) {
     out.modul = {

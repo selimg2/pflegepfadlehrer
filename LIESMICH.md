@@ -2,6 +2,13 @@
 
 Dieser Ordner ist eine eigene Website nur für Lehrkräfte und Praxisanleitende.
 
+## Neu (21.11.2026): Assistent, Quizfragen, EU-Betrieb
+
+- **Assistent kennt die App.** Neue Wissensdatei `daten/app-wissen.js` in der Lernenden-App (18 Einträge: Stress-Werkzeug, Sprache umstellen, Ausbildungsnachweis, Dokumente ausfüllen u. a.). Antworten verweisen mit einem Button direkt an die richtige Stelle.
+- **Tests des Assistenten ohne Quellenhinweise.** Fragen im Klausurmodus enthalten keine Verweise wie „laut Quelle 2“. Der Server prüft Antwortoptionen zusätzlich: Länge, Absolutwörter („immer“, „nie“) und Grammatik dürfen die richtige Antwort nicht verraten; die Reihenfolge wird gemischt. Bitte `assistent` neu bereitstellen: `supabase functions deploy assistent`.
+- **370 Modulfragen überarbeitet** (`content.json` und `daten/module`): falsche Antworten sind jetzt gleich lang und gleich formuliert wie die richtige.
+- **Alles in der EU:** Datenbank, Speicher und Funktionen laufen in `eu-central-2` (Zürich; Angemessenheitsbeschluss). Für OpenAI bei der Plattform ein Projekt mit Datenresidenz Europa anlegen, dort einen neuen Schlüssel erzeugen und als Secrets `OPENAI_API_KEY` sowie `OPENAI_BASE_URL=https://eu.api.openai.com/v1` setzen. Vercel liefert statische Dateien über ein weltweites Netz aus; es enthält keine Personendaten.
+
 ## Neu in dieser Version (20.11.2026): Rückmeldungen aus der Pflegeschule
 
 Analyse und offene Punkte: `FEEDBACK_PRAXISLEHRKRAFT.md` im Ordner der Lernenden-App.
