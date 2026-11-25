@@ -36,8 +36,48 @@
     ".az-fbi p{margin:8px 0;white-space:pre-wrap}.az-fbi textarea{width:100%;box-sizing:border-box;border-radius:10px;border:1px solid var(--line,#cbd5e1);padding:8px;font:inherit;min-height:54px;background:var(--bg,#fff);color:inherit}",
     ".az-pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600;background:var(--fill,#eef2f7)}.az-pill.neu{background:#ffe8e6;color:#c0362c}.az-pill.in_arbeit{background:#fff4d6;color:#a16207}.az-pill.erledigt{background:#e3f7e8;color:#15803d}",
     ".az-seg{display:inline-flex;gap:4px;background:var(--fill,#eef2f7);padding:3px;border-radius:10px}.az-seg button{all:unset;cursor:pointer;padding:5px 10px;border-radius:8px;font-size:13px}.az-seg button[aria-pressed=true]{background:var(--surface,#fff);box-shadow:0 1px 2px rgba(0,0,0,.08);font-weight:600}",
-    ".az-note{font-size:13px;color:var(--muted,#64748b);line-height:1.5}"
+    ".az-note{font-size:13px;color:var(--muted,#64748b);line-height:1.5}",
+    /* Neugestaltung im Stil der Portal-Startseite */
+    ".az-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}.az-head .hello{margin-bottom:0}",
+    ".az-tabs{position:sticky;top:0;z-index:5;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:22px 0 4px;padding:5px;border-radius:16px;background:color-mix(in srgb,var(--surface,#fff) 82%,transparent);backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);border:1px solid var(--line,#e5e7eb);box-shadow:var(--shadow,0 1px 2px rgba(0,0,0,.05))}",
+    ".az-tabs::-webkit-scrollbar{display:none}",
+    ".az-tabs button{all:unset;cursor:pointer;flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border-radius:12px;font-weight:600;font-size:14px;color:var(--muted,#64748b);transition:background .15s,color .15s}",
+    ".az-tabs button:hover{color:var(--fg,#111);background:var(--surface2,#f1f5f9)}",
+    ".az-tabs button[aria-selected=true]{color:var(--accent,#0062FF);background:var(--accent-soft,#e8f0ff)}",
+    ".az-tabs button:focus-visible{outline:2px solid var(--accent,#0062FF);outline-offset:2px}",
+    ".az-tabs svg{width:18px;height:18px;flex:0 0 auto}.az-tabs .az-b{background:#ff3b30;color:#fff;border-radius:999px;font-size:11px;line-height:16px;min-width:16px;text-align:center;padding:0 5px}",
+    ".az-att .qa{cursor:pointer}.az-att .qa b.az-n{font-size:30px;letter-spacing:-.02em;line-height:1.1}.az-att .qa .muted{font-size:13.5px}",
+    ".az-att .qa.az-ok{--qc:var(--c-green,#16a34a)}.az-att .qa.az-warn{--qc:var(--c-amber,#d97706)}.az-att .qa.az-bad{--qc:#e11d48}.az-att .qa.az-info{--qc:var(--c-violet,#7c3aed)}.az-att .qa.az-blue{--qc:var(--c-blue,#2563eb)}",
+    ".az-att .qa .az-go{position:absolute;right:16px;top:18px;font-size:13px;font-weight:600;color:var(--qc)}",
+    ".az-blocks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}",
+    ".az-blocks .ksbstats{grid-template-columns:repeat(3,minmax(0,1fr))}.az-blocks .ksbstats>span{min-width:0}",
+    ".az-blocks .ksbh small{display:block;color:rgba(255,255,255,.85);font-size:13px;margin-top:2px;position:relative;z-index:1}",
+    ".az-blocks .ksbh .az-big{font-size:34px;font-weight:750;letter-spacing:-.03em;line-height:1;position:relative;z-index:1;text-align:right}",
+    ".az-grid2>.card{display:flex;flex-direction:column}.az-grid2>.card .az-chart{margin-top:auto}",
+    ".az-card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}.az-card-h h3{margin:0}.az-card-h span{font-size:13px;color:var(--muted,#64748b)}",
+    ".az-tab tbody tr:hover td{background:var(--surface2,#f8fafc)}.az-tab td:first-child,.az-tab th:first-child{padding-left:10px}",
+    ".az-grid2{align-items:stretch}.az-grid2>.card,.az-grid2>.card+.card{margin:0!important}",
+    ".az-bar{grid-template-columns:minmax(0,2.2fr) minmax(60px,2fr) auto}",
+    ".az-fbi{border-radius:18px;padding:16px 18px;border:1px solid var(--line,#e5e7eb);box-shadow:var(--shadow,none)}.az-fbi textarea{background:var(--surface2,#f6f7f9);border-color:transparent}",
+    ".az-blocks .ksblock{text-align:left}",
+    "@media (max-width:640px){.az-tabs button span.az-l{display:none}.az-tabs button{padding:9px 11px}}"
   ].join("");
+  /* Linien-Icons im Stil der Portal-Navigation */
+  var IC = {
+    home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
+    school: "M3 21h18M5 21V8l7-4 7 4v13M9 21v-5h6v5M9 10h.01M15 10h.01M12 10h.01",
+    users: "M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM22 19v-1a4 4 0 0 0-3-3.87M16 3.13a3.5 3.5 0 0 1 0 6.75",
+    chat: "M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z",
+    chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
+    book: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM20 17v4H6.5A2.5 2.5 0 0 1 4 18.5",
+    shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 12l2 2 4-4",
+    mail: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6",
+    check: "M20 6 9 17l-5-5",
+    alert: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z",
+    star: "M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"
+  };
+  function Ico(p) { return h("svg", { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": "true" }, h("path", { d: IC[p.n] })); }
+  window.FP_AdminIcon = Ico;
   function useCss() { useEffect(function () { if (document.getElementById("az-css")) return; var s = document.createElement("style"); s.id = "az-css"; s.textContent = CSS; document.head.appendChild(s); }, []); }
 
   var MODTITEL = function (id) {
@@ -64,9 +104,9 @@
       h("div", { className: "az-legend" }, h("span", { style: { "--c": "var(--accent,#0062FF)" } }, "Sitzungen"), h("span", { style: { "--c": "#34c759" } }, "Modulaufrufe"), h("span", { style: { "--c": "#ff9f0a" } }, "Trainings")));
   }
   function KiVerlauf(p) {
-    var t = p.tage || [], W = 640, H = 120, n = t.length || 1, bw = W / n;
+    var t = p.tage || [], W = 640, H = 150, n = t.length || 1, bw = W / n;
     var max = Math.max(1, Math.max.apply(null, t.map(function (x) { return (x.ki_assistent || 0) + (x.ki_gespraech || 0) + (x.ki_pflegeplanung || 0); })));
-    return h("div", null, h("svg", { className: "az-chart", viewBox: "0 0 " + W + " " + H, preserveAspectRatio: "none", style: { height: 120 } },
+    return h("div", null, h("svg", { className: "az-chart", viewBox: "0 0 " + W + " " + H, preserveAspectRatio: "none", role: "img", "aria-label": "KI-Nutzung je Tag" },
       t.map(function (x, i) {
         var a = (x.ki_assistent || 0) / max * (H - 8), b = (x.ki_gespraech || 0) / max * (H - 8), c = (x.ki_pflegeplanung || 0) / max * (H - 8);
         return h("g", { key: i }, h("rect", { x: i * bw + 1, y: H - a, width: Math.max(1, bw - 2), height: a }), h("rect", { className: "b2", x: i * bw + 1, y: H - a - b, width: Math.max(1, bw - 2), height: b }), h("rect", { className: "b3", x: i * bw + 1, y: H - a - b - c, width: Math.max(1, bw - 2), height: c }), h("title", null, dt(x.tag) + ": Assistent " + (x.ki_assistent || 0) + ", Gespräche " + (x.ki_gespraech || 0) + ", Pflegeplanung " + (x.ki_pflegeplanung || 0)));
@@ -80,29 +120,52 @@
     }));
   }
 
+  /* Kachel „braucht Aufmerksamkeit“ (Stil: Schnellzugriff der Startseite) */
+  function Att(p) {
+    return h("button", { type: "button", className: "card qa " + p.k, onClick: p.onClick },
+      h(Ico, { n: p.ico }), p.go ? h("span", { className: "az-go" }, p.go + " →") : null,
+      h("b", { className: "az-n" }, p.v), h("b", null, p.t), h("span", { className: "muted" }, p.s));
+  }
+  /* Kennzahlenblock (Stil: Kurskarten der Startseite) */
+  function Block(p) {
+    return h("button", { type: "button", className: "ksblock", style: { "--kc": p.c }, onClick: p.onClick, "aria-label": p.t + ": " + p.big + " " + p.bigL },
+      h("div", { className: "ksbh" },
+        h("div", null, h("div", { className: "eyebrow" }, p.eb), h("b", null, p.t)),
+        h("div", null, h("div", { className: "az-big" }, p.big), h("small", { style: { textAlign: "right" } }, p.bigL))),
+      p.rows.map(function (r, i) { return h("div", { key: i, className: "ksbstats" }, r.map(function (s, j) { return h("span", { key: j }, h("b", null, s[0]), h("small", null, s[1])); })); }));
+  }
   function Uebersicht(p) {
-    var d = p.d, k = d.kpi || {};
+    var d = p.d, k = d.kpi || {}, go = p.go;
+    var qs = useState(null), qst = qs[0], setQst = qs[1];
+    useEffect(function () { if (window.FP_QuellenStatus) window.FP_QuellenStatus().then(setQst).catch(function () {}); }, []);
+    var schulen = d.schulen || [];
+    var still = schulen.filter(function (s) { return s.aktiv && !Number(s.aktiv_7); }).length;
+    var gesperrt = schulen.filter(function (s) { return !s.aktiv; }).length;
+    var att = [];
+    if (Number(k.anfragen)) att.push(h(Att, { key: "a", k: "az-bad", ico: "users", v: num(k.anfragen), t: "Zugangsanfragen", s: "Lehrkräfte warten auf Freischaltung", go: "Prüfen", onClick: function () { go("lehrkraefte"); } }));
+    if (Number(k.feedback_neu)) att.push(h(Att, { key: "f", k: "az-warn", ico: "chat", v: num(k.feedback_neu), t: "Neues Feedback", s: "Rückmeldungen aus App und Portal", go: "Lesen", onClick: function () { go("feedback"); } }));
+    if (Number(k.unbestaetigt)) att.push(h(Att, { key: "u", k: "az-blue", ico: "mail", v: num(k.unbestaetigt), t: "E-Mail unbestätigt", s: "Konten ohne bestätigte Adresse", go: "Ansehen", onClick: function () { go("lehrkraefte"); } }));
+    if (still || gesperrt) att.push(h(Att, { key: "s", k: "az-info", ico: "school", v: num(still + gesperrt), t: "Schulen ohne Aktivität", s: (still ? still + " ohne Nutzung in 7 Tagen" : "") + (still && gesperrt ? " · " : "") + (gesperrt ? gesperrt + " gesperrt" : ""), go: "Schulen", onClick: function () { go("schulen"); } }));
+    if (qst && qst.offen) att.push(h(Att, { key: "q", k: "az-info", ico: "book", v: num(qst.offen), t: "Quellen ungeprüft", s: num(qst.geprueft) + " von " + num(qst.gesamt) + " geprüft", go: "Register", onClick: function () { go("quellen"); } }));
+    if (!att.length) att.push(h(Att, { key: "ok", k: "az-ok", ico: "check", v: "Alles erledigt", t: "Keine offenen Punkte", s: "Anfragen, Feedback und Schulen sind auf dem neuesten Stand." }));
+    var ki = d.ki || {};
     return h("div", null,
-      h("div", { className: "az-kpis" },
-        h(Kpi, { v: num(k.schulen), l: "Schulen", s: num(k.schulen_aktiv) + " aktiv" }),
-        h(Kpi, { v: num(k.lehrkraefte), l: "Lehrkräfte" }),
-        h(Kpi, { v: num(k.lernende), l: "Lernende", s: num(k.lernende_mit_kurs) + " im Kurs" }),
-        h(Kpi, { v: num(k.aktiv_7), l: "Aktiv (7 Tage)", s: num(k.aktiv_30) + " in 30 T." }),
-        h(Kpi, { v: num(k.neu_zeitraum), l: "Neue Konten", s: d.zeitraum + " Tage" }),
-        h(Kpi, { v: num(k.kurse), l: "Kurse" }),
-        h(Kpi, { v: num(k.eigene_module), l: "Eigene Module" }),
-        h(Kpi, { v: k.feedback_schnitt ? String(k.feedback_schnitt).replace(".", ",") + " ★" : "–", l: "Feedback-Schnitt", s: num(k.feedback_neu) + " neu" }),
-        h(Kpi, { v: num(k.anfragen), l: "Offene Anfragen" }),
-        h(Kpi, { v: num(k.unbestaetigt), l: "E-Mail unbestätigt" }),
-        h(Kpi, { v: num(k.abgaben), l: "Abgaben", s: num(k.aufgaben) + " Aufgaben" }),
-        h(Kpi, { v: num(k.live_stunden), l: "Live-Stunden" }),
-        h(Kpi, { v: num(k.pruefungen), l: "Examens-Durchläufe" }),
-        h(Kpi, { v: num(k.nachweis_eintraege), l: "Nachweis-Einträge" })),
+      h("div", { className: "sec" }, h("h2", null, "Braucht deine Aufmerksamkeit")),
+      h("div", { className: "quick az-att" }, att),
+      h("div", { className: "sec" }, h("h2", null, "Plattform in Zahlen"), h("span", { className: "muted", style: { fontSize: 14 } }, "Zeitraum: " + (d.zeitraum || 30) + " Tage")),
+      h("div", { className: "az-blocks" },
+        h(Block, { c: "#2563eb", eb: num(k.schulen) + " Schulen · " + num(k.schulen_aktiv) + " aktiv", t: "Schulen und Konten", big: num(k.lernende), bigL: "Lernende", onClick: function () { go("schulen"); },
+          rows: [[[num(k.lehrkraefte), "Lehrkräfte"], [num(k.lernende_mit_kurs), "Lernende im Kurs"], [num(k.neu_zeitraum), "neue Konten"]], [[num(k.schulen_aktiv), "aktive Schulen"], [num(k.anfragen), "offene Anfragen"], [num(k.unbestaetigt), "E-Mail unbestätigt"]]] }),
+        h(Block, { c: "#0d9488", eb: num(k.aktiv_30) + " aktiv in 30 Tagen", t: "Lernaktivität", big: num(k.aktiv_7), bigL: "aktiv in 7 Tagen", onClick: function () { go("nutzung"); },
+          rows: [[[num(k.abgaben), "Abgaben"], [num(k.aufgaben), "Aufgaben"], [num(k.live_stunden), "Live-Stunden"]], [[num(k.pruefungen), "Examens-Durchläufe"], [num(k.nachweis_eintraege), "Nachweis-Einträge"], [num(k.kurse) + " / " + num(k.eigene_module), "Kurse / eigene Module"]]] }),
+        h(Block, { c: "#9333ea", eb: num(k.feedback_neu) + " neue Rückmeldungen", t: "Feedback und KI", big: k.feedback_schnitt ? String(k.feedback_schnitt).replace(".", ",") + " ★" : "–", bigL: "Feedback-Schnitt", onClick: function () { go("feedback"); },
+          rows: [[[num(ki.assistent), "Assistent-Nachrichten"], [num(ki.gespraeche), "Sprach­simulationen"], [num(ki.pflegeplanung), "Pflege­planungen"]], [[num(k.feedback_neu), "neues Feedback"], [num(ki.auswertungen), "KI-Auswertungen"], [Number(ki.uebersetzung_zeichen) >= 1000 ? num(Math.round(ki.uebersetzung_zeichen / 1000)) + " Tsd." : num(ki.uebersetzung_zeichen), "Zeichen übersetzt"]]] })),
+      h("div", { className: "sec" }, h("h2", null, "Verlauf")),
       h("div", { className: "az-grid2" },
-        h("div", { className: "card" }, h("h3", { style: { marginTop: 0 } }, "Aktivität je Tag"), h(Verlauf, { tage: d.tage })),
-        h("div", { className: "card" }, h("h3", { style: { marginTop: 0 } }, "KI-Nutzung je Tag"), h(KiVerlauf, { tage: d.tage }),
-          h("p", { className: "az-note" }, num(d.ki && d.ki.assistent) + " Assistent-Nachrichten · " + num(d.ki && d.ki.gespraeche) + " Gespräche · " + num(d.ki && d.ki.auswertungen) + " Auswertungen · " + num(d.ki && d.ki.pflegeplanung) + " Pflegeplanungen · " + num(d.ki && d.ki.uebersetzung_zeichen) + " Zeichen übersetzt"))),
-      h("div", { className: "card", style: { marginTop: 14 } }, h("h3", { style: { marginTop: 0 } }, "Schulen im Vergleich"), h(SchulTabelle, { rows: d.schulen })));
+        h("div", { className: "card" }, h("div", { className: "az-card-h" }, h("h3", null, "Aktivität je Tag")), h(Verlauf, { tage: d.tage })),
+        h("div", { className: "card" }, h("div", { className: "az-card-h" }, h("h3", null, "KI-Nutzung je Tag"), h("span", null, num(ki.auswertungen) + " Auswertungen · " + num(ki.uebersetzung_zeichen) + " Zeichen übersetzt")), h(KiVerlauf, { tage: d.tage }))),
+      h("div", { className: "sec" }, h("h2", null, "Schulen im Vergleich"), h("button", { type: "button", className: "skip", onClick: function () { go("schulen"); } }, "Schulen verwalten")),
+      h("div", { className: "card" }, h(SchulTabelle, { rows: d.schulen })));
   }
 
   function SchulTabelle(p) {
@@ -215,20 +278,24 @@
     var go = function (k) { setTab(k); try { sessionStorage.setItem("fp-az-tab", k); } catch (x) {} };
     if (!window.FP_SB) return h("div", { className: "wrap wide" }, h("div", { className: "hello" }, h("h1", null, "Admin")), h("div", { className: "card" }, h("p", { className: "muted" }, "Im Demo-Modus gibt es keine Verwaltung.")));
     var k = (d && d.kpi) || {};
-    var TABS = [["uebersicht", "Übersicht"], ["schulen", "Schulen"], ["lehrkraefte", "Lehrkräfte", k.anfragen], ["feedback", "Feedback", k.feedback_neu], ["nutzung", "Nutzung"], ["datenschutz", "Datenschutz"]];
+    var TABS = [["uebersicht", "Übersicht", "home"], ["schulen", "Schulen", "school"], ["lehrkraefte", "Lehrkräfte", "users", k.anfragen], ["feedback", "Feedback", "chat", k.feedback_neu], ["nutzung", "Nutzung", "chart"], ["quellen", "Quellen", "book"], ["datenschutz", "Datenschutz", "shield"]];
+    var std = new Date().getHours();
     return h("div", { className: "wrap wide" },
-      h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Plattform-Administration"), h("h1", { style: { marginTop: 8 } }, "Admin-Zentrale"),
-        h("p", null, "Alles auf einen Blick: Schulen, Lehrkräfte, Nutzung, KI und Feedback. Lernende erscheinen nur als Zahlen.")),
-      h("div", { className: "row", style: { justifyContent: "space-between", flexWrap: "wrap", gap: 10, alignItems: "center" } },
-        h("nav", { className: "az-nav", "aria-label": "Admin-Bereiche" }, TABS.map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": tab === x[0], onClick: function () { go(x[0]); } }, x[1], x[2] ? h("span", { className: "az-b" }, x[2]) : null); })),
-        ["uebersicht", "nutzung"].indexOf(tab) >= 0 && h("div", { className: "az-seg" }, [[7, "7 Tage"], [30, "30 Tage"], [90, "90 Tage"], [365, "1 Jahr"]].map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": tage === x[0], onClick: function () { setTage(x[0]); } }, x[1]); }))),
+      h("div", { className: "az-head" },
+        h("div", { className: "hello" }, h("div", { className: "eyebrow" }, "Fallpfad Admin-Zentrale"), h("h1", { style: { marginTop: 8 } }, std < 11 ? "Guten Morgen." : std < 18 ? "Guten Tag." : "Guten Abend."),
+          h("p", null, "Schulen, Lehrkräfte, Nutzung, Feedback und Quellen der ganzen Plattform. Lernende erscheinen hier nur als Zahlen.")),
+        ["uebersicht", "nutzung"].indexOf(tab) >= 0 && h("div", { className: "az-seg", role: "group", "aria-label": "Zeitraum" }, [[7, "7 Tage"], [30, "30 Tage"], [90, "90 Tage"], [365, "1 Jahr"]].map(function (x) { return h("button", { key: x[0], type: "button", "aria-pressed": tage === x[0], onClick: function () { setTage(x[0]); } }, x[1]); }))),
+      h("nav", { className: "az-tabs", role: "tablist", "aria-label": "Admin-Bereiche" }, TABS.map(function (x) {
+        return h("button", { key: x[0], type: "button", role: "tab", title: x[1], "aria-label": x[1] + (x[3] ? ", " + x[3] + " offen" : ""), "aria-selected": tab === x[0], onClick: function () { go(x[0]); } }, h(Ico, { n: x[2] }), h("span", { className: "az-l" }, x[1]), x[3] ? h("span", { className: "az-b", "aria-label": x[3] + " offen" }, x[3]) : null);
+      })),
       err && h("div", { className: "notice bad" }, fehlt(err) ? "Statistiken sind gerade nicht verfügbar." : "Statistiken konnten nicht geladen werden."),
-      !d ? h("p", { className: "muted" }, "Wird geladen …") :
-        tab === "uebersicht" ? h(Uebersicht, { d: d }) :
+      h("div", { style: { marginTop: 18 } }, !d ? h("p", { className: "muted" }, "Wird geladen …") :
+        tab === "uebersicht" ? h(Uebersicht, { d: d, go: go }) :
         tab === "schulen" ? (Schulen ? h(Schulen, { eingebettet: true }) : null) :
         tab === "lehrkraefte" ? h(Lehrkraefte, { d: d, err: setErr, reload: load }) :
         tab === "feedback" ? h(Feedback, { reload: load }) :
-        tab === "nutzung" ? h(Nutzung, { d: d }) : h(Datenschutz));
+        tab === "nutzung" ? h(Nutzung, { d: d }) :
+        tab === "quellen" ? (window.FP_AdminQuellen ? h(window.FP_AdminQuellen) : h("p", { className: "muted" }, "Quellenregister nicht geladen.")) : h(Datenschutz)));
   }
   window.FP_AdminPage = Zentrale;
 })();
